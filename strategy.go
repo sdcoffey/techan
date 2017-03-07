@@ -6,7 +6,7 @@ type Strategy struct {
 	UnstablePeriod int
 }
 
-func (this Strategy) ShouldEnter(index int, record TradingRecord) bool {
+func (this Strategy) ShouldEnter(index int, record *TradingRecord) bool {
 	if index < this.UnstablePeriod {
 		return false
 	}
@@ -14,7 +14,7 @@ func (this Strategy) ShouldEnter(index int, record TradingRecord) bool {
 	return this.EntryRule.IsSatisfied(index, record)
 }
 
-func (this Strategy) ShouldExit(index int, record TradingRecord) bool {
+func (this Strategy) ShouldExit(index int, record *TradingRecord) bool {
 	if index < this.UnstablePeriod {
 		return false
 	}

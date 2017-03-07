@@ -1,6 +1,10 @@
-hash: 978f227ae6fe54abc9e42c4fc58a9fcdf0f5605a40416655984a7b98ad852d44
-updated: 2017-03-07T08:55:28.228622901-08:00
+hash: 99ee300ab2d3db43697c9b8b1414ada646e66f41ec6fd868d01988bfccda5aad
+updated: 2017-03-07T11:39:14.69851597-08:00
 imports:
 - name: github.com/shopspring/decimal
   version: 3526cd0bdb7f64e1178943b7dee81a0cc3d86a69
+- name: github.com/stretchr/testify
+  version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
+  subpackages:
+  - assert
 testImports: []

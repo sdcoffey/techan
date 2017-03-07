@@ -5,19 +5,19 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type AmountIndictor *TimeSeries
+type AmountIndictor TimeSeries
 
 func (this AmountIndictor) Calculate(index int) decimal.Decimal {
-	return this.Ticks[index].Amount
+	return TimeSeries(this).Ticks[index].Amount
 }
 
-type VolumeIndicator *TimeSeries
+type VolumeIndicator TimeSeries
 
 func (this VolumeIndicator) Calculate(index int) decimal.Decimal {
 	return this.Ticks[index].Volume
 }
 
-type ClosePriceIndicator *TimeSeries
+type ClosePriceIndicator TimeSeries
 
 func (this ClosePriceIndicator) Calculate(index int) decimal.Decimal {
 	return this.Ticks[index].ClosePrice
