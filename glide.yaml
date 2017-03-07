@@ -1,0 +1,3 @@
+package: github.com/sdcoffey/talib4g
+import: 
+  - package: github.com/shopspring/decimal
