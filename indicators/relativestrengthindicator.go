@@ -13,8 +13,8 @@ type RSIIndicator struct {
 
 func NewRSIIndicator(ind Indicator, timeFrame int) RSIIndicator {
 	return RSIIndicator{
-		AvgGainIndicator: AverageIndicator{CumulativeGainsIndicator{ind, timeFrame}},
-		AvgLossIndicator: AverageIndicator{CumulativeLossesIndicator{ind, timeFrame}},
+		AvgGainIndicator: AverageIndicator{CumulativeGainsIndicator{ind, timeFrame}, timeFrame},
+		AvgLossIndicator: AverageIndicator{CumulativeLossesIndicator{ind, timeFrame}, timeFrame},
 		TimeFrame:        timeFrame,
 	}
 }

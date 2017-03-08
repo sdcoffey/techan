@@ -1,6 +1,7 @@
 package talib4g
 
 import (
+	"fmt"
 	"github.com/shopspring/decimal"
 	"time"
 )
@@ -50,4 +51,13 @@ func (this *Tick) AddTrade(tradeAmount, tradePrice decimal.Decimal) {
 	this.Volume = this.Volume.Add(tradeAmount.Mul(tradePrice))
 
 	this.TradeCount++
+}
+
+func (this *Tick) String() string {
+	return fmt.Sprintf("Tick ending at %s - HL: %s/%s V: %s",
+		this.EndTime.Format(time.Stamp),
+		this.MaxPrice,
+		this.MinPrice,
+		this.Volume,
+	)
 }

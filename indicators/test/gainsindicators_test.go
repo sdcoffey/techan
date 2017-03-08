@@ -1,8 +1,8 @@
 package test
 
 import (
-	"testing"
 	. "github.com/sdcoffey/talib4g/indicators"
+	"testing"
 )
 
 func TestCumulativeGainsIndicator(t *testing.T) {

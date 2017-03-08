@@ -22,11 +22,9 @@ func (this *TimeSeries) AddTick(tick *Tick) {
 		panic(fmt.Errorf("Error adding Tick: Tick cannot be nil"))
 	}
 
-	if len(this.Ticks) > 0 && !tick.EndTime.After(this.LastTick().EndTime) {
-		panic(fmt.Errorf("Error adding Tick: cannot have end Time < series end time"))
+	if this.LastTick() == nil || tick.EndTime.After(this.LastTick().EndTime) {
+		this.Ticks = append(this.Ticks, tick)
 	}
-
-	this.Ticks = append(this.Ticks, tick)
 }
 
 func (this *TimeSeries) LastTick() *Tick {
