@@ -34,10 +34,22 @@ func (this ruleBase) Or(other Rule) Rule {
 	return orRule{this, other}
 }
 
-type SimpleRule struct {
+type OverIndicatorRule struct {
 	ruleBase
+	First  Indicator
+	Second Indicator
 }
 
-func (this SimpleRule) IsSatisfied(index int, record *TradingRecord) bool {
-	return index > 0
+func (this OverIndicatorRule) IsSatisfied(index int, record *TradingRecord) bool {
+	return this.First.Calculate(index).Cmp(this.Second.Calculate(index)) > 0
+}
+
+type UnderIndicatorRule struct {
+	ruleBase
+	First  Indicator
+	Second Indicator
+}
+
+func (this UnderIndicatorRule) IsSatisfied(index int, record *TradingRecord) bool {
+	return this.First.Calculate(index).Cmp(this.Second.Calculate(index)) < 0
 }

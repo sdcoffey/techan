@@ -9,7 +9,7 @@ func TestCumulativeGainsIndicator(t *testing.T) {
 	ts := MockTimeSeries(1, 2, 3, 5, 8, 13)
 
 	cumGains := CumulativeGainsIndicator{
-		Indicator: ClosePriceIndicator(*ts),
+		Indicator: ClosePriceIndicator{ts},
 		TimeFrame: 10,
 	}
 
@@ -25,7 +25,7 @@ func TestCumulativeLossesIndicator(t *testing.T) {
 	ts := MockTimeSeries(13, 8, 5, 3, 2, 1)
 
 	cumGains := CumulativeLossesIndicator{
-		Indicator: ClosePriceIndicator(*ts),
+		Indicator: ClosePriceIndicator{ts},
 		TimeFrame: 10,
 	}
 
@@ -42,7 +42,7 @@ func TestAverageIndicator(t *testing.T) {
 
 	avgGains := AverageIndicator{
 		Indicator: CumulativeGainsIndicator{
-			Indicator: ClosePriceIndicator(*ts),
+			Indicator: ClosePriceIndicator{ts},
 			TimeFrame: 10,
 		},
 		TimeFrame: 10,

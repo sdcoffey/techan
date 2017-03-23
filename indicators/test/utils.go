@@ -10,6 +10,8 @@ import (
 	. "github.com/stretchr/testify/assert"
 )
 
+var tickIndex int
+
 func RandomTimeSeries(size int) *TimeSeries {
 	vals := make([]float64, size)
 	for i := 0; i < size; i++ {
@@ -19,13 +21,22 @@ func RandomTimeSeries(size int) *TimeSeries {
 	return MockTimeSeries(vals...)
 }
 
+func MockTick(closePrice float64) *Tick {
+	t := NewTick(time.Second, time.Unix(int64(tickIndex), 0))
+	t.ClosePrice = decimal.NewFromFloat(closePrice)
+
+	return t
+}
+
 func MockTimeSeries(values ...float64) *TimeSeries {
 	ts := NewTimeSeries()
-	for i, val := range values {
-		tick := NewTick(time.Second, time.Unix(int64(i), 0))
+	for _, val := range values {
+		tick := NewTick(time.Second, time.Unix(int64(tickIndex), 0))
 		tick.ClosePrice = decimal.NewFromFloat(val)
 
 		ts.AddTick(tick)
+
+		tickIndex++
 	}
 
 	return ts

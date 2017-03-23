@@ -4,20 +4,20 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type OrderType int
+type OrderSide int
 
 const (
-	BUY OrderType = iota
+	BUY OrderSide = iota
 	SELL
 )
 
 type Order struct {
-	Type   OrderType
+	Type   OrderSide
 	Price  decimal.Decimal
 	Amount decimal.Decimal
 }
 
-func NewOrder(orderType OrderType) (o *Order) {
+func NewOrder(orderType OrderSide) (o *Order) {
 	o = new(Order)
 	o.Type = orderType
 

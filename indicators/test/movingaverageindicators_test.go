@@ -9,7 +9,7 @@ func TestSimpleMovingAverage(t *testing.T) {
 	ts := MockTimeSeries(1, 2, 3, 4, 3, 4, 5, 4, 3, 3, 4, 3, 2)
 
 	sma := SMAIndicator{
-		Indicator: ClosePriceIndicator(*ts),
+		Indicator: ClosePriceIndicator{ts},
 		TimeFrame: 3,
 	}
 
@@ -37,7 +37,7 @@ func TestExponentialMovingAverage(t *testing.T) {
 		63.37, 61.33, 61.51)
 
 	ema := EMAIndicator{
-		Indicator: ClosePriceIndicator(*ts),
+		Indicator: ClosePriceIndicator{ts},
 		TimeFrame: 10,
 	}
 
@@ -50,7 +50,7 @@ func BenchmarkExpoentialMovingAverage(b *testing.B) {
 	size := 5000
 	ts := RandomTimeSeries(size)
 
-	ema := NewEMAIndicator(ClosePriceIndicator(*ts), 10)
+	ema := NewEMAIndicator(ClosePriceIndicator{ts}, 10)
 
 	ema.Calculate(size - 2)
 

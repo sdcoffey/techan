@@ -5,9 +5,7 @@ import (
 )
 
 type TimeSeries struct {
-	BeginIndex int
-	EndIndex   int
-	Ticks      []*Tick
+	Ticks []*Tick
 }
 
 func NewTimeSeries() (t *TimeSeries) {
