@@ -2,6 +2,7 @@ package talib4g
 
 import (
 	"github.com/shopspring/decimal"
+	"time"
 )
 
 type OrderSide int
@@ -12,9 +13,10 @@ const (
 )
 
 type Order struct {
-	Type   OrderSide
-	Price  decimal.Decimal
-	Amount decimal.Decimal
+	Type          OrderSide
+	Price         decimal.Decimal
+	Amount        decimal.Decimal
+	ExecutionTime time.Time
 }
 
 func NewOrder(orderType OrderSide) (o *Order) {

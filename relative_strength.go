@@ -1,7 +1,6 @@
-package indicators
+package talib4g
 
 import (
-	. "github.com/sdcoffey/talib4g"
 	"github.com/shopspring/decimal"
 )
 
@@ -26,7 +25,11 @@ func (this RSIIndicator) Calculate(index int) decimal.Decimal {
 
 	averageGain := this.AvgGainIndicator.Calculate(index)
 	averageLoss := this.AvgLossIndicator.Calculate(index)
-	relativeStrength := averageGain.Div(averageLoss)
+
+	relativeStrength := decimal.Zero
+	if averageLoss.Cmp(decimal.Zero) != 0 {
+		relativeStrength = averageGain.Div(averageLoss)
+	}
 
 	hundred := TEN.Mul(TEN)
 	return hundred.Sub(hundred.Div(ONE.Add(relativeStrength)))

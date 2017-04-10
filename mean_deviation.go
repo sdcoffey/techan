@@ -1,9 +1,6 @@
-package indicators
+package talib4g
 
-import (
-	. "github.com/sdcoffey/talib4g"
-	"github.com/shopspring/decimal"
-)
+import "github.com/shopspring/decimal"
 
 type MeanDeviationIndicator struct {
 	ind       Indicator

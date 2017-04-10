@@ -2,6 +2,8 @@ package talib4g
 
 import (
 	"fmt"
+	"github.com/shopspring/decimal"
+	"log"
 )
 
 type TimeSeries struct {
@@ -31,4 +33,29 @@ func (this *TimeSeries) LastTick() *Tick {
 	}
 
 	return nil
+}
+
+func (this *TimeSeries) Run(strategy Strategy) *TradingRecord {
+	record := NewTradingRecord()
+
+	for i, tick := range this.Ticks {
+		log.Println(i)
+		if strategy.ShouldEnter(i, record) {
+			order := NewOrder(BUY)
+			order.Price = tick.ClosePrice
+			order.Amount = decimal.NewFromFloat(1)
+			order.ExecutionTime = tick.EndTime
+
+			record.Enter(order.Price, order.Amount, order.ExecutionTime)
+		} else if strategy.ShouldExit(i, record) {
+			order := NewOrder(SELL)
+			order.Amount = decimal.NewFromFloat(1)
+			order.Price = tick.ClosePrice
+			order.ExecutionTime = tick.EndTime
+
+			record.Exit(order.Price, order.Amount, order.ExecutionTime)
+		}
+	}
+
+	return record
 }

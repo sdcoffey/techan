@@ -1,7 +1,6 @@
-package indicators
+package talib4g
 
 import (
-	. "github.com/sdcoffey/talib4g"
 	"github.com/shopspring/decimal"
 )
 

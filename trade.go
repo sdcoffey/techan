@@ -6,7 +6,9 @@ type Trade struct {
 }
 
 func newTrade() (t *Trade) {
-	return new(Trade)
+	return &Trade{
+		orders: [2]*Order{nil, nil},
+	}
 }
 
 func NewTrade(openOrder *Order) (t *Trade) {
@@ -37,7 +39,7 @@ func (this *Trade) IsClosed() bool {
 }
 
 func (this *Trade) IsNew() bool {
-	return this.EntranceOrder() == nil && this.ExitOrder() != nil
+	return this.EntranceOrder() == nil && this.ExitOrder() == nil
 }
 
 func (this *Trade) EntranceOrder() *Order {

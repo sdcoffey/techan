@@ -4,6 +4,14 @@ type Rule interface {
 	IsSatisfied(index int, record *TradingRecord) bool
 }
 
+func And(r1, r2 Rule) Rule {
+	return andRule{r1, r2}
+}
+
+func Or(r1, r2 Rule) Rule {
+	return orRule{r1, r2}
+}
+
 type andRule struct {
 	r1 Rule
 	r2 Rule
@@ -22,20 +30,7 @@ func (this orRule) IsSatisfied(index int, record *TradingRecord) bool {
 	return this.r1.IsSatisfied(index, record) || this.r2.IsSatisfied(index, record)
 }
 
-type ruleBase struct {
-	Rule
-}
-
-func (this ruleBase) And(other Rule) Rule {
-	return andRule{this, other}
-}
-
-func (this ruleBase) Or(other Rule) Rule {
-	return orRule{this, other}
-}
-
 type OverIndicatorRule struct {
-	ruleBase
 	First  Indicator
 	Second Indicator
 }
@@ -45,7 +40,6 @@ func (this OverIndicatorRule) IsSatisfied(index int, record *TradingRecord) bool
 }
 
 type UnderIndicatorRule struct {
-	ruleBase
 	First  Indicator
 	Second Indicator
 }

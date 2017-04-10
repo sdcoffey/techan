@@ -1,7 +1,6 @@
-package indicators
+package talib4g
 
 import (
-	. "github.com/sdcoffey/talib4g"
 	"github.com/shopspring/decimal"
 )
 
@@ -10,7 +9,7 @@ type FixedIndicator []decimal.Decimal
 func NewFixedIndicator(vals ...int) FixedIndicator {
 	slc := make([]decimal.Decimal, len(vals))
 	for i, val := range vals {
-		slc[i] = NewDecimal(val)
+		slc[i] = decimal.NewFromFloat(float64(val))
 	}
 
 	return FixedIndicator(slc)
