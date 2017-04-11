@@ -54,3 +54,28 @@ func (lta LogTradesAnalysis) Analyze(record *TradingRecord) decimal.Decimal {
 	}
 	return decimal.Zero
 }
+
+type ProfitableTradesAnalysis string
+
+func (pta ProfitableTradesAnalysis) Analyze(record *TradingRecord) decimal.Decimal {
+	var profitableTrades int
+	for _, trade := range record.Trades {
+		costBasis := trade.EntranceOrder().Amount.Mul(trade.EntranceOrder().Price)
+		sellPrice := trade.ExitOrder().Amount.Mul(trade.ExitOrder().Price)
+
+		if costBasis.Cmp(sellPrice) < 0 {
+			profitableTrades++
+		}
+	}
+
+	return decimal.NewFromFloat(float64(profitableTrades))
+}
+
+type AverageProfitAnalysis string
+
+func (apa AverageProfitAnalysis) Analyze(record *TradingRecord) decimal.Decimal {
+	var tp TotalProfitAnalysis
+	totalProft := tp.Analyze(record)
+
+	return totalProft.Div(decimal.NewFromFloat(float64(len(record.Trades))))
+}
