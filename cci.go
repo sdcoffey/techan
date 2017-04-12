@@ -1,9 +1,5 @@
 package talib4g
 
-import (
-	"github.com/shopspring/decimal"
-)
-
 type CCIIndicator struct {
 	tpi TypicalPriceIndicator
 	sma SMAIndicator
@@ -20,13 +16,10 @@ func NewCCIIndicator(ts *TimeSeries, timeFrame int) CCIIndicator {
 	}
 }
 
-func (this CCIIndicator) Calculate(index int) decimal.Decimal {
+func (this CCIIndicator) Calculate(index int) float64 {
 	typicalPrice := this.tpi.Calculate(index)
 	typicalPriceAvg := this.sma.Calculate(index)
 	mean := this.md.Calculate(index)
-	if mean.Cmp(ZERO) == 0 {
-		return ZERO
-	}
 
-	return (typicalPrice.Sub(typicalPriceAvg)).Div(mean.Mul(decimal.NewFromFloat(0.015)))
+	return (typicalPrice - typicalPriceAvg) / (mean * 0.015)
 }

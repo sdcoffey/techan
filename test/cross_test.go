@@ -1,26 +1,25 @@
 package test
 
 import (
-	"github.com/sdcoffey/talib4g/indicators"
-	"github.com/shopspring/decimal"
+	. "github.com/sdcoffey/talib4g"
 	"testing"
 
 	. "github.com/stretchr/testify/assert"
 )
 
 func TestCrossIndicator(t *testing.T) {
-	fixed := indicators.NewFixedIndicator(1, 2, 3, 4, 5, 4, 3, 6)
-	cross := indicators.CrossIndicator{
-		Upper: indicators.ConstantIndicator(decimal.New(4, 0)),
-		Lower: fixed,
+	fixed := NewFixedIndicator(12, 11, 10, 9, 11, 8, 7, 6)
+	cross := CrossIndicator{
+		Lower: ConstantIndicator(10.0),
+		Upper: fixed,
 	}
 
-	True(t, cross.Calculate(0).Equal(decimal.Zero))
-	True(t, cross.Calculate(1).Equal(decimal.Zero))
-	True(t, cross.Calculate(2).Equal(decimal.Zero))
-	True(t, cross.Calculate(3).Equal(decimal.Zero))
-	True(t, cross.Calculate(4).Equal(decimal.New(1, 0)))
-	True(t, cross.Calculate(5).Equal(decimal.Zero))
-	True(t, cross.Calculate(6).Equal(decimal.Zero))
-	True(t, cross.Calculate(7).Equal(decimal.New(1, 0)))
+	EqualValues(t, 0.0, cross.Calculate(0))
+	EqualValues(t, 0.0, cross.Calculate(1))
+	EqualValues(t, 0.0, cross.Calculate(2))
+	EqualValues(t, 1.0, cross.Calculate(3))
+	EqualValues(t, 0.0, cross.Calculate(4))
+	EqualValues(t, 1.0, cross.Calculate(5))
+	EqualValues(t, 0.0, cross.Calculate(6))
+	EqualValues(t, 0.0, cross.Calculate(7))
 }

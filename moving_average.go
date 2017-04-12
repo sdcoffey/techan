@@ -1,70 +1,61 @@
 package talib4g
 
-import (
-	"github.com/shopspring/decimal"
-)
-
 type SMAIndicator struct {
 	Indicator Indicator
 	TimeFrame int
 }
 
-func (this SMAIndicator) Calculate(index int) decimal.Decimal {
-	sum := ZERO
+func (this SMAIndicator) Calculate(index int) float64 {
+	sum := 0.0
 	for i := Max(0, index-this.TimeFrame+1); i <= index; i++ {
-		sum = sum.Add(this.Indicator.Calculate(i))
+		sum += this.Indicator.Calculate(i)
 	}
 	realTimeFrame := Min(this.TimeFrame, index+1)
 
-	return sum.Div(NewDecimal(realTimeFrame))
+	return sum / float64(realTimeFrame)
 }
 
 type EMAIndicator struct {
 	Indicator   Indicator
 	TimeFrame   int
-	resultCache []*decimal.Decimal
+	resultCache []float64
 }
 
 func NewEMAIndicator(indicator Indicator, timeFrame int) *EMAIndicator {
 	return &EMAIndicator{
 		Indicator:   indicator,
 		TimeFrame:   timeFrame,
-		resultCache: make([]*decimal.Decimal, timeFrame),
+		resultCache: make([]float64, timeFrame),
 	}
 }
 
-func (this *EMAIndicator) Calculate(index int) decimal.Decimal {
-	if len(this.resultCache) > index && this.resultCache[index] != nil {
-		return *this.resultCache[index]
-	} else if index+1 < this.TimeFrame {
-		result := SMAIndicator{this.Indicator, this.TimeFrame}.Calculate(index)
-		this.cacheResult(index, result)
+func (this *EMAIndicator) Calculate(index int) float64 {
+	if index+1 < this.TimeFrame {
+		return SMAIndicator{this.Indicator, this.TimeFrame}.Calculate(index)
+	}
 
-		return result
-	} else if index == 0 {
+	if index == 0 {
 		result := this.Indicator.Calculate(index)
-		this.cacheResult(index, result)
-
 		return result
 	}
 
 	emaPrev := this.Calculate(index - 1)
-	result := this.Indicator.Calculate(index).Sub(emaPrev).Mul(this.multiplier()).Add(emaPrev)
-	this.cacheResult(index, result)
+	mult := 2.0 / float64(this.TimeFrame+1)
+	result := (this.Indicator.Calculate(index)-emaPrev)*mult + emaPrev
 
 	return result
 }
 
-func (this *EMAIndicator) cacheResult(index int, value decimal.Decimal) {
+func (this *EMAIndicator) cacheResult(index int, val float64) {
 	if index < len(this.resultCache) {
-		this.resultCache[index] = &value
+		this.resultCache[index] = val
 	} else {
-		this.resultCache = append(this.resultCache, &value)
+		this.resultCache = append(this.resultCache, val)
 	}
 }
 
-func (this EMAIndicator) multiplier() decimal.Decimal {
-	return TWO.Div(NewDecimal(this.TimeFrame + 1))
+func (this EMAIndicator) multiplier(index int) float64 {
+	return 2.0 / (float64(index) + 1)
 }
 
 type MACDIndicator struct {
@@ -79,6 +70,6 @@ func NewMACDIndicator(i Indicator, shortTimeFrame, longTimeFrame int) MACDIndica
 	}
 }
 
-func (this MACDIndicator) Calculate(index int) decimal.Decimal {
-	return this.shortEMA.Calculate(index).Sub(this.longEMA.Calculate(index))
+func (this MACDIndicator) Calculate(index int) float64 {
+	return this.shortEMA.Calculate(index) - this.longEMA.Calculate(index)
 }

@@ -1,6 +1,8 @@
 package talib4g
 
-import "github.com/shopspring/decimal"
+import (
+	"math"
+)
 
 type MeanDeviationIndicator struct {
 	ind       Indicator
@@ -19,15 +21,15 @@ func NewMeanDeviationIndicator(ind Indicator, timeFrame int) MeanDeviationIndica
 	}
 }
 
-func (this MeanDeviationIndicator) Calculate(index int) decimal.Decimal {
-	absoluteDeviations := ZERO
+func (this MeanDeviationIndicator) Calculate(index int) float64 {
+	absoluteDeviations := 0.0
 
 	average := this.sma.Calculate(index)
 	startIndex := Max(0, index-this.timeFrame+1)
 
 	for i := startIndex; i <= index; i++ {
-		absoluteDeviations = absoluteDeviations.Add(this.ind.Calculate(i).Sub(average).Abs())
+		average += this.ind.Calculate(i) - math.Abs(average)
 	}
 
-	return absoluteDeviations.Div(NewDecimal(index - startIndex + 1))
+	return absoluteDeviations / float64(index-startIndex+1)
 }

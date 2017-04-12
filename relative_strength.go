@@ -1,9 +1,5 @@
 package talib4g
 
-import (
-	"github.com/shopspring/decimal"
-)
-
 type RSIIndicator struct {
 	AvgGainIndicator AverageIndicator
 	AvgLossIndicator AverageIndicator
@@ -18,19 +14,18 @@ func NewRSIIndicator(ind Indicator, timeFrame int) RSIIndicator {
 	}
 }
 
-func (this RSIIndicator) Calculate(index int) decimal.Decimal {
+func (this RSIIndicator) Calculate(index int) float64 {
 	if index == 0 {
-		return ZERO
+		return 0.0
 	}
 
 	averageGain := this.AvgGainIndicator.Calculate(index)
 	averageLoss := this.AvgLossIndicator.Calculate(index)
 
-	relativeStrength := decimal.Zero
-	if averageLoss.Cmp(decimal.Zero) != 0 {
-		relativeStrength = averageGain.Div(averageLoss)
+	relativeStrength := 0.0
+	if averageLoss > 0 {
+		relativeStrength = averageGain / averageLoss
 	}
 
-	hundred := TEN.Mul(TEN)
-	return hundred.Sub(hundred.Div(ONE.Add(relativeStrength)))
+	return 100.0 - (100.0 / (1 + relativeStrength))
 }

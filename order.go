@@ -1,7 +1,6 @@
 package talib4g
 
 import (
-	"github.com/shopspring/decimal"
 	"time"
 )
 
@@ -14,8 +13,8 @@ const (
 
 type Order struct {
 	Type          OrderSide
-	Price         decimal.Decimal
-	Amount        decimal.Decimal
+	Price         float64
+	Amount        float64
 	ExecutionTime time.Time
 }
 

@@ -1,13 +1,9 @@
 package talib4g
 
-import (
-	"github.com/shopspring/decimal"
-)
+type ConstantIndicator float64
 
-type ConstantIndicator decimal.Decimal
-
-func (this ConstantIndicator) Calculate(index int) decimal.Decimal {
-	return decimal.Decimal(this)
+func (this ConstantIndicator) Calculate(index int) float64 {
+	return float64(this)
 }
 
 type OverIndicator struct {

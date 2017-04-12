@@ -2,7 +2,6 @@ package talib4g
 
 import (
 	"fmt"
-	"github.com/shopspring/decimal"
 	"time"
 )
 
@@ -10,12 +9,12 @@ type Tick struct {
 	Period     time.Duration
 	BeginTime  time.Time
 	EndTime    time.Time
-	OpenPrice  decimal.Decimal
-	ClosePrice decimal.Decimal
-	MaxPrice   decimal.Decimal
-	MinPrice   decimal.Decimal
-	Amount     decimal.Decimal
-	Volume     decimal.Decimal
+	OpenPrice  float64 `json:",string"`
+	ClosePrice float64 `json:",string"`
+	MaxPrice   float64 `json:",string"`
+	MinPrice   float64 `json:",string"`
+	Amount     float64 `json:",string"`
+	Volume     float64 `json:",string"`
 	TradeCount uint
 }
 
@@ -29,26 +28,26 @@ func NewTick(period time.Duration, endTime time.Time) (t *Tick) {
 	return t
 }
 
-func (this *Tick) AddTrade(tradeAmount, tradePrice decimal.Decimal) {
-	if this.OpenPrice == decimal.Zero {
+func (this *Tick) AddTrade(tradeAmount, tradePrice float64) {
+	if this.OpenPrice == 0 {
 		this.OpenPrice = tradePrice
 	}
 	this.ClosePrice = tradePrice
 
-	if this.MaxPrice == decimal.Zero {
+	if this.MaxPrice == 0 {
 		this.MaxPrice = tradePrice
-	} else if tradePrice.Cmp(this.MaxPrice) > 0 {
+	} else if tradePrice > this.MaxPrice {
 		this.MaxPrice = tradePrice
 	}
 
-	if this.MinPrice == decimal.Zero {
+	if this.MinPrice == 0 {
 		this.MinPrice = tradePrice
-	} else if tradePrice.Cmp(this.MinPrice) < 0 {
+	} else if tradePrice < this.MinPrice {
 		this.MinPrice = tradePrice
 	}
 
-	this.Amount = this.Amount.Add(tradeAmount)
-	this.Volume = this.Volume.Add(tradeAmount.Mul(tradePrice))
+	this.Amount += tradeAmount
+	this.Volume += (tradeAmount * tradePrice)
 
 	this.TradeCount++
 }

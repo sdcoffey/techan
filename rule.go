@@ -36,7 +36,7 @@ type OverIndicatorRule struct {
 }
 
 func (this OverIndicatorRule) IsSatisfied(index int, record *TradingRecord) bool {
-	return this.First.Calculate(index).Cmp(this.Second.Calculate(index)) > 0
+	return this.First.Calculate(index) > this.Second.Calculate(index)
 }
 
 type UnderIndicatorRule struct {
@@ -45,5 +45,5 @@ type UnderIndicatorRule struct {
 }
 
 func (this UnderIndicatorRule) IsSatisfied(index int, record *TradingRecord) bool {
-	return this.First.Calculate(index).Cmp(this.Second.Calculate(index)) < 0
+	return this.First.Calculate(index) < this.Second.Calculate(index)
 }

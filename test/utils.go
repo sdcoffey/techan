@@ -23,7 +23,7 @@ func RandomTimeSeries(size int) *TimeSeries {
 
 func MockTick(closePrice float64) *Tick {
 	t := NewTick(time.Second, time.Unix(int64(tickIndex), 0))
-	t.ClosePrice = decimal.NewFromFloat(closePrice)
+	t.ClosePrice = closePrice
 
 	return t
 }
@@ -32,7 +32,7 @@ func MockTimeSeries(values ...float64) *TimeSeries {
 	ts := NewTimeSeries()
 	for _, val := range values {
 		tick := NewTick(time.Second, time.Unix(int64(tickIndex), 0))
-		tick.ClosePrice = decimal.NewFromFloat(val)
+		tick.ClosePrice = val
 
 		ts.AddTick(tick)
 
@@ -42,7 +42,8 @@ func MockTimeSeries(values ...float64) *TimeSeries {
 	return ts
 }
 
-func decimalEquals(t *testing.T, expected float64, actual decimal.Decimal) {
+func decimalEquals(t *testing.T, expected float64, actual float64) {
 	d := decimal.NewFromFloat(expected)
-	Equal(t, d.StringFixed(4), actual.StringFixed(4))
+	e := decimal.NewFromFloat(actual)
+	Equal(t, d.StringFixed(4), e.StringFixed(4))
 }

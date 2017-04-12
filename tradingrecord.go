@@ -2,8 +2,6 @@ package talib4g
 
 import (
 	"time"
-
-	"github.com/shopspring/decimal"
 )
 
 type TradingRecord struct {
@@ -21,7 +19,7 @@ func (this *TradingRecord) CurrentTrade() *Trade {
 	return this.currentTrade
 }
 
-func (this *TradingRecord) Enter(price, amount decimal.Decimal, time time.Time) {
+func (this *TradingRecord) Enter(price, amount float64, time time.Time) {
 	order := NewOrder(BUY)
 	order.Amount = amount
 	order.Price = price
@@ -29,7 +27,7 @@ func (this *TradingRecord) Enter(price, amount decimal.Decimal, time time.Time) 
 	this.operate(order)
 }
 
-func (this *TradingRecord) Exit(price, amount decimal.Decimal, time time.Time) {
+func (this *TradingRecord) Exit(price, amount float64, time time.Time) {
 	order := NewOrder(SELL)
 	order.Amount = amount
 	order.Price = price

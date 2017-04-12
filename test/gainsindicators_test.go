@@ -1,7 +1,8 @@
 package test
 
 import (
-	. "github.com/sdcoffey/talib4g/indicators"
+	. "github.com/sdcoffey/talib4g"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -13,12 +14,12 @@ func TestCumulativeGainsIndicator(t *testing.T) {
 		TimeFrame: 10,
 	}
 
-	decimalEquals(t, 0, cumGains.Calculate(0))
-	decimalEquals(t, 1, cumGains.Calculate(1))
-	decimalEquals(t, 2, cumGains.Calculate(2))
-	decimalEquals(t, 4, cumGains.Calculate(3))
-	decimalEquals(t, 7, cumGains.Calculate(4))
-	decimalEquals(t, 12, cumGains.Calculate(5))
+	assert.EqualValues(t, 0, cumGains.Calculate(0))
+	assert.EqualValues(t, 1, cumGains.Calculate(1))
+	assert.EqualValues(t, 2, cumGains.Calculate(2))
+	assert.EqualValues(t, 4, cumGains.Calculate(3))
+	assert.EqualValues(t, 7, cumGains.Calculate(4))
+	assert.EqualValues(t, 12, cumGains.Calculate(5))
 }
 
 func TestCumulativeLossesIndicator(t *testing.T) {
@@ -29,12 +30,12 @@ func TestCumulativeLossesIndicator(t *testing.T) {
 		TimeFrame: 10,
 	}
 
-	decimalEquals(t, 0, cumGains.Calculate(0))
-	decimalEquals(t, -5, cumGains.Calculate(1))
-	decimalEquals(t, -8, cumGains.Calculate(2))
-	decimalEquals(t, -10, cumGains.Calculate(3))
-	decimalEquals(t, -11, cumGains.Calculate(4))
-	decimalEquals(t, -12, cumGains.Calculate(5))
+	assert.EqualValues(t, 0, cumGains.Calculate(0))
+	assert.EqualValues(t, -5, cumGains.Calculate(1))
+	assert.EqualValues(t, -8, cumGains.Calculate(2))
+	assert.EqualValues(t, -10, cumGains.Calculate(3))
+	assert.EqualValues(t, -11, cumGains.Calculate(4))
+	assert.EqualValues(t, -12, cumGains.Calculate(5))
 }
 
 func TestAverageIndicator(t *testing.T) {
@@ -48,10 +49,10 @@ func TestAverageIndicator(t *testing.T) {
 		TimeFrame: 10,
 	}
 
-	decimalEquals(t, 0, avgGains.Calculate(0))
-	decimalEquals(t, 1.0/2.0, avgGains.Calculate(1))
-	decimalEquals(t, 2.0/3.0, avgGains.Calculate(2))
-	decimalEquals(t, 4.0/4.0, avgGains.Calculate(3))
-	decimalEquals(t, 7.0/5.0, avgGains.Calculate(4))
-	decimalEquals(t, 12.0/6.0, avgGains.Calculate(5))
+	assert.EqualValues(t, 0, avgGains.Calculate(0))
+	assert.EqualValues(t, 1.0/2.0, avgGains.Calculate(1))
+	assert.EqualValues(t, 2.0/3.0, avgGains.Calculate(2))
+	assert.EqualValues(t, 4.0/4.0, avgGains.Calculate(3))
+	assert.EqualValues(t, 7.0/5.0, avgGains.Calculate(4))
+	assert.EqualValues(t, 12.0/6.0, avgGains.Calculate(5))
 }

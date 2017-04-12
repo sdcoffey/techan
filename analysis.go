@@ -2,24 +2,23 @@ package talib4g
 
 import (
 	"fmt"
-	"github.com/shopspring/decimal"
 	"log"
 	"time"
 )
 
 type Analysis interface {
-	Analyze(*TradingRecord) decimal.Decimal
+	Analyze(*TradingRecord) float64
 }
 
 type TotalProfitAnalysis string
 
-func (tps TotalProfitAnalysis) Analyze(record *TradingRecord) decimal.Decimal {
-	profit := decimal.NewFromFloat(0)
+func (tps TotalProfitAnalysis) Analyze(record *TradingRecord) float64 {
+	profit := 0.0
 	for _, trade := range record.Trades {
-		costBasis := trade.EntranceOrder().Amount.Mul(trade.EntranceOrder().Price)
-		sellPrice := trade.ExitOrder().Amount.Mul(trade.ExitOrder().Price)
+		costBasis := trade.EntranceOrder().Amount * trade.EntranceOrder().Price
+		sellPrice := trade.ExitOrder().Amount * trade.ExitOrder().Price
 
-		profit = profit.Add(sellPrice.Sub(costBasis))
+		profit += sellPrice - costBasis
 	}
 
 	return profit
@@ -27,13 +26,13 @@ func (tps TotalProfitAnalysis) Analyze(record *TradingRecord) decimal.Decimal {
 
 type NumTradesAnalysis string
 
-func (nta NumTradesAnalysis) Analyze(record *TradingRecord) decimal.Decimal {
-	return decimal.New(int64(len(record.Trades)), 0)
+func (nta NumTradesAnalysis) Analyze(record *TradingRecord) float64 {
+	return float64(len(record.Trades))
 }
 
 type LogTradesAnalysis string
 
-func (lta LogTradesAnalysis) Analyze(record *TradingRecord) decimal.Decimal {
+func (lta LogTradesAnalysis) Analyze(record *TradingRecord) float64 {
 	logOrder := func(order *Order) {
 		var oType string
 		var action string
@@ -45,37 +44,37 @@ func (lta LogTradesAnalysis) Analyze(record *TradingRecord) decimal.Decimal {
 			action = "Exited"
 		}
 
-		log.Println(fmt.Sprintf("%s - %s with %s (%s @ $%s)", order.ExecutionTime.Format(time.RFC822), action, oType, order.Amount, order.Price))
+		log.Println(fmt.Sprintf("%s - %s with %s (%f @ $%f)", order.ExecutionTime.Format(time.RFC822), action, oType, order.Amount, order.Price))
 	}
 
 	for _, trade := range record.Trades {
 		logOrder(trade.EntranceOrder())
 		logOrder(trade.ExitOrder())
 	}
-	return decimal.Zero
+	return 0.0
 }
 
 type ProfitableTradesAnalysis string
 
-func (pta ProfitableTradesAnalysis) Analyze(record *TradingRecord) decimal.Decimal {
+func (pta ProfitableTradesAnalysis) Analyze(record *TradingRecord) float64 {
 	var profitableTrades int
 	for _, trade := range record.Trades {
-		costBasis := trade.EntranceOrder().Amount.Mul(trade.EntranceOrder().Price)
-		sellPrice := trade.ExitOrder().Amount.Mul(trade.ExitOrder().Price)
+		costBasis := trade.EntranceOrder().Amount * trade.EntranceOrder().Price
+		sellPrice := trade.ExitOrder().Amount * trade.ExitOrder().Price
 
-		if costBasis.Cmp(sellPrice) < 0 {
+		if sellPrice > costBasis {
 			profitableTrades++
 		}
 	}
 
-	return decimal.NewFromFloat(float64(profitableTrades))
+	return float64(profitableTrades)
 }
 
 type AverageProfitAnalysis string
 
-func (apa AverageProfitAnalysis) Analyze(record *TradingRecord) decimal.Decimal {
+func (apa AverageProfitAnalysis) Analyze(record *TradingRecord) float64 {
 	var tp TotalProfitAnalysis
 	totalProft := tp.Analyze(record)
 
-	return totalProft.Div(decimal.NewFromFloat(float64(len(record.Trades))))
+	return totalProft / float64(len(record.Trades))
 }

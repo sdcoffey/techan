@@ -1,7 +1,7 @@
 package test
 
 import (
-	. "github.com/sdcoffey/talib4g/indicators"
+	. "github.com/sdcoffey/talib4g"
 	"testing"
 )
 
@@ -36,10 +36,7 @@ func TestExponentialMovingAverage(t *testing.T) {
 		63.91, 63.85, 62.95,
 		63.37, 61.33, 61.51)
 
-	ema := EMAIndicator{
-		Indicator: ClosePriceIndicator{ts},
-		TimeFrame: 10,
-	}
+	ema := NewEMAIndicator(ClosePriceIndicator{ts}, 10)
 
 	decimalEquals(t, 63.6536, ema.Calculate(9))
 	decimalEquals(t, 63.2312, ema.Calculate(10))
@@ -47,15 +44,12 @@ func TestExponentialMovingAverage(t *testing.T) {
 }
 
 func BenchmarkExpoentialMovingAverage(b *testing.B) {
-	size := 5000
+	size := 10000
 	ts := RandomTimeSeries(size)
-
-	ema := NewEMAIndicator(ClosePriceIndicator{ts}, 10)
-
-	ema.Calculate(size - 2)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
+		ema := NewEMAIndicator(ClosePriceIndicator{ts}, 10)
 		ema.Calculate(size - 1)
 	}
 }
