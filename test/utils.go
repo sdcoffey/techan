@@ -14,8 +14,18 @@ var tickIndex int
 
 func RandomTimeSeries(size int) *TimeSeries {
 	vals := make([]float64, size)
+	rand.Seed(time.Now().Unix())
 	for i := 0; i < size; i++ {
-		vals[i] = rand.Float64() * 100
+		val := rand.Float64() * 100
+		if i == 0 {
+			vals[i] = val
+		} else {
+			if i%2 == 0 {
+				vals[i] = vals[i-1] + (val / 10)
+			} else {
+				vals[i] = vals[i-1] - (val / 10)
+			}
+		}
 	}
 
 	return MockTimeSeries(vals...)

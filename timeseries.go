@@ -2,6 +2,7 @@ package talib4g
 
 import (
 	"fmt"
+	"time"
 )
 
 type TimeSeries struct {
@@ -13,6 +14,15 @@ func NewTimeSeries() (t *TimeSeries) {
 	t.Ticks = make([]*Tick, 0)
 
 	return t
+}
+
+func (this TimeSeries) TimeXValues() []time.Time {
+	times := make([]time.Time, len(this.Ticks))
+	for i, tick := range this.Ticks {
+		times[i] = tick.EndTime
+	}
+
+	return times
 }
 
 func (this *TimeSeries) AddTick(tick *Tick) {

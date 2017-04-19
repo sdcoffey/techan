@@ -1,5 +1,11 @@
 package talib4g
 
+import (
+	"github.com/wcharczuk/go-chart"
+	"github.com/wcharczuk/go-chart/drawing"
+	"time"
+)
+
 type SMAIndicator struct {
 	Indicator Indicator
 	TimeFrame int
@@ -13,6 +19,22 @@ func (this SMAIndicator) Calculate(index int) float64 {
 	realTimeFrame := Min(this.TimeFrame, index+1)
 
 	return sum / float64(realTimeFrame)
+}
+
+func (this SMAIndicator) Plot(xvals []time.Time) chart.TimeSeries {
+	y := make([]float64, len(xvals))
+	for i := range xvals {
+		y[i] = this.Calculate(i)
+	}
+	return chart.TimeSeries{
+		YValues: y,
+		XValues: xvals,
+		Style: chart.Style{
+			Show:        true,
+			StrokeWidth: 1,
+			StrokeColor: drawing.ColorFromHex("f00"),
+		},
+	}
 }
 
 type EMAIndicator struct {
@@ -44,6 +66,22 @@ func (this *EMAIndicator) Calculate(index int) float64 {
 	result := (this.Indicator.Calculate(index)-emaPrev)*mult + emaPrev
 
 	return result
+}
+
+func (this *EMAIndicator) Plot(xvals []time.Time) chart.TimeSeries {
+	y := make([]float64, len(xvals))
+	for i := range xvals {
+		y[i] = this.Calculate(i)
+	}
+	return chart.TimeSeries{
+		YValues: y,
+		XValues: xvals,
+		Style: chart.Style{
+			Show:        true,
+			StrokeWidth: 1,
+			StrokeColor: drawing.ColorFromHex("0f0"),
+		},
+	}
 }
 
 func (this *EMAIndicator) cacheResult(index int, val float64) {

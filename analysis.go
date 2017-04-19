@@ -3,6 +3,7 @@ package talib4g
 import (
 	"fmt"
 	"log"
+	"os"
 	"time"
 )
 
@@ -77,4 +78,10 @@ func (apa AverageProfitAnalysis) Analyze(record *TradingRecord) float64 {
 	totalProft := tp.Analyze(record)
 
 	return totalProft / float64(len(record.Trades))
+}
+
+type graphAnalysis struct {
+	output *os.File
+	record TradingRecord
+	series TimeSeries
 }

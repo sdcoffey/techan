@@ -3,6 +3,8 @@ package test
 import (
 	. "github.com/sdcoffey/talib4g"
 	"github.com/stretchr/testify/assert"
+	"github.com/wcharczuk/go-chart"
+	"os"
 	"testing"
 )
 
@@ -55,4 +57,30 @@ func TestAverageIndicator(t *testing.T) {
 	assert.EqualValues(t, 4.0/4.0, avgGains.Calculate(3))
 	assert.EqualValues(t, 7.0/5.0, avgGains.Calculate(4))
 	assert.EqualValues(t, 12.0/6.0, avgGains.Calculate(5))
+}
+
+func TestChart(t *testing.T) {
+	ts := RandomTimeSeries(1000)
+
+	cpi := ClosePriceIndicator{ts}
+	ema := NewEMAIndicator(cpi, 15)
+	sma := SMAIndicator{cpi, 15}
+
+	f, _ := os.OpenFile("data.png", os.O_CREATE|os.O_TRUNC|os.O_RDWR, os.FileMode(0755))
+	defer f.Close()
+	xvals := ts.TimeXValues()
+	ch := chart.Chart{
+		YAxis: chart.YAxis{
+			Style: chart.StyleShow(),
+		},
+		Series: []chart.Series{
+			cpi.Plot(xvals),
+			ema.Plot(xvals),
+			sma.Plot(xvals),
+		},
+	}
+	err := ch.Render(chart.PNG, f)
+	if err != nil {
+		panic(err)
+	}
 }
