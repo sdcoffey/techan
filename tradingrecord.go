@@ -23,6 +23,7 @@ func (this *TradingRecord) Enter(price, amount float64, time time.Time) {
 	order := NewOrder(BUY)
 	order.Amount = amount
 	order.Price = price
+	order.ExecutionTime = time
 
 	this.operate(order)
 }
@@ -31,6 +32,7 @@ func (this *TradingRecord) Exit(price, amount float64, time time.Time) {
 	order := NewOrder(SELL)
 	order.Amount = amount
 	order.Price = price
+	order.ExecutionTime = time
 
 	this.operate(order)
 }

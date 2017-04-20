@@ -63,8 +63,6 @@ func TestChart(t *testing.T) {
 	ts := RandomTimeSeries(1000)
 
 	cpi := ClosePriceIndicator{ts}
-	ema := NewEMAIndicator(cpi, 15)
-	sma := SMAIndicator{cpi, 15}
 
 	f, _ := os.OpenFile("data.png", os.O_CREATE|os.O_TRUNC|os.O_RDWR, os.FileMode(0755))
 	defer f.Close()
@@ -74,9 +72,11 @@ func TestChart(t *testing.T) {
 			Style: chart.StyleShow(),
 		},
 		Series: []chart.Series{
-			cpi.Plot(xvals),
-			ema.Plot(xvals),
-			sma.Plot(xvals),
+			chart.TimeSeries{
+				Style:   chart.StyleShow(),
+				XValues: xvals,
+				YValues: Plot(xvals, cpi),
+			},
 		},
 	}
 	err := ch.Render(chart.PNG, f)
