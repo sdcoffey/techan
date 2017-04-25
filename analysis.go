@@ -11,12 +11,13 @@ type Analysis interface {
 	Analyze(*TradingRecord) float64
 }
 
-type TotalProfitAnalysis string
+type TotalProfitAnalysis float64
 
 func (tps TotalProfitAnalysis) Analyze(record *TradingRecord) float64 {
 	profit := 0.0
 	for _, trade := range record.Trades {
 		costBasis := trade.EntranceOrder().Amount * trade.EntranceOrder().Price
+		costBasis *= float64(1 + tps)
 		sellPrice := trade.ExitOrder().Amount * trade.ExitOrder().Price
 
 		profit += sellPrice - costBasis

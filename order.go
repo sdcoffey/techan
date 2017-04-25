@@ -1,8 +1,6 @@
 package talib4g
 
-import (
-	"time"
-)
+import "time"
 
 type OrderSide int
 
