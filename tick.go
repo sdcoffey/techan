@@ -13,7 +13,6 @@ type Tick struct {
 	ClosePrice float64 `json:",string"`
 	MaxPrice   float64 `json:",string"`
 	MinPrice   float64 `json:",string"`
-	Amount     float64 `json:",string"`
 	Volume     float64 `json:",string"`
 	TradeCount uint
 }
@@ -46,9 +45,7 @@ func (this *Tick) AddTrade(tradeAmount, tradePrice float64) {
 		this.MinPrice = tradePrice
 	}
 
-	this.Amount += tradeAmount
-	this.Volume += (tradeAmount * tradePrice)
-
+	this.Volume += tradeAmount
 	this.TradeCount++
 }
 

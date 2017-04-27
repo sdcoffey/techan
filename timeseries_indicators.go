@@ -1,15 +1,5 @@
 package talib4g
 
-type AmountIndictor struct {
-	*TimeSeries
-}
-
-type pl func(i int) float64
-
-func (this AmountIndictor) Calculate(index int) float64 {
-	return this.Ticks[index].Amount
-}
-
 type VolumeIndicator struct {
 	*TimeSeries
 }

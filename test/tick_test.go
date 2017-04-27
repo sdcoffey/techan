@@ -28,6 +28,5 @@ func TestTick_AddTrade(t *testing.T) {
 	assert.EqualValues(t, 1, tick.MinPrice)
 	assert.EqualValues(t, 3, tick.ClosePrice)
 
-	assert.EqualValues(t, 4, tick.Amount)
-	assert.EqualValues(t, 11, tick.Volume)
+	assert.EqualValues(t, 4, tick.Volume)
 }
