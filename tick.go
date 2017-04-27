@@ -53,7 +53,7 @@ func (this *Tick) AddTrade(tradeAmount, tradePrice float64) {
 }
 
 func (this *Tick) String() string {
-	return fmt.Sprintf("Tick ending at %s - HL: %s/%s V: %s",
+	return fmt.Sprintf("Tick ending at %s - HL: %.5f/%.5f V: %.5f",
 		this.EndTime.Format(time.Stamp),
 		this.MaxPrice,
 		this.MinPrice,
