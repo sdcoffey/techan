@@ -8,14 +8,14 @@ func (cir crossIndicatorRule) IsSatisfied(index int, record *TradingRecord) bool
 	return cir.cross.Calculate(index) > 0
 }
 
-func NewCrossUpIndicatorRule(i1, i2 Indicator) Rule {
+func NewCrossUpIndicatorRule(upper, lower Indicator) Rule {
 	return crossIndicatorRule{
-		cross: CrossIndicator{i2, i1},
+		cross: CrossIndicator{upper, lower},
 	}
 }
 
-func NewCrossDownIndicatorRule(i1, i2 Indicator) Rule {
+func NewCrossDownIndicatorRule(upper, lower Indicator) Rule {
 	return crossIndicatorRule{
-		cross: CrossIndicator{i1, i2},
+		cross: CrossIndicator{lower, upper},
 	}
 }
