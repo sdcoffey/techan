@@ -43,24 +43,17 @@ func (this *TimeSeries) LastTick() *Tick {
 	return nil
 }
 
-func (this *TimeSeries) Run(strategy Strategy) *TradingRecord {
+func (this *TimeSeries) Run(strategy Strategy, startingAmount float64) *TradingRecord {
 	record := NewTradingRecord()
 
+	var openPositionAmount float64
 	for i, tick := range this.Ticks {
 		if strategy.ShouldEnter(i, record) {
-			order := NewOrder(BUY)
-			order.Price = tick.ClosePrice
-			order.Amount = 1.0
-			order.ExecutionTime = tick.EndTime
-
-			record.Enter(order.Price, order.Amount, order.ExecutionTime)
+			openPositionAmount = startingAmount / tick.ClosePrice
+			record.Enter(tick.ClosePrice, openPositionAmount, tick.EndTime)
 		} else if strategy.ShouldExit(i, record) {
-			order := NewOrder(SELL)
-			order.Amount = 1.0
-			order.Price = tick.ClosePrice
-			order.ExecutionTime = tick.EndTime
-
-			record.Exit(order.Price, order.Amount, order.ExecutionTime)
+			record.Exit(tick.ClosePrice, openPositionAmount, tick.EndTime)
+			openPositionAmount = 0
 		}
 	}
 

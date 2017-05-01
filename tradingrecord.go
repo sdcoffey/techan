@@ -11,6 +11,7 @@ type TradingRecord struct {
 
 func NewTradingRecord() (t *TradingRecord) {
 	t = new(TradingRecord)
+	t.Trades = make([]*Trade, 0)
 	t.currentTrade = newTrade()
 	return t
 }

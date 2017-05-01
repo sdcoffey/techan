@@ -56,6 +56,16 @@ func (lta LogTradesAnalysis) Analyze(record *TradingRecord) float64 {
 	return 0.0
 }
 
+type PeriodProfitAnalysis time.Duration
+
+func (ppa PeriodProfitAnalysis) Analyze(record *TradingRecord) float64 {
+	var tp TotalProfitAnalysis
+	totalProfit := tp.Analyze(record)
+
+	periods := record.Trades[len(record.Trades)-1].ExitOrder().ExecutionTime.Sub(record.Trades[0].EntranceOrder().ExecutionTime) / time.Duration(ppa)
+	return totalProfit / float64(periods)
+}
+
 type ProfitableTradesAnalysis string
 
 func (pta ProfitableTradesAnalysis) Analyze(record *TradingRecord) float64 {
