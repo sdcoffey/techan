@@ -38,7 +38,7 @@ func TestRuleStrategy_ShouldEnter(t *testing.T) {
 		assert.False(t, s.ShouldEnter(6, record))
 	})
 
-	t.Run("Returns true when position is closed", func (t *testing.T) {
+	t.Run("Returns true when position is closed", func(t *testing.T) {
 		record := NewTradingRecord()
 
 		s := RuleStrategy{

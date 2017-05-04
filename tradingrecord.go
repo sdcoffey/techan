@@ -5,18 +5,18 @@ import (
 )
 
 type TradingRecord struct {
-	Trades       []*Trade
-	currentTrade *Trade
+	Trades       []*Position
+	currentTrade *Position
 }
 
 func NewTradingRecord() (t *TradingRecord) {
 	t = new(TradingRecord)
-	t.Trades = make([]*Trade, 0)
+	t.Trades = make([]*Position, 0)
 	t.currentTrade = newTrade()
 	return t
 }
 
-func (this *TradingRecord) CurrentTrade() *Trade {
+func (this *TradingRecord) CurrentTrade() *Position {
 	return this.currentTrade
 }
 
