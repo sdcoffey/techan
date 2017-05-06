@@ -1,16 +1,15 @@
-package test
+package talib4g
 
 import (
+	"fmt"
 	"math/rand"
 	"testing"
 	"time"
 
-	. "github.com/sdcoffey/talib4g"
-	"github.com/shopspring/decimal"
 	. "github.com/stretchr/testify/assert"
 )
 
-var tickIndex int
+var candleIndex int
 
 func RandomTimeSeries(size int) *TimeSeries {
 	vals := make([]float64, size)
@@ -31,8 +30,8 @@ func RandomTimeSeries(size int) *TimeSeries {
 	return MockTimeSeries(vals...)
 }
 
-func MockTick(closePrice float64) *Tick {
-	t := NewTick(time.Second, time.Unix(int64(tickIndex), 0))
+func MockCandle(closePrice float64) *Candle {
+	t := NewCandle(time.Second, time.Unix(int64(candleIndex), 0))
 	t.ClosePrice = closePrice
 
 	return t
@@ -41,19 +40,17 @@ func MockTick(closePrice float64) *Tick {
 func MockTimeSeries(values ...float64) *TimeSeries {
 	ts := NewTimeSeries()
 	for _, val := range values {
-		tick := NewTick(time.Second, time.Unix(int64(tickIndex), 0))
-		tick.ClosePrice = val
+		candle := NewCandle(time.Second, time.Unix(int64(candleIndex), 0))
+		candle.ClosePrice = val
 
-		ts.AddTick(tick)
+		ts.AddCandle(candle)
 
-		tickIndex++
+		candleIndex++
 	}
 
 	return ts
 }
 
 func decimalEquals(t *testing.T, expected float64, actual float64) {
-	d := decimal.NewFromFloat(expected)
-	e := decimal.NewFromFloat(actual)
-	Equal(t, d.StringFixed(4), e.StringFixed(4))
+	Equal(t, fmt.Sprintf("%.4f", actual), fmt.Sprintf("%.4f", actual))
 }

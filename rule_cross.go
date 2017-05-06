@@ -1,7 +1,7 @@
 package talib4g
 
 type crossIndicatorRule struct {
-	cross CrossIndicator
+	cross Indicator
 }
 
 func (cir crossIndicatorRule) IsSatisfied(index int, record *TradingRecord) bool {
@@ -10,12 +10,12 @@ func (cir crossIndicatorRule) IsSatisfied(index int, record *TradingRecord) bool
 
 func NewCrossUpIndicatorRule(upper, lower Indicator) Rule {
 	return crossIndicatorRule{
-		cross: CrossIndicator{upper, lower},
+		cross: NewCrossIndicator(upper, lower),
 	}
 }
 
 func NewCrossDownIndicatorRule(upper, lower Indicator) Rule {
 	return crossIndicatorRule{
-		cross: CrossIndicator{lower, upper},
+		cross: NewCrossIndicator(lower, upper),
 	}
 }

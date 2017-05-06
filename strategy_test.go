@@ -77,7 +77,7 @@ func TestRuleStrategy_ShouldExit(t *testing.T) {
 		assert.False(t, s.ShouldExit(6, record))
 	})
 
-	t.Run("Returns rue when position is open", func(t *testing.T) {
+	t.Run("Returns true when position is open", func(t *testing.T) {
 		record := NewTradingRecord()
 		record.Enter(0, 0, time.Now())
 

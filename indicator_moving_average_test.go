@@ -1,17 +1,13 @@
-package test
+package talib4g
 
 import (
-	. "github.com/sdcoffey/talib4g"
 	"testing"
 )
 
 func TestSimpleMovingAverage(t *testing.T) {
 	ts := MockTimeSeries(1, 2, 3, 4, 3, 4, 5, 4, 3, 3, 4, 3, 2)
 
-	sma := SMAIndicator{
-		Indicator: ClosePriceIndicator{ts},
-		TimeFrame: 3,
-	}
+	sma := NewSimpleMovingAverage(NewClosePriceIndicator(ts), 3)
 
 	decimalEquals(t, 1, sma.Calculate(0))
 	decimalEquals(t, 1.5, sma.Calculate(1))
@@ -36,20 +32,20 @@ func TestExponentialMovingAverage(t *testing.T) {
 		63.91, 63.85, 62.95,
 		63.37, 61.33, 61.51)
 
-	ema := NewEMAIndicator(ClosePriceIndicator{ts}, 10)
+	ema := NewEMAIndicator(NewClosePriceIndicator(ts), 10)
 
 	decimalEquals(t, 63.6536, ema.Calculate(9))
 	decimalEquals(t, 63.2312, ema.Calculate(10))
 	decimalEquals(t, 62.9182, ema.Calculate(11))
 }
 
-func BenchmarkExpoentialMovingAverage(b *testing.B) {
+func BenchmarkExponetialMovingAverage(b *testing.B) {
 	size := 10000
 	ts := RandomTimeSeries(size)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		ema := NewEMAIndicator(ClosePriceIndicator{ts}, 10)
+		ema := NewEMAIndicator(NewClosePriceIndicator(ts), 10)
 		ema.Calculate(size - 1)
 	}
 }

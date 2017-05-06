@@ -12,7 +12,7 @@ type TradingRecord struct {
 func NewTradingRecord() (t *TradingRecord) {
 	t = new(TradingRecord)
 	t.Trades = make([]*Position, 0)
-	t.currentTrade = newTrade()
+	t.currentTrade = newPosition()
 	return t
 }
 
@@ -42,7 +42,7 @@ func (this *TradingRecord) operate(order *Order) {
 	if this.currentTrade.IsOpen() {
 		this.currentTrade.Exit(order)
 		this.Trades = append(this.Trades, this.currentTrade)
-		this.currentTrade = newTrade()
+		this.currentTrade = newPosition()
 	} else if this.currentTrade.IsNew() {
 		this.currentTrade.Enter(order)
 	}

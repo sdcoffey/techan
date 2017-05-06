@@ -2,7 +2,7 @@ package talib4g
 
 import (
 	"fmt"
-	"log"
+	"io"
 	"os"
 	"time"
 )
@@ -32,7 +32,9 @@ func (nta NumTradesAnalysis) Analyze(record *TradingRecord) float64 {
 	return float64(len(record.Trades))
 }
 
-type LogTradesAnalysis string
+type LogTradesAnalysis struct {
+	io.Writer
+}
 
 func (lta LogTradesAnalysis) Analyze(record *TradingRecord) float64 {
 	logOrder := func(order *Order) {
@@ -46,7 +48,7 @@ func (lta LogTradesAnalysis) Analyze(record *TradingRecord) float64 {
 			action = "Exited"
 		}
 
-		log.Println(fmt.Sprintf("%s - %s with %s (%f @ $%f)", order.ExecutionTime.Format(time.RFC822), action, oType, order.Amount, order.Price))
+		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - %s with %s (%f @ $%f)", order.ExecutionTime.Format(time.RFC822), action, oType, order.Amount, order.Price))
 	}
 
 	for _, trade := range record.Trades {

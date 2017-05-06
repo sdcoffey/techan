@@ -1,25 +1,37 @@
 package talib4g
 
-type VolumeIndicator struct {
+type volumeIndicator struct {
 	*TimeSeries
 }
 
-func (this VolumeIndicator) Calculate(index int) float64 {
-	return this.Ticks[index].Volume
+func NewVolumeIndicator(series *TimeSeries) Indicator {
+	return volumeIndicator{series}
 }
 
-type ClosePriceIndicator struct {
+func (vi volumeIndicator) Calculate(index int) float64 {
+	return vi.Candles[index].Volume
+}
+
+type closePriceIndicator struct {
 	*TimeSeries
 }
 
-func (this ClosePriceIndicator) Calculate(index int) float64 {
-	return this.Ticks[index].ClosePrice
+func NewClosePriceIndicator(series *TimeSeries) Indicator {
+	return closePriceIndicator{series}
 }
 
-type TypicalPriceIndicator struct {
+func (cpi closePriceIndicator) Calculate(index int) float64 {
+	return cpi.Candles[index].ClosePrice
+}
+
+type typicalPriceIndicator struct {
 	*TimeSeries
 }
 
-func (this TypicalPriceIndicator) Calculate(index int) float64 {
-	return (this.Ticks[index].MaxPrice + this.Ticks[index].MinPrice + this.Ticks[index].ClosePrice) / 3.0
+func NewTypicalPriceIndicator(series *TimeSeries) Indicator {
+	return typicalPriceIndicator{series}
+}
+
+func (this typicalPriceIndicator) Calculate(index int) float64 {
+	return (this.Candles[index].MaxPrice + this.Candles[index].MinPrice + this.Candles[index].ClosePrice) / 3.0
 }

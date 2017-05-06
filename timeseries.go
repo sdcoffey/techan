@@ -6,38 +6,38 @@ import (
 )
 
 type TimeSeries struct {
-	Ticks []*Tick
+	Candles []*Candle
 }
 
 func NewTimeSeries() (t *TimeSeries) {
 	t = new(TimeSeries)
-	t.Ticks = make([]*Tick, 0)
+	t.Candles = make([]*Candle, 0)
 
 	return t
 }
 
 func (this TimeSeries) TimeXValues() []time.Time {
-	times := make([]time.Time, len(this.Ticks))
-	for i, tick := range this.Ticks {
+	times := make([]time.Time, len(this.Candles))
+	for i, tick := range this.Candles {
 		times[i] = tick.EndTime
 	}
 
 	return times
 }
 
-func (this *TimeSeries) AddTick(tick *Tick) {
+func (this *TimeSeries) AddCandle(tick *Candle) {
 	if tick == nil {
 		panic(fmt.Errorf("Error adding Tick: Tick cannot be nil"))
 	}
 
-	if this.LastTick() == nil || tick.EndTime.After(this.LastTick().EndTime) {
-		this.Ticks = append(this.Ticks, tick)
+	if this.LastCandle() == nil || tick.EndTime.After(this.LastCandle().EndTime) {
+		this.Candles = append(this.Candles, tick)
 	}
 }
 
-func (this *TimeSeries) LastTick() *Tick {
-	if len(this.Ticks) > 0 {
-		return this.Ticks[len(this.Ticks)-1]
+func (this *TimeSeries) LastCandle() *Candle {
+	if len(this.Candles) > 0 {
+		return this.Candles[len(this.Candles)-1]
 	}
 
 	return nil
@@ -47,7 +47,7 @@ func (this *TimeSeries) Run(strategy Strategy, startingAmount float64) *TradingR
 	record := NewTradingRecord()
 
 	var openPositionAmount float64
-	for i, tick := range this.Ticks {
+	for i, tick := range this.Candles {
 		if strategy.ShouldEnter(i, record) {
 			openPositionAmount = startingAmount / tick.ClosePrice
 			record.Enter(tick.ClosePrice, openPositionAmount, tick.EndTime)

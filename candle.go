@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type Tick struct {
+type Candle struct {
 	Period     time.Duration
 	BeginTime  time.Time
 	EndTime    time.Time
@@ -17,17 +17,17 @@ type Tick struct {
 	TradeCount uint
 }
 
-func NewTick(period time.Duration, endTime time.Time) (t *Tick) {
-	t = new(Tick)
+func NewCandle(period time.Duration, endTime time.Time) (c *Candle) {
+	c = new(Candle)
 
-	t.Period = period
-	t.EndTime = endTime
-	t.BeginTime = t.EndTime.Add(-t.Period)
+	c.Period = period
+	c.EndTime = endTime
+	c.BeginTime = c.EndTime.Add(-c.Period)
 
-	return t
+	return c
 }
 
-func (this *Tick) AddTrade(tradeAmount, tradePrice float64) {
+func (this *Candle) AddTrade(tradeAmount, tradePrice float64) {
 	if this.OpenPrice == 0 {
 		this.OpenPrice = tradePrice
 	}
@@ -49,8 +49,8 @@ func (this *Tick) AddTrade(tradeAmount, tradePrice float64) {
 	this.TradeCount++
 }
 
-func (this *Tick) String() string {
-	return fmt.Sprintf("Tick ending at %s - HL: %.5f/%.5f V: %.5f",
+func (this *Candle) String() string {
+	return fmt.Sprintf("%s \nOpen: %.5f\nClose: %.5f\nVolume: %.5f",
 		this.EndTime.Format(time.Stamp),
 		this.MaxPrice,
 		this.MinPrice,

@@ -5,13 +5,13 @@ type Position struct {
 	orders [2]*Order
 }
 
-func newTrade() (t *Position) {
+func newPosition() (t *Position) {
 	return &Position{
 		orders: [2]*Order{nil, nil},
 	}
 }
 
-func NewTrade(openOrder *Order) (t *Position) {
+func NewPosition(openOrder *Order) (t *Position) {
 	t = new(Position)
 	t.orders[0] = openOrder
 
