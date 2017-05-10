@@ -22,7 +22,7 @@ func (sma smaIndicator) Calculate(index int) float64 {
 type emaIndicator struct {
 	Indicator
 	window      int
-	resultCache []float64
+	resultCache []*float64
 }
 
 // Returns a new Exponential Moving Average Calculator
@@ -31,32 +31,35 @@ func NewEMAIndicator(indicator Indicator, window int) Indicator {
 	return &emaIndicator{
 		Indicator:   indicator,
 		window:      window,
-		resultCache: make([]float64, window),
+		resultCache: make([]*float64, 10000),
 	}
 }
 
 func (ema *emaIndicator) Calculate(index int) float64 {
-	if index+1 < ema.window {
-		return smaIndicator{ema.Indicator, ema.window}.Calculate(index)
-	}
-
 	if index == 0 {
 		result := ema.Indicator.Calculate(index)
 		return result
+	} else if index+1 < ema.window {
+		result := smaIndicator{ema.Indicator, ema.window}.Calculate(index)
+		ema.cacheResult(index, result)
+		return result
+	} else if len(ema.resultCache) > index && ema.resultCache[index] != nil {
+		return *ema.resultCache[index]
 	}
 
 	emaPrev := ema.Calculate(index - 1)
 	mult := 2.0 / float64(ema.window+1)
 	result := (ema.Indicator.Calculate(index)-emaPrev)*mult + emaPrev
+	ema.cacheResult(index, result)
 
 	return result
 }
 
 func (ema *emaIndicator) cacheResult(index int, val float64) {
 	if index < len(ema.resultCache) {
-		ema.resultCache[index] = val
+		ema.resultCache[index] = &val
 	} else {
-		ema.resultCache = append(ema.resultCache, val)
+		ema.resultCache = append(ema.resultCache, &val)
 	}
 }
 
