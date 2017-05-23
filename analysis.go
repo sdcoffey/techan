@@ -21,7 +21,7 @@ func (tps TotalProfitAnalysis) Analyze(record *TradingRecord) float64 {
 			costBasis *= float64(1 + tps)
 			sellPrice := trade.ExitOrder().Amount * trade.ExitOrder().Price
 
-			profit += (sellPrice - costBasis)
+			profit += sellPrice - costBasis
 		}
 	}
 

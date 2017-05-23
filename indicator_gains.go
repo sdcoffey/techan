@@ -50,5 +50,5 @@ func (pgi percentChangeIndicator) Calculate(index int) float64 {
 		return 0
 	}
 
-	return pgi.Indicator.Calculate(index) / pgi.Indicator.Calculate(index-1)  - 1
+	return pgi.Indicator.Calculate(index)/pgi.Indicator.Calculate(index-1) - 1
 }

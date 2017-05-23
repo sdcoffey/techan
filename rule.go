@@ -62,6 +62,6 @@ func (pgr percentChangeRule) IsSatisfied(index int, record *TradingRecord) bool 
 func NewPercentChangeRule(indicator Indicator, percent float64) Rule {
 	return percentChangeRule{
 		indicator: NewPercentChangeIndicator(indicator),
-		percent: percent,
+		percent:   percent,
 	}
 }
