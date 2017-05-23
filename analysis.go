@@ -21,7 +21,7 @@ func (tps TotalProfitAnalysis) Analyze(record *TradingRecord) float64 {
 			costBasis *= float64(1 + tps)
 			sellPrice := trade.ExitOrder().Amount * trade.ExitOrder().Price
 
-			profit += sellPrice - costBasis
+			profit += (sellPrice - costBasis)
 		}
 	}
 
@@ -50,7 +50,7 @@ func (lta LogTradesAnalysis) Analyze(record *TradingRecord) float64 {
 			action = "Exited"
 		}
 
-		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - %s with %s (%f @ $%f)", order.ExecutionTime.Format(time.RFC822), action, oType, order.Amount, order.Price))
+		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - %s with %s (%f @ $%f)", order.ExecutionTime.UTC().Format(time.RFC822), action, oType, order.Amount, order.Price))
 	}
 
 	for _, trade := range record.Trades {

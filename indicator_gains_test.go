@@ -86,3 +86,27 @@ func TestCumulativeLossesIndicator(t *testing.T) {
 		assert.EqualValues(t, 3, cumLosses.Calculate(5))
 	})
 }
+
+func TestPercentGainIndicator(t *testing.T) {
+	t.Run("Up", func(t *testing.T) {
+		ts := MockTimeSeries(1, 1.5, 2.25, 2.25)
+
+		pgi := NewPercentChangeIndicator(NewClosePriceIndicator(ts))
+
+		assert.EqualValues(t, 0, pgi.Calculate(0))
+		assert.EqualValues(t, .5, pgi.Calculate(1))
+		assert.EqualValues(t, .5, pgi.Calculate(2))
+		assert.EqualValues(t, 0, pgi.Calculate(3))
+	})
+
+	t.Run("Down", func(t *testing.T) {
+		ts := MockTimeSeries(2.25, 1.125, .5625, .5625)
+
+		pgi := NewPercentChangeIndicator(NewClosePriceIndicator(ts))
+
+		assert.EqualValues(t, 0, pgi.Calculate(0))
+		assert.EqualValues(t, -.5, pgi.Calculate(1))
+		assert.EqualValues(t, -.5, pgi.Calculate(2))
+		assert.EqualValues(t, 0, pgi.Calculate(3))
+	})
+}

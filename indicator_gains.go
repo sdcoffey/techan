@@ -36,3 +36,19 @@ func (ci cumulativeIndicator) Calculate(index int) float64 {
 
 	return total
 }
+
+type percentChangeIndicator struct {
+	Indicator
+}
+
+func NewPercentChangeIndicator(indicator Indicator) Indicator {
+	return percentChangeIndicator{indicator}
+}
+
+func (pgi percentChangeIndicator) Calculate(index int) float64 {
+	if index == 0 {
+		return 0
+	}
+
+	return pgi.Indicator.Calculate(index) / pgi.Indicator.Calculate(index-1)  - 1
+}

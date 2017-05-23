@@ -1,5 +1,7 @@
 package talib4g
 
+import "math"
+
 type Rule interface {
 	IsSatisfied(index int, record *TradingRecord) bool
 }
@@ -46,4 +48,20 @@ type UnderIndicatorRule struct {
 
 func (this UnderIndicatorRule) IsSatisfied(index int, record *TradingRecord) bool {
 	return this.First.Calculate(index) < this.Second.Calculate(index)
+}
+
+type percentChangeRule struct {
+	indicator Indicator
+	percent   float64
+}
+
+func (pgr percentChangeRule) IsSatisfied(index int, record *TradingRecord) bool {
+	return math.Abs(pgr.indicator.Calculate(index)) > math.Abs(pgr.percent)
+}
+
+func NewPercentChangeRule(indicator Indicator, percent float64) Rule {
+	return percentChangeRule{
+		indicator: NewPercentChangeIndicator(indicator),
+		percent: percent,
+	}
 }
