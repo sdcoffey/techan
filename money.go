@@ -3,6 +3,7 @@ package talib4g
 import (
 	"math"
 	"strconv"
+	"strings"
 )
 
 type Calculatable interface {
@@ -40,13 +41,12 @@ func (m Money) M(other Calculatable) Money {
 }
 
 func (m Money) D(other Calculatable) Money {
-	return NMI((m.raw/m.multiplier)/(other.Value()/m.multiplier), m.Currency)
+	return NM((float64(m.raw)/float64(m.multiplier))/(float64(other.Value())/float64(m.multiplier)), m.Currency)
 }
 
 // Returns a money in currency other, at the given exchange rate
 func (m Money) Convert(exchangeRate Money) Money {
-	v := (m.raw / m.multiplier) * (exchangeRate.raw / exchangeRate.multiplier)
-	return NMI(v, exchangeRate.Currency)
+	return NM((float64(m.raw)/float64(m.multiplier))/(float64(exchangeRate.raw)/float64(exchangeRate.multiplier)), exchangeRate.Currency)
 }
 
 func (m Money) Value() int {
@@ -54,7 +54,11 @@ func (m Money) Value() int {
 }
 
 func (m Money) String() string {
-	return strconv.FormatFloat(float64(m.raw)/float64(m.multiplier), 'f', m.decimal, 64)
+	return strconv.FormatFloat(m.Float(), 'f', m.decimal, 64)
+}
+
+func (m Money) Float() float64 {
+	return float64(m.raw) / float64(m.multiplier)
 }
 
 type Currency struct {
@@ -71,7 +75,24 @@ func newCurrency(label string, decimalPlace int) *Currency {
 	}
 }
 
+func CurrencyForName(name string) *Currency {
+	switch strings.ToUpper(name) {
+	case USD.label:
+		return USD
+	case EUR.label:
+		return EUR
+	case BTC.label:
+		return BTC
+	case ETH.label:
+		return ETH
+	}
+
+	return nil
+}
+
 var (
 	USD *Currency = newCurrency("USD", 2)
+	EUR *Currency = newCurrency("EUR", 2)
 	BTC *Currency = newCurrency("BTC", 8)
+	ETH *Currency = newCurrency("ETH", 18)
 )

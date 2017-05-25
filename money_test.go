@@ -53,21 +53,31 @@ func TestMoney_Mul(t *testing.T) {
 
 func TestMoney_Div(t *testing.T) {
 	money := NM(10, USD)
-	money = money.D(NM(10, USD))
+	money = money.D(NM(12, USD))
 
-	assert.EqualValues(t, NM(1, USD).Value(), money.Value())
+	assert.EqualValues(t, NM(.83, USD).Value(), money.Value())
 }
 
 func TestMoney_Convert(t *testing.T) {
-	btc := NM(1, BTC)
-	btcInDollar := btc.Convert(NM(100, USD))
+	usd := NM(1000, USD)
+	btc := usd.Convert(NM(100, BTC))
 
-	assert.EqualValues(t, NM(100, USD).Value(), btcInDollar.Value())
+	assert.EqualValues(t, NM(10, BTC).Value(), btc.Value())
+
+	usd = NM(1, USD)
+	eur := usd.Convert(NM(1.2, EUR))
+
+	assert.EqualValues(t, NM(.83, EUR).Value(), eur.Value())
 }
 
 func TestMoney_String(t *testing.T) {
 	money := NM(10.38, USD)
 	assert.EqualValues(t, "10.38", money.String())
+}
+
+func TestMoney_Float(t *testing.T) {
+	money := NM(10.38, BTC)
+	assert.EqualValues(t, 10.38, money.Float())
 }
 
 func BenchmarkAdd(b *testing.B) {
