@@ -18,21 +18,21 @@ func TestTradingRecord_CurrentTrade(t *testing.T) {
 
 	yesterday := time.Now().Add(-time.Hour * 24)
 
-	record.Enter(1, 2, yesterday)
+	record.Enter(NM(1, USD), NS(2), yesterday)
 
-	assert.EqualValues(t, 1, record.CurrentTrade().EntranceOrder().Price)
-	assert.EqualValues(t, 2, record.CurrentTrade().EntranceOrder().Amount)
+	assert.EqualValues(t, 1, record.CurrentTrade().EntranceOrder().Price.Float())
+	assert.EqualValues(t, 2, record.CurrentTrade().EntranceOrder().Amount.Float())
 	assert.EqualValues(t, yesterday.UnixNano(),
 		record.CurrentTrade().EntranceOrder().ExecutionTime.UnixNano())
 
 	now := time.Now()
-	record.Exit(3, 4, now)
+	record.Exit(NM(3, USD), NS(4), now)
 	assert.True(t, record.CurrentTrade().IsNew())
 
-	lastTrade := record.Trades[len(record.Trades)-1]
+	lastTrade := record.LastTrade()
 
-	assert.EqualValues(t, 3, lastTrade.ExitOrder().Price)
-	assert.EqualValues(t, 4, lastTrade.ExitOrder().Amount)
+	assert.EqualValues(t, 3, lastTrade.ExitOrder().Price.Float())
+	assert.EqualValues(t, 4, lastTrade.ExitOrder().Amount.Float())
 	assert.EqualValues(t, now.UnixNano(),
 		lastTrade.ExitOrder().ExecutionTime.UnixNano())
 }

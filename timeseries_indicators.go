@@ -9,7 +9,7 @@ func NewVolumeIndicator(series *TimeSeries) Indicator {
 }
 
 func (vi volumeIndicator) Calculate(index int) float64 {
-	return vi.Candles[index].Volume
+	return vi.Candles[index].Volume.Float()
 }
 
 type closePriceIndicator struct {
@@ -21,7 +21,7 @@ func NewClosePriceIndicator(series *TimeSeries) Indicator {
 }
 
 func (cpi closePriceIndicator) Calculate(index int) float64 {
-	return cpi.Candles[index].ClosePrice
+	return cpi.Candles[index].ClosePrice.Float()
 }
 
 type typicalPriceIndicator struct {
@@ -33,5 +33,5 @@ func NewTypicalPriceIndicator(series *TimeSeries) Indicator {
 }
 
 func (this typicalPriceIndicator) Calculate(index int) float64 {
-	return (this.Candles[index].MaxPrice + this.Candles[index].MinPrice + this.Candles[index].ClosePrice) / 3.0
+	return this.Candles[index].MaxPrice.A(this.Candles[index].MinPrice).A(this.Candles[index].ClosePrice).Float() / 3.0
 }

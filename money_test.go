@@ -80,11 +80,57 @@ func TestMoney_Float(t *testing.T) {
 	assert.EqualValues(t, 10.38, money.Float())
 }
 
+func TestMoney_Abs(t *testing.T) {
+	t.Run("Is negative", func(t *testing.T) {
+		money := NM(-10, USD)
+		assert.EqualValues(t, 10, money.Abs().Float())
+	})
+
+	t.Run("Is positive", func(t *testing.T) {
+		money := NM(10, USD)
+		assert.EqualValues(t, 10, money.Abs().Float())
+	})
+
+	t.Run("Is zero", func(t *testing.T) {
+		money := NM(0, USD)
+		assert.EqualValues(t, 0, money.Abs().Float())
+	})
+}
+
+func TestMoney_Frac(t *testing.T) {
+	t.Run("Less than 1", func(t *testing.T) {
+		money := NM(10, USD)
+		money = money.Frac(.5)
+
+		assert.EqualValues(t, 5, money.Float())
+
+		money = NM(.25, USD)
+		money = money.Frac(.5)
+
+		assert.EqualValues(t, .12, money.Float())
+	})
+
+	t.Run("Greater than 1", func(t *testing.T) {
+		money := NM(10, USD)
+		money = money.Frac(2)
+
+		assert.EqualValues(t, 20, money.Float())
+	})
+}
+
+func TestMoney_Net(t *testing.T) {
+	money := NM(-10, USD)
+	assert.EqualValues(t, 10, money.Neg().Float())
+
+	money = NM(10, USD)
+	assert.EqualValues(t, -10, money.Neg().Float())
+}
+
 func BenchmarkAdd(b *testing.B) {
 	money := NM(100, USD)
 
 	for i := 0; i < b.N; i++ {
-		money.A(NM(1, USD))
+		money = money.A(NM(1, USD))
 	}
 }
 
@@ -92,7 +138,7 @@ func BenchmarkSub(b *testing.B) {
 	money := NM(100, USD)
 
 	for i := 0; i < b.N; i++ {
-		money.S(NM(1, USD))
+		money = money.S(NM(1, USD))
 	}
 }
 
@@ -100,7 +146,7 @@ func BenchmarkMul(b *testing.B) {
 	money := NM(100, USD)
 
 	for i := 0; i < b.N; i++ {
-		money.M(NM(100, USD))
+		money = money.M(NM(100, USD))
 	}
 }
 
@@ -108,6 +154,6 @@ func BenchmarkDiv(b *testing.B) {
 	money := NM(100, USD)
 
 	for i := 0; i < b.N; i++ {
-		money.D(NM(2, USD))
+		money = money.D(NM(2, USD))
 	}
 }

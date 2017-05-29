@@ -9,15 +9,15 @@ const (
 	SELL
 )
 
-type Order struct {
+type order struct {
 	Type          OrderSide
-	Price         float64
-	Amount        float64
+	Price         Money
+	Amount        Money
 	ExecutionTime time.Time
 }
 
-func NewOrder(orderType OrderSide) (o *Order) {
-	o = new(Order)
+func NewOrder(orderType OrderSide) (o *order) {
+	o = new(order)
 	o.Type = orderType
 
 	return o

@@ -18,7 +18,7 @@ func TestTimeSeries_AddCandle(t *testing.T) {
 		ts := NewTimeSeries()
 
 		candle := NewCandle(time.Minute, time.Now())
-		candle.ClosePrice = 1
+		candle.ClosePrice = NM(1, USD)
 
 		ts.AddCandle(candle)
 
@@ -30,14 +30,14 @@ func TestTimeSeries_AddCandle(t *testing.T) {
 
 		now := time.Now()
 		candle := NewCandle(time.Minute, now)
-		candle.ClosePrice = 1
+		candle.ClosePrice = NM(1, USD)
 
 		ts.AddCandle(candle)
 
 		then := now.Add(-time.Minute * 10)
 
 		nextCandle := NewCandle(time.Minute, then)
-		nextCandle.ClosePrice = 2
+		candle.ClosePrice = NM(2, USD)
 
 		ts.AddCandle(nextCandle)
 
@@ -51,21 +51,23 @@ func TestTimeSeries_LastCandle(t *testing.T) {
 
 	now := time.Now()
 	candle := NewCandle(time.Minute, now)
-	candle.ClosePrice = 1
+	candle.ClosePrice = NM(1, USD)
 
 	ts.AddCandle(candle)
 
 	assert.EqualValues(t, now.UnixNano(), ts.LastCandle().EndTime.UnixNano())
-	assert.EqualValues(t, 1, ts.LastCandle().ClosePrice)
+	assert.EqualValues(t, 1, ts.LastCandle().ClosePrice.Float())
 
 	next := time.Now().Add(time.Minute)
 	newCandle := NewCandle(time.Minute, next)
-	newCandle.ClosePrice = 2
+	newCandle.ClosePrice = NM(2, USD)
 
 	ts.AddCandle(newCandle)
 
+	assert.Len(t, ts.Candles, 2)
+
 	assert.EqualValues(t, next.UnixNano(), ts.LastCandle().EndTime.UnixNano())
-	assert.EqualValues(t, 2, ts.LastCandle().ClosePrice)
+	assert.EqualValues(t, 2, ts.LastCandle().ClosePrice.Float())
 }
 
 func TestTimeSeries_LastIndex(t *testing.T) {

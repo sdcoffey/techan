@@ -14,8 +14,8 @@ func TestPosition_NoOrders_IsNew(t *testing.T) {
 
 func TestPosition_NewPosition_IsOpen(t *testing.T) {
 	order := NewOrder(BUY)
-	order.Amount = 1
-	order.Price = 2
+	order.Amount = NS(1)
+	order.Price = NM(2, USD)
 
 	position := NewPosition(order)
 	assert.True(t, position.IsOpen())
@@ -25,8 +25,8 @@ func TestPosition_NewPosition_IsOpen(t *testing.T) {
 
 func TestNewPosition_WithBuy_IsLong(t *testing.T) {
 	order := NewOrder(BUY)
-	order.Amount = 1
-	order.Price = 2
+	order.Amount = NS(1)
+	order.Price = NM(2, USD)
 
 	position := NewPosition(order)
 	assert.True(t, position.IsLong())
@@ -34,8 +34,8 @@ func TestNewPosition_WithBuy_IsLong(t *testing.T) {
 
 func TestNewPosition_WithSell_IsShort(t *testing.T) {
 	order := NewOrder(SELL)
-	order.Amount = 1
-	order.Price = 2
+	order.Amount = NS(1)
+	order.Price = NM(2, USD)
 
 	position := NewPosition(order)
 	assert.True(t, position.IsShort())
@@ -45,8 +45,8 @@ func TestPosition_Enter(t *testing.T) {
 	position := newPosition()
 
 	order := NewOrder(BUY)
-	order.Amount = 1
-	order.Price = 1
+	order.Amount = NS(1)
+	order.Price = NM(3, USD)
 	order.ExecutionTime = time.Now()
 
 	position.Enter(order)
@@ -61,8 +61,8 @@ func TestPosition_Close(t *testing.T) {
 	position := newPosition()
 
 	entranceOrder := NewOrder(BUY)
-	entranceOrder.Amount = 1
-	entranceOrder.Price = 1
+	entranceOrder.Amount = NS(1)
+	entranceOrder.Price = NM(1, USD)
 	entranceOrder.ExecutionTime = time.Now()
 
 	position.Enter(entranceOrder)
@@ -73,8 +73,8 @@ func TestPosition_Close(t *testing.T) {
 	assert.EqualValues(t, entranceOrder.ExecutionTime, position.EntranceOrder().ExecutionTime)
 
 	exitOrder := NewOrder(SELL)
-	exitOrder.Amount = 1
-	exitOrder.Price = 4
+	entranceOrder.Amount = NS(1)
+	entranceOrder.Price = NM(4, USD)
 	exitOrder.ExecutionTime = time.Now()
 
 	position.Exit(exitOrder)
@@ -84,4 +84,38 @@ func TestPosition_Close(t *testing.T) {
 	assert.EqualValues(t, exitOrder.Amount, position.ExitOrder().Amount)
 	assert.EqualValues(t, exitOrder.Price, position.ExitOrder().Price)
 	assert.EqualValues(t, exitOrder.ExecutionTime, position.ExitOrder().ExecutionTime)
+}
+
+func TestPosition_CostBasis(t *testing.T) {
+	p := newPosition()
+
+	order := NewOrder(BUY)
+	order.Amount = NS(1)
+	order.Price = NM(10, USD)
+
+	p.Enter(order)
+
+	costBasis := NM(10, USD)
+
+	assert.EqualValues(t, costBasis.Value(), p.CostBasis().Value())
+}
+
+func TestPosition_ExitPrice(t *testing.T) {
+	p := newPosition()
+
+	order := NewOrder(BUY)
+	order.Amount = NS(1)
+	order.Price = NM(10, USD)
+
+	p.Enter(order)
+
+	order = NewOrder(SELL)
+	order.Amount = NS(1)
+	order.Price = NM(12, USD)
+
+	p.Exit(order)
+
+	sellValue := NM(12, USD)
+
+	assert.EqualValues(t, sellValue.Value(), p.SellValue().Value())
 }

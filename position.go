@@ -2,58 +2,72 @@ package talib4g
 
 // A pair of two Order objects
 type Position struct {
-	orders [2]*Order
+	orders [2]*order
 }
 
 func newPosition() (t *Position) {
 	return &Position{
-		orders: [2]*Order{nil, nil},
+		orders: [2]*order{nil, nil},
 	}
 }
 
-func NewPosition(openOrder *Order) (t *Position) {
+func NewPosition(openOrder *order) (t *Position) {
 	t = new(Position)
 	t.orders[0] = openOrder
 
 	return t
 }
 
-func (this *Position) Enter(order *Order) {
+func (p *Position) Enter(order *order) {
 	if order != nil {
-		this.orders[0] = order
+		p.orders[0] = order
 	}
 }
 
-func (this *Position) Exit(order *Order) {
+func (p *Position) Exit(order *order) {
 	if order != nil {
-		this.orders[1] = order
+		p.orders[1] = order
 	}
 }
 
-func (this *Position) IsLong() bool {
-	return this.EntranceOrder() != nil && this.EntranceOrder().Type == BUY
+func (p *Position) IsLong() bool {
+	return p.EntranceOrder() != nil && p.EntranceOrder().Type == BUY
 }
 
-func (this *Position) IsShort() bool {
-	return this.EntranceOrder() != nil && this.EntranceOrder().Type == SELL
+func (p *Position) IsShort() bool {
+	return p.EntranceOrder() != nil && p.EntranceOrder().Type == SELL
 }
 
-func (this *Position) IsOpen() bool {
-	return this.EntranceOrder() != nil && this.ExitOrder() == nil
+func (p *Position) IsOpen() bool {
+	return p.EntranceOrder() != nil && p.ExitOrder() == nil
 }
 
-func (this *Position) IsClosed() bool {
-	return this.EntranceOrder() != nil && this.ExitOrder() != nil
+func (p *Position) IsClosed() bool {
+	return p.EntranceOrder() != nil && p.ExitOrder() != nil
 }
 
-func (this *Position) IsNew() bool {
-	return this.EntranceOrder() == nil && this.ExitOrder() == nil
+func (p *Position) IsNew() bool {
+	return p.EntranceOrder() == nil && p.ExitOrder() == nil
 }
 
-func (this *Position) EntranceOrder() *Order {
-	return this.orders[0]
+func (p *Position) EntranceOrder() *order {
+	return p.orders[0]
 }
 
-func (this *Position) ExitOrder() *Order {
-	return this.orders[1]
+func (p *Position) ExitOrder() *order {
+	return p.orders[1]
+}
+
+func (p *Position) CostBasis() Money {
+	if p.EntranceOrder() != nil {
+		return p.EntranceOrder().Amount.M(p.EntranceOrder().Price)
+	}
+	return NM(0, USD)
+}
+
+func (p *Position) SellValue() Money {
+	if p.IsClosed() {
+		return p.ExitOrder().Amount.M(p.ExitOrder().Price)
+	}
+	return NM(0, USD)
 }

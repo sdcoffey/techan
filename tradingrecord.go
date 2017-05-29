@@ -20,7 +20,15 @@ func (this *TradingRecord) CurrentTrade() *Position {
 	return this.currentTrade
 }
 
-func (this *TradingRecord) Enter(price, amount float64, time time.Time) {
+func (this *TradingRecord) LastTrade() *Position {
+	if len(this.Trades) == 0 {
+		return nil
+	}
+
+	return this.Trades[len(this.Trades)-1]
+}
+
+func (this *TradingRecord) Enter(price, amount Money, time time.Time) {
 	order := NewOrder(BUY)
 	order.Amount = amount
 	order.Price = price
@@ -29,7 +37,7 @@ func (this *TradingRecord) Enter(price, amount float64, time time.Time) {
 	this.operate(order)
 }
 
-func (this *TradingRecord) Exit(price, amount float64, time time.Time) {
+func (this *TradingRecord) Exit(price, amount Money, time time.Time) {
 	order := NewOrder(SELL)
 	order.Amount = amount
 	order.Price = price
@@ -38,7 +46,7 @@ func (this *TradingRecord) Exit(price, amount float64, time time.Time) {
 	this.operate(order)
 }
 
-func (this *TradingRecord) operate(order *Order) {
+func (this *TradingRecord) operate(order *order) {
 	if this.currentTrade.IsOpen() {
 		this.currentTrade.Exit(order)
 		this.Trades = append(this.Trades, this.currentTrade)

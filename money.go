@@ -1,6 +1,7 @@
 package talib4g
 
 import (
+	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -13,6 +14,10 @@ type Calculatable interface {
 type Money struct {
 	*Currency
 	raw int
+}
+
+func NS(value int) Money {
+	return Money{security, value}
 }
 
 func NM(rawVal float64, currency *Currency) Money {
@@ -36,12 +41,46 @@ func (m Money) S(other Calculatable) Money {
 }
 
 func (m Money) M(other Calculatable) Money {
-	return NMI((m.raw/m.multiplier)*(other.Value()/m.multiplier), m.Currency)
-
+	lhs := m.raw / m.multiplier
+	val := other.Value()
+	rhs := val / m.multiplier
+	return NMI(lhs*rhs, m.Currency)
 }
 
 func (m Money) D(other Calculatable) Money {
 	return NM((float64(m.raw)/float64(m.multiplier))/(float64(other.Value())/float64(m.multiplier)), m.Currency)
+}
+
+func (m Money) GT(other Money) bool {
+	return m.cmp(other) > 0
+}
+
+func (m Money) LT(other Money) bool {
+	return m.cmp(other) < 0
+}
+
+func (m Money) EQ(other Money) bool {
+	return m.cmp(other) == 0
+}
+
+func (m Money) Zero() bool {
+	return m.raw == 0
+}
+
+func (m Money) Abs() Money {
+	if m.raw < 0 {
+		return Money{m.Currency, -m.raw}
+	}
+
+	return m
+}
+
+func (m Money) Neg() Money {
+	return Money{m.Currency, -m.raw}
+}
+
+func (m Money) Frac(fraction float64) Money {
+	return Money{m.Currency, int(float64(m.raw) * fraction)}
 }
 
 // Returns a money in currency other, at the given exchange rate
@@ -54,23 +93,38 @@ func (m Money) Value() int {
 }
 
 func (m Money) String() string {
-	return strconv.FormatFloat(m.Float(), 'f', m.decimal, 64)
+	if m.Currency == nil {
+		return "0"
+	} else {
+		return strconv.FormatFloat(m.Float(), 'f', int(math.Log10(float64(m.multiplier))), 64)
+	}
 }
 
 func (m Money) Float() float64 {
 	return float64(m.raw) / float64(m.multiplier)
 }
 
+func (m Money) cmp(other Money) int {
+	if m.Currency != other.Currency {
+		panic(fmt.Errorf("Cannot compare two moneys of different currency"))
+	}
+
+	if m.raw == other.raw {
+		return 0
+	} else if m.raw < other.raw {
+		return -1
+	}
+	return 1
+}
+
 type Currency struct {
 	label      string
 	multiplier int
-	decimal    int
 }
 
 func newCurrency(label string, decimalPlace int) *Currency {
 	return &Currency{
 		label:      label,
-		decimal:    decimalPlace,
 		multiplier: int(math.Pow(10, float64(decimalPlace))),
 	}
 }
@@ -91,8 +145,10 @@ func CurrencyForName(name string) *Currency {
 }
 
 var (
-	USD *Currency = newCurrency("USD", 2)
-	EUR *Currency = newCurrency("EUR", 2)
-	BTC *Currency = newCurrency("BTC", 8)
-	ETH *Currency = newCurrency("ETH", 18)
+	security *Currency = newCurrency("SEC", 0)
+	USD      *Currency = newCurrency("USD", 2)
+	EUR      *Currency = newCurrency("EUR", 2)
+	GBP      *Currency = newCurrency("GBP", 2)
+	BTC      *Currency = newCurrency("BTC", 8)
+	ETH      *Currency = newCurrency("ETH", 18)
 )

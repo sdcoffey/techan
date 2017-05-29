@@ -8,7 +8,6 @@ import (
 
 func TestConstantIndicator_Calculate(t *testing.T) {
 	ci := NewConstantIndicator(4.56)
-	println(ci.Calculate(0))
 
 	assert.EqualValues(t, 4.56, ci.Calculate(0))
 	assert.EqualValues(t, 4.56, ci.Calculate(-math.MaxInt64))

@@ -9,11 +9,11 @@ type Candle struct {
 	Period     time.Duration
 	BeginTime  time.Time
 	EndTime    time.Time
-	OpenPrice  float64 `json:",string"`
-	ClosePrice float64 `json:",string"`
-	MaxPrice   float64 `json:",string"`
-	MinPrice   float64 `json:",string"`
-	Volume     float64 `json:",string"`
+	OpenPrice  Money `json:",string"`
+	ClosePrice Money `json:",string"`
+	MaxPrice   Money `json:",string"`
+	MinPrice   Money `json:",string"`
+	Volume     Money `json:",string"`
 	TradeCount uint
 }
 
@@ -27,31 +27,38 @@ func NewCandle(period time.Duration, endTime time.Time) (c *Candle) {
 	return c
 }
 
-func (this *Candle) AddTrade(tradeAmount, tradePrice float64) {
-	if this.OpenPrice == 0 {
+func (this *Candle) AddTrade(tradeAmount, tradePrice Money) {
+	if this.OpenPrice.Zero() {
 		this.OpenPrice = tradePrice
 	}
 	this.ClosePrice = tradePrice
 
-	if this.MaxPrice == 0 {
+	if this.MaxPrice.Zero() {
 		this.MaxPrice = tradePrice
-	} else if tradePrice > this.MaxPrice {
+	} else if tradePrice.GT(this.MaxPrice) {
 		this.MaxPrice = tradePrice
 	}
 
-	if this.MinPrice == 0 {
+	if this.MinPrice.Zero() {
 		this.MinPrice = tradePrice
-	} else if tradePrice < this.MinPrice {
+	} else if tradePrice.LT(this.MinPrice) {
 		this.MinPrice = tradePrice
 	}
 
-	this.Volume += tradeAmount
+	if this.Volume.Zero() {
+		this.Volume = tradeAmount
+	} else {
+		this.Volume = this.Volume.A(tradeAmount)
+	}
+
 	this.TradeCount++
 }
 
 func (this *Candle) String() string {
-	return fmt.Sprintf("%s \nOpen: %.5f\nClose: %.5f\nVolume: %.5f",
+	return fmt.Sprintf("%s \nOpen: %s\nClose: %s\nHigh: %s\nLow: %s\nVolume: %s",
 		this.EndTime.Format(time.Stamp),
+		this.OpenPrice,
+		this.ClosePrice,
 		this.MaxPrice,
 		this.MinPrice,
 		this.Volume,

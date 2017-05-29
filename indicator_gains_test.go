@@ -100,7 +100,7 @@ func TestPercentGainIndicator(t *testing.T) {
 	})
 
 	t.Run("Down", func(t *testing.T) {
-		ts := MockTimeSeries(2.25, 1.125, .5625, .5625)
+		ts := MockTimeSeries(10, 5, 2.5, 2.5)
 
 		pgi := NewPercentChangeIndicator(NewClosePriceIndicator(ts))
 

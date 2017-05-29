@@ -14,18 +14,14 @@ type Analysis interface {
 type TotalProfitAnalysis float64
 
 func (tps TotalProfitAnalysis) Analyze(record *TradingRecord) float64 {
-	profit := 0.0
+	profit := NM(0, USD)
 	for _, trade := range record.Trades {
 		if trade.IsClosed() {
-			costBasis := trade.EntranceOrder().Amount * trade.EntranceOrder().Price
-			costBasis *= float64(1 + tps)
-			sellPrice := trade.ExitOrder().Amount * trade.ExitOrder().Price
-
-			profit += sellPrice - costBasis
+			profit = profit.A(trade.SellValue().S(trade.CostBasis()))
 		}
 	}
 
-	return profit
+	return profit.Float()
 }
 
 type NumTradesAnalysis string
@@ -39,23 +35,18 @@ type LogTradesAnalysis struct {
 }
 
 func (lta LogTradesAnalysis) Analyze(record *TradingRecord) float64 {
-	logOrder := func(order *Order) {
-		var oType string
-		var action string
-		if order.Type == BUY {
-			oType = "buy"
-			action = "Entered"
-		} else {
-			oType = "sell"
-			action = "Exited"
-		}
+	logOrder := func(trade *Position) {
+		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - enter with buy (%f @ $%f)", trade.EntranceOrder().ExecutionTime.UTC().Format(time.RFC822), trade.EntranceOrder().Amount, trade.EntranceOrder().Price))
+		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - exit with sell (%f @ $%f)", trade.ExitOrder().ExecutionTime.UTC().Format(time.RFC822), trade.ExitOrder().Amount, trade.ExitOrder().Price))
 
-		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - %s with %s (%f @ $%f)", order.ExecutionTime.UTC().Format(time.RFC822), action, oType, order.Amount, order.Price))
+		profit := trade.ExitOrder().Amount.Convert(trade.ExitOrder().Price).S(trade.EntranceOrder().Amount.Convert(trade.EntranceOrder().Price))
+		fmt.Fprintln(lta.Writer, fmt.Sprintf("Profit: $%.2f", profit))
 	}
 
 	for _, trade := range record.Trades {
-		logOrder(trade.EntranceOrder())
-		logOrder(trade.ExitOrder())
+		if trade.IsClosed() {
+			logOrder(trade)
+		}
 	}
 	return 0.0
 }
@@ -75,10 +66,10 @@ type ProfitableTradesAnalysis string
 func (pta ProfitableTradesAnalysis) Analyze(record *TradingRecord) float64 {
 	var profitableTrades int
 	for _, trade := range record.Trades {
-		costBasis := trade.EntranceOrder().Amount * trade.EntranceOrder().Price
-		sellPrice := trade.ExitOrder().Amount * trade.ExitOrder().Price
+		costBasis := trade.EntranceOrder().Amount.Convert(trade.EntranceOrder().Price)
+		sellPrice := trade.ExitOrder().Amount.Convert(trade.ExitOrder().Price)
 
-		if sellPrice > costBasis {
+		if sellPrice.GT(costBasis) {
 			profitableTrades++
 		}
 	}
