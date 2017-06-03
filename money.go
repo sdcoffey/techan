@@ -96,13 +96,18 @@ func (m Money) String() string {
 	if m.Currency == nil {
 		return "0"
 	} else {
-		return strconv.FormatFloat(m.Float(), 'f', int(math.Log10(float64(m.multiplier))), 64)
+		return fmt.Sprintf("%s %s", m.Currency.label, strconv.FormatFloat(m.Float(), 'f', int(math.Log10(float64(m.multiplier))), 64))
 	}
 }
 
 func (m Money) Float() float64 {
 	return float64(m.raw) / float64(m.multiplier)
 }
+
+//func (m Money) MarshalJSON() ([]byte, error) {
+//	currency, _ := m.Currency.MarshalJSON()
+//	return []byte(fmt.Sprintf(`{"Value":%d, "Currency":%s}`, m.raw, string(currency))), nil
+//}
 
 func (m Money) cmp(other Money) int {
 	if m.Currency != other.Currency {
@@ -120,6 +125,26 @@ func (m Money) cmp(other Money) int {
 type Currency struct {
 	label      string
 	multiplier int
+}
+
+//func (c *Currency) MarshalJSON() ([]byte, error) {
+//	return []byte(fmt.Sprintf(`{"Label":"%s"}`, c.label)), nil
+//}
+//
+//func (c *Currency) UnmarshalJSON(b []byte) error {
+//	curr := CurrencyForName(string(b[10:13]))
+//	if curr == nil {
+//		return fmt.Errorf("No such currency: %s", string(b))
+//	}
+//
+//	c.label = curr.label
+//	c.multiplier = curr.multiplier
+//
+//	return nil
+//}
+
+func (c *Currency) String() string {
+	return c.label
 }
 
 func newCurrency(label string, decimalPlace int) *Currency {
