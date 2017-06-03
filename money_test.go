@@ -3,6 +3,7 @@ package talib4g
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"encoding/json"
 )
 
 func TestMoney_New(t *testing.T) {
@@ -118,12 +119,29 @@ func TestMoney_Frac(t *testing.T) {
 	})
 }
 
-func TestMoney_Net(t *testing.T) {
+func TestMoney_Neg(t *testing.T) {
 	money := NM(-10, USD)
 	assert.EqualValues(t, 10, money.Neg().Float())
 
 	money = NM(10, USD)
 	assert.EqualValues(t, -10, money.Neg().Float())
+}
+
+func TestMoney_MarshalJSON(t *testing.T) {
+	c := USD
+	jsonValue, err := json.Marshal(c)
+	assert.NoError(t, err)
+	assert.EqualValues(t, `{"Label":"USD"}`, jsonValue)
+}
+
+func TestMoney_UnmarshalJSON(t *testing.T) {
+	marshaled := `{"Label":"USD"}`
+	var currency Currency
+
+	err := json.Unmarshal([]byte(marshaled), &currency)
+	assert.NoError(t, err)
+
+	assert.EqualValues(t, "USD", currency.String())
 }
 
 func BenchmarkAdd(b *testing.B) {
