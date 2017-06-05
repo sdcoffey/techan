@@ -55,7 +55,15 @@ func (this *Candle) AddTrade(tradeAmount, tradePrice Money) {
 }
 
 func (this *Candle) String() string {
-	return fmt.Sprintf("%s \nOpen: %s\nClose: %s\nHigh: %s\nLow: %s\nVolume: %s",
+	return fmt.Sprintf(
+		`
+	Time:	%s
+	Open: 	%s
+	Close: 	%s
+	High: 	%s
+	Low: 	%s
+	Volume: %s
+	`,
 		this.EndTime.Format(time.Stamp),
 		this.OpenPrice,
 		this.ClosePrice,
