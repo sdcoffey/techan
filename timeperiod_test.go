@@ -1,7 +1,6 @@
 package talib4g
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -49,8 +48,6 @@ func TestParse(t *testing.T) {
 		assert.EqualValues(t, now.Hour(), TimePeriod.End.Hour())
 		assert.EqualValues(t, now.Minute(), TimePeriod.End.Minute())
 		assert.EqualValues(t, now.Second(), TimePeriod.End.Second())
-
-		fmt.Println(TimePeriod.Length())
 	})
 
 	t.Run("SimpleDate:SimpleDate", func(t *testing.T) {

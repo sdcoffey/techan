@@ -97,7 +97,7 @@ func (m Money) String() string {
 	if m.Currency == nil {
 		return "0"
 	} else {
-		return fmt.Sprintf("%s %s", m.Currency.label, strconv.FormatFloat(m.Float(), 'f', int(math.Log10(float64(m.multiplier))), 64))
+		return strconv.FormatFloat(m.Float(), 'f', int(math.Log10(float64(m.multiplier))), 64)
 	}
 }
 

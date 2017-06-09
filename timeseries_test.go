@@ -1,7 +1,6 @@
 package talib4g
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -34,8 +33,6 @@ func TestTimeSeries_AddCandle(t *testing.T) {
 		candle.ClosePrice = NM(1, USD)
 
 		ts.AddCandle(candle)
-		fmt.Println(ts.LastCandle().Period)
-
 		then := now.Add(-time.Minute * 10)
 
 		nextCandle := NewCandle(NewTimePeriodD(then, time.Minute))

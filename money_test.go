@@ -73,7 +73,7 @@ func TestMoney_Convert(t *testing.T) {
 
 func TestMoney_String(t *testing.T) {
 	money := NM(10.38, USD)
-	assert.EqualValues(t, "USD 10.38", money.String())
+	assert.EqualValues(t, "10.38", money.String())
 }
 
 func TestMoney_Float(t *testing.T) {
