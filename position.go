@@ -59,15 +59,15 @@ func (p *Position) ExitOrder() *order {
 }
 
 func (p *Position) CostBasis() Money {
-	if p.EntranceOrder() != nil {
-		return p.EntranceOrder().Amount.M(p.EntranceOrder().Price)
+	if p.IsOpen() || p.IsClosed() {
+		return p.EntranceOrder().Amount.Convert(p.EntranceOrder().Price)
 	}
 	return NM(0, USD)
 }
 
-func (p *Position) SellValue() Money {
+func (p *Position) ExitValue() Money {
 	if p.IsClosed() {
-		return p.ExitOrder().Amount.M(p.ExitOrder().Price)
+		return p.ExitOrder().Amount.Convert(p.ExitOrder().Price)
 	}
 	return NM(0, USD)
 }

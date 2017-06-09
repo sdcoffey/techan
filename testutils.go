@@ -31,7 +31,7 @@ func RandomTimeSeries(size int) *TimeSeries {
 }
 
 func MockCandle(closePrice float64) *Candle {
-	t := NewCandle(time.Second, time.Unix(int64(candleIndex), 0))
+	t := NewCandle(NewTimePeriodD(time.Unix(int64(candleIndex), 0), time.Second))
 	t.ClosePrice = NM(closePrice, USD)
 
 	return t
@@ -40,7 +40,7 @@ func MockCandle(closePrice float64) *Candle {
 func MockTimeSeries(values ...float64) *TimeSeries {
 	ts := NewTimeSeries()
 	for _, val := range values {
-		candle := NewCandle(time.Second, time.Unix(int64(candleIndex), 0))
+		candle := NewCandle(NewTimePeriodD(time.Unix(int64(candleIndex), 0), time.Second))
 		candle.ClosePrice = NM(val, USD)
 
 		ts.AddCandle(candle)

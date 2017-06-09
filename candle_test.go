@@ -6,16 +6,9 @@ import (
 	"time"
 )
 
-func TestCandle_SetsBeginTime(t *testing.T) {
-	now := time.Now()
-	candle := NewCandle(time.Minute, now.Add(time.Minute))
-	assert.EqualValues(t, now.Add(time.Minute).UnixNano(), candle.EndTime.UnixNano())
-	assert.EqualValues(t, now.UnixNano(), candle.BeginTime.UnixNano())
-	assert.EqualValues(t, time.Minute, candle.Period)
-}
-
 func TestCandle_AddTrade(t *testing.T) {
-	candle := NewCandle(time.Minute, time.Now().Add(time.Minute))
+	now := time.Now()
+	candle := NewCandle(NewTimePeriod(now, now.Add(time.Minute)))
 
 	candle.AddTrade(NM(1, security), NM(2, USD)) // Open
 	candle.AddTrade(NM(1, security), NM(5, USD)) // High

@@ -6,9 +6,7 @@ import (
 )
 
 type Candle struct {
-	Period     time.Duration
-	BeginTime  time.Time
-	EndTime    time.Time
+	Period     TimePeriod
 	OpenPrice  Money `json:",string"`
 	ClosePrice Money `json:",string"`
 	MaxPrice   Money `json:",string"`
@@ -17,12 +15,9 @@ type Candle struct {
 	TradeCount uint
 }
 
-func NewCandle(period time.Duration, endTime time.Time) (c *Candle) {
+func NewCandle(period TimePeriod) (c *Candle) {
 	c = new(Candle)
-
 	c.Period = period
-	c.EndTime = endTime
-	c.BeginTime = c.EndTime.Add(-c.Period)
 
 	return c
 }
@@ -64,7 +59,7 @@ func (this *Candle) String() string {
 	Low: 	%s
 	Volume: %s
 	`,
-		this.EndTime.Format(time.Stamp),
+		this.Period.End.Format(time.Stamp),
 		this.OpenPrice,
 		this.ClosePrice,
 		this.MaxPrice,

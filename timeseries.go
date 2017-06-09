@@ -15,14 +15,17 @@ func NewTimeSeries() (t *TimeSeries) {
 	return t
 }
 
-func (ts *TimeSeries) AddCandle(candle *Candle) {
+func (ts *TimeSeries) AddCandle(candle *Candle) bool {
 	if candle == nil {
 		panic(fmt.Errorf("Error adding Candle: candle cannot be nil"))
 	}
 
-	if ts.LastCandle() == nil || candle.EndTime.After(ts.LastCandle().EndTime) {
+	if ts.LastCandle() == nil || candle.Period.Since(ts.LastCandle().Period) >= 0 {
 		ts.Candles = append(ts.Candles, candle)
+		return true
 	}
+
+	return false
 }
 
 func (ts *TimeSeries) LastCandle() *Candle {

@@ -1,6 +1,7 @@
 package talib4g
 
 import (
+	"bytes"
 	"fmt"
 	"math"
 	"strconv"
@@ -8,27 +9,27 @@ import (
 )
 
 type Calculatable interface {
-	Value() int
+	Value() int64
 }
 
 type Money struct {
 	*Currency
-	raw int
+	raw int64
 }
 
 func NS(value int) Money {
-	return Money{security, value}
+	return Money{security, int64(value)}
 }
 
 func NM(rawVal float64, currency *Currency) Money {
-	return Money{currency, int(rawVal * float64(currency.multiplier))}
+	return Money{currency, int64(rawVal * float64(currency.multiplier))}
 }
 
-func NMI(rawVal int, currency *Currency) Money {
-	return Money{currency, rawVal * currency.multiplier}
+func NMI(rawVal int64, currency *Currency) Money {
+	return Money{currency, int64(rawVal) * currency.multiplier}
 }
 
-func nmr(rawVal int, currency *Currency) Money {
+func nmr(rawVal int64, currency *Currency) Money {
 	return Money{currency, rawVal}
 }
 
@@ -80,15 +81,15 @@ func (m Money) Neg() Money {
 }
 
 func (m Money) Frac(fraction float64) Money {
-	return Money{m.Currency, int(float64(m.raw) * fraction)}
+	return Money{m.Currency, int64(float64(m.raw) * fraction)}
 }
 
 // Returns a money in currency other, at the given exchange rate
 func (m Money) Convert(exchangeRate Money) Money {
-	return NM((float64(m.raw)/float64(m.multiplier))/(float64(exchangeRate.raw)/float64(exchangeRate.multiplier)), exchangeRate.Currency)
+	return NM(m.Float()/(m.Float()/exchangeRate.Float())*m.Float(), exchangeRate.Currency)
 }
 
-func (m Money) Value() int {
+func (m Money) Value() int64 {
 	return m.raw
 }
 
@@ -104,10 +105,25 @@ func (m Money) Float() float64 {
 	return float64(m.raw) / float64(m.multiplier)
 }
 
-//func (m Money) MarshalJSON() ([]byte, error) {
-//	currency, _ := m.Currency.MarshalJSON()
-//	return []byte(fmt.Sprintf(`{"Value":%d, "Currency":%s}`, m.raw, string(currency))), nil
-//}
+func (m Money) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf(`{"Value":%d,"Currency":"%s"}`, m.raw, string(m.Currency.label))), nil
+}
+
+func (m *Money) UnmarshalJSON(b []byte) error {
+	split := bytes.Split(b, []byte(","))
+	rawStr := split[0][9:]
+	currencyStr := split[1][12:15]
+
+	var err error
+	m.raw, err = strconv.ParseInt(string(rawStr), 10, 64)
+	if err != nil {
+		return fmt.Errorf("Error parsing Value -> %s", err)
+	}
+
+	m.Currency = CurrencyForName(string(currencyStr))
+
+	return nil
+}
 
 func (m Money) cmp(other Money) int {
 	if m.Currency != other.Currency {
@@ -124,24 +140,24 @@ func (m Money) cmp(other Money) int {
 
 type Currency struct {
 	label      string
-	multiplier int
+	multiplier int64
 }
 
-//func (c *Currency) MarshalJSON() ([]byte, error) {
-//	return []byte(fmt.Sprintf(`{"Label":"%s"}`, c.label)), nil
-//}
-//
-//func (c *Currency) UnmarshalJSON(b []byte) error {
-//	curr := CurrencyForName(string(b[10:13]))
-//	if curr == nil {
-//		return fmt.Errorf("No such currency: %s", string(b))
-//	}
-//
-//	c.label = curr.label
-//	c.multiplier = curr.multiplier
-//
-//	return nil
-//}
+func (c *Currency) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf(`{"Label":"%s"}`, c.label)), nil
+}
+
+func (c *Currency) UnmarshalJSON(b []byte) error {
+	curr := CurrencyForName(string(b[10:13]))
+	if curr == nil {
+		return fmt.Errorf("No such currency: %s", string(b))
+	}
+
+	c.label = curr.label
+	c.multiplier = curr.multiplier
+
+	return nil
+}
 
 func (c *Currency) String() string {
 	return c.label
@@ -150,7 +166,7 @@ func (c *Currency) String() string {
 func newCurrency(label string, decimalPlace int) *Currency {
 	return &Currency{
 		label:      label,
-		multiplier: int(math.Pow(10, float64(decimalPlace))),
+		multiplier: int64(math.Pow(10, float64(decimalPlace))),
 	}
 }
 

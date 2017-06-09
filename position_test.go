@@ -100,7 +100,7 @@ func TestPosition_CostBasis(t *testing.T) {
 	assert.EqualValues(t, costBasis.Value(), p.CostBasis().Value())
 }
 
-func TestPosition_ExitPrice(t *testing.T) {
+func TestPosition_ExitValue(t *testing.T) {
 	p := newPosition()
 
 	order := NewOrder(BUY)
@@ -117,5 +117,5 @@ func TestPosition_ExitPrice(t *testing.T) {
 
 	sellValue := NM(12, USD)
 
-	assert.EqualValues(t, sellValue.Value(), p.SellValue().Value())
+	assert.EqualValues(t, sellValue.Value(), p.ExitValue().Value())
 }

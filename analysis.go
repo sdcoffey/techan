@@ -14,14 +14,16 @@ type Analysis interface {
 type TotalProfitAnalysis float64
 
 func (tps TotalProfitAnalysis) Analyze(record *TradingRecord) float64 {
-	profit := NM(0, USD)
+	totalProfit := NM(0, USD)
 	for _, trade := range record.Trades {
 		if trade.IsClosed() {
-			profit = profit.A(trade.SellValue().S(trade.CostBasis()))
+			profit := trade.ExitValue().S(trade.CostBasis())
+			profit = profit.Frac(-(float64(tps) - 1))
+			totalProfit = totalProfit.A(trade.ExitValue().S(trade.CostBasis()))
 		}
 	}
 
-	return profit.Float()
+	return totalProfit.Float()
 }
 
 type NumTradesAnalysis string
@@ -36,11 +38,11 @@ type LogTradesAnalysis struct {
 
 func (lta LogTradesAnalysis) Analyze(record *TradingRecord) float64 {
 	logOrder := func(trade *Position) {
-		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - enter with buy (%f @ $%f)", trade.EntranceOrder().ExecutionTime.UTC().Format(time.RFC822), trade.EntranceOrder().Amount, trade.EntranceOrder().Price))
-		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - exit with sell (%f @ $%f)", trade.ExitOrder().ExecutionTime.UTC().Format(time.RFC822), trade.ExitOrder().Amount, trade.ExitOrder().Price))
+		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - enter with buy (%s @ $%s)", trade.EntranceOrder().ExecutionTime.UTC().Format(time.RFC822), trade.EntranceOrder().Amount, trade.EntranceOrder().Price))
+		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - exit with sell (%s @ $%s)", trade.ExitOrder().ExecutionTime.UTC().Format(time.RFC822), trade.ExitOrder().Amount, trade.ExitOrder().Price))
 
-		profit := trade.ExitOrder().Amount.Convert(trade.ExitOrder().Price).S(trade.EntranceOrder().Amount.Convert(trade.EntranceOrder().Price))
-		fmt.Fprintln(lta.Writer, fmt.Sprintf("Profit: $%.2f", profit))
+		profit := trade.ExitValue().S(trade.CostBasis())
+		fmt.Fprintln(lta.Writer, fmt.Sprintf("Profit: $%s", profit))
 	}
 
 	for _, trade := range record.Trades {

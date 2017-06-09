@@ -1,9 +1,9 @@
 package talib4g
 
 import (
+	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"testing"
-	"encoding/json"
 )
 
 func TestMoney_New(t *testing.T) {
@@ -60,20 +60,20 @@ func TestMoney_Div(t *testing.T) {
 }
 
 func TestMoney_Convert(t *testing.T) {
-	usd := NM(1000, USD)
-	btc := usd.Convert(NM(100, BTC))
+	btc := NM(10, BTC)
+	usdWorth := btc.Convert(NM(100, USD))
 
-	assert.EqualValues(t, NM(10, BTC).Value(), btc.Value())
+	assert.EqualValues(t, NM(1000, USD).Value(), usdWorth.Value())
 
-	usd = NM(1, USD)
-	eur := usd.Convert(NM(1.2, EUR))
+	usd := NM(1, USD)
+	eurWorth := usd.Convert(NM(.5, EUR))
 
-	assert.EqualValues(t, NM(.83, EUR).Value(), eur.Value())
+	assert.EqualValues(t, NM(0.5, EUR).Value(), eurWorth.Value())
 }
 
 func TestMoney_String(t *testing.T) {
 	money := NM(10.38, USD)
-	assert.EqualValues(t, "10.38", money.String())
+	assert.EqualValues(t, "USD 10.38", money.String())
 }
 
 func TestMoney_Float(t *testing.T) {
@@ -128,13 +128,32 @@ func TestMoney_Neg(t *testing.T) {
 }
 
 func TestMoney_MarshalJSON(t *testing.T) {
+	c := NM(10, USD)
+	jsonVal, err := json.Marshal(c)
+	assert.NoError(t, err)
+
+	assert.EqualValues(t, `{"Value":1000,"Currency":"USD"}`, string(jsonVal))
+}
+
+func TestMoney_UnmarshalJSON(t *testing.T) {
+	value := `{"Value":1000,"Currency":"USD"}`
+	var money Money
+
+	err := json.Unmarshal([]byte(value), &money)
+	assert.NoError(t, err)
+
+	assert.EqualValues(t, 10, money.Float())
+	assert.EqualValues(t, "USD", money.Currency.String())
+}
+
+func TestCurrency_MarshalJSON(t *testing.T) {
 	c := USD
 	jsonValue, err := json.Marshal(c)
 	assert.NoError(t, err)
 	assert.EqualValues(t, `{"Label":"USD"}`, jsonValue)
 }
 
-func TestMoney_UnmarshalJSON(t *testing.T) {
+func TestCurrency_UnmarshalJSON(t *testing.T) {
 	marshaled := `{"Label":"USD"}`
 	var currency Currency
 
