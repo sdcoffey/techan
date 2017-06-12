@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"time"
+	"math"
 )
 
 type Analysis interface {
@@ -17,9 +18,9 @@ func (tps TotalProfitAnalysis) Analyze(record *TradingRecord) float64 {
 	totalProfit := NM(0, USD)
 	for _, trade := range record.Trades {
 		if trade.IsClosed() {
-			profit := trade.ExitValue().S(trade.CostBasis())
-			profit = profit.Frac(-(float64(tps) - 1))
-			totalProfit = totalProfit.A(trade.ExitValue().S(trade.CostBasis()))
+			costBasis := trade.CostBasis().Frac(1 + float64(tps))
+			exitValue := trade.ExitValue().Frac(math.Abs(float64(tps) -1))
+			totalProfit = totalProfit.A(exitValue.S(costBasis))
 		}
 	}
 
