@@ -2,7 +2,6 @@ package talib4g
 
 import (
 	"fmt"
-	"time"
 )
 
 type Candle struct {
@@ -59,7 +58,7 @@ func (this *Candle) String() string {
 	Low: 	%s
 	Volume: %s
 	`,
-		this.Period.End.Format(time.Stamp),
+		this.Period,
 		this.OpenPrice,
 		this.ClosePrice,
 		this.MaxPrice,

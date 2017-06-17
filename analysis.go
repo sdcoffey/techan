@@ -3,9 +3,9 @@ package talib4g
 import (
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"time"
-	"math"
 )
 
 type Analysis interface {
@@ -19,12 +19,22 @@ func (tps TotalProfitAnalysis) Analyze(record *TradingRecord) float64 {
 	for _, trade := range record.Trades {
 		if trade.IsClosed() {
 			costBasis := trade.CostBasis().Frac(1 + float64(tps))
-			exitValue := trade.ExitValue().Frac(math.Abs(float64(tps) -1))
+			exitValue := trade.ExitValue().Frac(math.Abs(float64(tps) - 1))
 			totalProfit = totalProfit.A(exitValue.S(costBasis))
 		}
 	}
 
 	return totalProfit.Float()
+}
+
+type PercentGainAnalysis struct{}
+
+func (pga PercentGainAnalysis) Analyze(record *TradingRecord) float64 {
+	if len(record.Trades) > 0 && record.Trades[0].IsClosed() {
+		return (record.Trades[len(record.Trades)-1].ExitValue().Float() / record.Trades[0].CostBasis().Float()) - 1
+	} else {
+		return 0
+	}
 }
 
 type NumTradesAnalysis string

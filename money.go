@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"math"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -15,6 +16,55 @@ type Calculatable interface {
 type Money struct {
 	*Currency
 	raw int64
+}
+
+func ParseMoneyAs(moneyString string, currency *Currency) (Money, error) {
+	return ParseMoney(currency.Symbol() + moneyString)
+}
+
+var zerosReg *regexp.Regexp = regexp.MustCompile("^0+$")
+
+func ParseMoney(moneyString string) (Money, error) {
+	if len(moneyString) == 0 {
+		return Money{}, fmt.Errorf("cannot parse string %s", moneyString)
+	}
+
+	symbol := []rune(moneyString)[0]
+	currency := CurrencyForSymbol(symbol)
+	if currency == nil {
+		return Money{}, fmt.Errorf("cannot parse symbol %s", string(symbol))
+	}
+
+	moneyString = strings.Split(moneyString, string(symbol))[1]
+
+	if zerosReg.MatchString(moneyString) {
+		return NM(0, currency), nil
+	}
+
+	dotIndex := strings.Index(moneyString, ".")
+	if dotIndex < 0 {
+		return Money{}, fmt.Errorf("Money string not well formed: %s", moneyString)
+	}
+
+	beforeDot, bdErr := strconv.ParseInt(string(moneyString[:dotIndex]), 10, 64)
+
+	afterDotStr := string(moneyString[dotIndex+1:])
+	if len(afterDotStr) > int(math.Log10(float64(currency.multiplier))) {
+		afterDotStr = string(afterDotStr[:int(math.Log10(float64(currency.multiplier)))])
+	} else {
+		for len(afterDotStr) < int(math.Log10(float64(currency.multiplier))) {
+			afterDotStr += "0"
+		}
+	}
+	afterDot, adErr := strconv.ParseInt(afterDotStr, 10, 64)
+
+	if bdErr != nil || adErr != nil {
+		return Money{}, fmt.Errorf("Could not parse decimal %s -> %s", moneyString[1:], bdErr.Error()+adErr.Error())
+	}
+
+	rawVal := beforeDot*currency.multiplier + afterDot
+
+	return nmr(rawVal, currency), nil
 }
 
 func NS(value int) Money {
@@ -101,6 +151,14 @@ func (m Money) String() string {
 	}
 }
 
+func (m Money) FormalString() string {
+	if m.Currency == nil {
+		return "0"
+	} else {
+		return fmt.Sprintf("%s%s", string(m.Currency.symbol), m.String())
+	}
+}
+
 func (m Money) Float() float64 {
 	return float64(m.raw) / float64(m.multiplier)
 }
@@ -140,6 +198,7 @@ func (m Money) cmp(other Money) int {
 
 type Currency struct {
 	label      string
+	symbol     rune
 	multiplier int64
 }
 
@@ -163,9 +222,14 @@ func (c *Currency) String() string {
 	return c.label
 }
 
-func newCurrency(label string, decimalPlace int) *Currency {
+func (c *Currency) Symbol() string {
+	return string(c.symbol)
+}
+
+func newCurrency(label string, symbol rune, decimalPlace int) *Currency {
 	return &Currency{
 		label:      label,
+		symbol:     symbol,
 		multiplier: int64(math.Pow(10, float64(decimalPlace))),
 	}
 }
@@ -176,20 +240,49 @@ func CurrencyForName(name string) *Currency {
 		return USD
 	case EUR.label:
 		return EUR
+	case GBP.label:
+		return GBP
+	case CAD.label:
+		return CAD
 	case BTC.label:
 		return BTC
 	case ETH.label:
 		return ETH
+	case LTC.label:
+		return LTC
+	}
+
+	return nil
+}
+
+func CurrencyForSymbol(symbol rune) *Currency {
+	switch symbol {
+	case USD.symbol:
+		return USD
+	case EUR.symbol:
+		return EUR
+	case GBP.symbol:
+		return GBP
+	case CAD.symbol:
+		return CAD
+	case BTC.symbol:
+		return BTC
+	case ETH.symbol:
+		return ETH
+	case LTC.symbol:
+		return LTC
 	}
 
 	return nil
 }
 
 var (
-	security *Currency = newCurrency("SEC", 0)
-	USD      *Currency = newCurrency("USD", 2)
-	EUR      *Currency = newCurrency("EUR", 2)
-	GBP      *Currency = newCurrency("GBP", 2)
-	BTC      *Currency = newCurrency("BTC", 8)
-	ETH      *Currency = newCurrency("ETH", 18)
+	security *Currency = newCurrency("SEC", 'S', 0)
+	USD      *Currency = newCurrency("USD", '$', 2)
+	EUR      *Currency = newCurrency("EUR", '€', 2)
+	GBP      *Currency = newCurrency("GBP", '£', 2)
+	CAD      *Currency = newCurrency("CAD", 'C', 2)
+	BTC      *Currency = newCurrency("BTC", 'B', 8)
+	ETH      *Currency = newCurrency("ETH", 'E', 18)
+	LTC      *Currency = newCurrency("LTC", 'L', 18)
 )

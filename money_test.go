@@ -6,6 +6,66 @@ import (
 	"testing"
 )
 
+func TestParseMoney(t *testing.T) {
+	t.Run("Returns error if zero length string", func(t *testing.T) {
+		_, err := ParseMoney("")
+		assert.EqualError(t, err, "cannot parse string ")
+	})
+
+	t.Run("Returns error if symbol no symbol present", func(t *testing.T) {
+		_, err := ParseMoney("10")
+		assert.EqualError(t, err, "cannot parse symbol 1")
+	})
+
+	t.Run("Returns error if symbol not recognized", func(t *testing.T) {
+		_, err := ParseMoney("™10")
+		assert.EqualError(t, err, "cannot parse symbol ™")
+	})
+
+	t.Run("Returns an error if decimal is unparseable", func(t *testing.T) {
+		_, err := ParseMoney("$dhjsk")
+		assert.Error(t, err)
+	})
+
+	t.Run("Parses well-formed money successfully", func(t *testing.T) {
+		m, err := ParseMoney("€4.21")
+		assert.NoError(t, err)
+
+		assert.EqualValues(t, 4.21, m.Float())
+		assert.EqualValues(t, "EUR", m.Currency.String())
+	})
+
+	t.Run("Parses all zeroes - zero", func(t *testing.T) {
+		m, err := ParseMoney("€0")
+		assert.NoError(t, err)
+
+		assert.EqualValues(t, 0, m.Float())
+		assert.EqualValues(t, "EUR", m.Currency.String())
+	})
+
+	t.Run("Parses all zeroes - multiple", func(t *testing.T) {
+		m, err := ParseMoney("€0000")
+		assert.NoError(t, err)
+
+		assert.EqualValues(t, 0, m.Float())
+		assert.EqualValues(t, "EUR", m.Currency.String())
+	})
+
+	t.Run("Handles non-total amount of zeroes in the decimal place < ", func(t *testing.T) {
+		m, err := ParseMoney("$4.1")
+		assert.NoError(t, err)
+
+		assert.EqualValues(t, 4.1, m.Float())
+	})
+
+	t.Run("Handles non-total amount of zeroes in the decimal place > ", func(t *testing.T) {
+		m, err := ParseMoney("$4.10000000")
+		assert.NoError(t, err)
+
+		assert.EqualValues(t, 4.1, m.Float())
+	})
+}
+
 func TestMoney_New(t *testing.T) {
 	t.Run("New with float", func(t *testing.T) {
 		money := NM(1.50, USD)
@@ -73,7 +133,12 @@ func TestMoney_Convert(t *testing.T) {
 
 func TestMoney_String(t *testing.T) {
 	money := NM(10.38, USD)
-	assert.EqualValues(t, "10.38", money.String())
+	assert.Equal(t, "10.38", money.String())
+}
+
+func TestMoney_FormalString(t *testing.T) {
+	money := NM(10.38, USD)
+	assert.Equal(t, "$10.38", money.FormalString())
 }
 
 func TestMoney_Float(t *testing.T) {
