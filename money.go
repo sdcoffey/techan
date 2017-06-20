@@ -283,6 +283,6 @@ var (
 	GBP      *Currency = newCurrency("GBP", '£', 2)
 	CAD      *Currency = newCurrency("CAD", 'C', 2)
 	BTC      *Currency = newCurrency("BTC", 'B', 8)
-	ETH      *Currency = newCurrency("ETH", 'E', 18)
-	LTC      *Currency = newCurrency("LTC", 'L', 18)
+	ETH      *Currency = newCurrency("ETH", 'E', 8)
+	LTC      *Currency = newCurrency("LTC", 'L', 8)
 )
