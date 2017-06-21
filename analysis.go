@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"math"
-	"os"
 	"time"
 )
 
@@ -99,8 +98,25 @@ func (apa AverageProfitAnalysis) Analyze(record *TradingRecord) float64 {
 	return totalProft / float64(len(record.Trades))
 }
 
-type graphAnalysis struct {
-	output *os.File
-	record TradingRecord
-	series TimeSeries
+type BuyAndHoldAnalysis struct {
+	*TimeSeries
+}
+
+func (baha BuyAndHoldAnalysis) Analyze(record *TradingRecord) float64 {
+	if len(record.Trades) == 0 {
+		return 0
+	}
+
+	openOrder := NewOrder(BUY)
+	openOrder.Amount = record.Trades[0].EntranceOrder().Amount
+	openOrder.Price = record.Trades[0].EntranceOrder().Price
+
+	closeOrder := NewOrder(SELL)
+	closeOrder.Amount = record.Trades[len(record.Trades)-1].ExitOrder().Amount
+	closeOrder.Price = record.Trades[len(record.Trades)-1].ExitOrder().Price
+
+	pos := NewPosition(openOrder)
+	pos.Exit(closeOrder)
+
+	return pos.ExitValue().S(pos.CostBasis()).Float()
 }
