@@ -36,3 +36,15 @@ func TestTradingRecord_CurrentTrade(t *testing.T) {
 	assert.EqualValues(t, now.UnixNano(),
 		lastTrade.ExitOrder().ExecutionTime.UnixNano())
 }
+
+func TestTradingRecord_Enter(t *testing.T) {
+	t.Run("Does not add trades older than last trade", func(t *testing.T) {
+		t.Fatal("Not implemented")
+	})
+}
+
+func TestTradingRecord_Exit(t *testing.T) {
+	t.Run("Does not add trades older than last trade", func(t *testing.T) {
+		t.Fatal("Not implemented")
+	})
+}
