@@ -42,6 +42,7 @@ func MockTimeSeries(values ...float64) *TimeSeries {
 	for _, val := range values {
 		candle := NewCandle(NewTimePeriodD(time.Unix(int64(candleIndex), 0), time.Second))
 		candle.ClosePrice = NM(val, USD)
+		candle.Volume = NM(val, BTC)
 
 		ts.AddCandle(candle)
 

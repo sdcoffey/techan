@@ -1,6 +1,8 @@
 package talib4g
 
-import "math"
+import (
+	"math"
+)
 
 type Rule interface {
 	IsSatisfied(index int, record *TradingRecord) bool
