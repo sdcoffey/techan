@@ -48,10 +48,18 @@ func (this *TradingRecord) Exit(price, amount Money, time time.Time) {
 
 func (this *TradingRecord) operate(order *order) {
 	if this.currentTrade.IsOpen() {
+		if order.ExecutionTime.Before(this.CurrentTrade().EntranceOrder().ExecutionTime) {
+			return
+		}
+
 		this.currentTrade.Exit(order)
 		this.Trades = append(this.Trades, this.currentTrade)
 		this.currentTrade = newPosition()
 	} else if this.currentTrade.IsNew() {
+		if this.LastTrade() != nil && order.ExecutionTime.Before(this.LastTrade().ExitOrder().ExecutionTime) {
+			return
+		}
+
 		this.currentTrade.Enter(order)
 	}
 }

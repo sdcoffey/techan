@@ -39,12 +39,27 @@ func TestTradingRecord_CurrentTrade(t *testing.T) {
 
 func TestTradingRecord_Enter(t *testing.T) {
 	t.Run("Does not add trades older than last trade", func(t *testing.T) {
-		t.Fatal("Not implemented")
+		record := NewTradingRecord()
+
+		now := time.Now()
+		record.Enter(NM(1, USD), NS(2), now)
+		record.Exit(NM(2, USD), NS(2), now.Add(time.Minute))
+
+		record.Enter(NM(2, USD), NS(2), now.Add(-time.Minute))
+
+		assert.True(t, record.CurrentTrade().IsNew())
+		assert.Len(t, record.Trades, 1)
 	})
 }
 
 func TestTradingRecord_Exit(t *testing.T) {
 	t.Run("Does not add trades older than last trade", func(t *testing.T) {
-		t.Fatal("Not implemented")
+		record := NewTradingRecord()
+
+		now := time.Now()
+		record.Enter(NM(1, USD), NS(2), now)
+		record.Exit(NM(2, USD), NS(2), now.Add(-time.Minute))
+
+		assert.True(t, record.CurrentTrade().IsOpen())
 	})
 }
