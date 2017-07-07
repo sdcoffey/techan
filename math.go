@@ -13,3 +13,24 @@ func Max(i, j int) int {
 	}
 	return j
 }
+
+func Pow(i, j int) int {
+	p := 1
+	for j > 0 {
+		if j&1 != 0 {
+			p *= i
+		}
+		j >>= 1
+		i *= i
+	}
+
+	return p
+}
+
+func Abs(b int) int {
+	if b < 0 {
+		return -b
+	}
+
+	return b
+}

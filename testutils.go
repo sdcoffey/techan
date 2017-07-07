@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	. "github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 var candleIndex int
@@ -53,5 +53,5 @@ func MockTimeSeries(values ...float64) *TimeSeries {
 }
 
 func decimalEquals(t *testing.T, expected float64, actual float64) {
-	Equal(t, fmt.Sprintf("%.4f", actual), fmt.Sprintf("%.4f", actual))
+	assert.Equal(t, fmt.Sprintf("%.4f", actual), fmt.Sprintf("%.4f", actual))
 }

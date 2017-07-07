@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"math"
+	"math/big"
 	"regexp"
 	"strconv"
 	"strings"
@@ -15,7 +16,7 @@ type Calculatable interface {
 
 type Money struct {
 	*Currency
-	raw int64
+	raw big.Int
 }
 
 func ParseMoneyAs(moneyString string, currency *Currency) (Money, error) {
@@ -62,44 +63,44 @@ func ParseMoney(moneyString string) (Money, error) {
 		return Money{}, fmt.Errorf("Could not parse decimal %s -> %s", moneyString[1:], bdErr.Error()+adErr.Error())
 	}
 
-	rawVal := beforeDot*currency.multiplier + afterDot
+	rawVal := big.NewInt(beforeDot*currency.multiplier + afterDot)
 
 	return nmr(rawVal, currency), nil
 }
 
 func NS(value int) Money {
-	return Money{security, int64(value)}
+	return Money{security, *big.NewInt(int64(value))}
 }
 
 func NM(rawVal float64, currency *Currency) Money {
-	return Money{currency, int64(rawVal * float64(currency.multiplier))}
+	return Money{currency, *big.NewInt(int64(rawVal * float64(currency.multiplier)))}
 }
 
 func NMI(rawVal int64, currency *Currency) Money {
-	return Money{currency, int64(rawVal) * currency.multiplier}
+	return Money{currency, *big.NewInt(int64(rawVal) * currency.multiplier)}
 }
 
-func nmr(rawVal int64, currency *Currency) Money {
-	return Money{currency, rawVal}
+func nmr(rawVal *big.Int, currency *Currency) Money {
+	return Money{currency, *rawVal}
 }
 
 func (m Money) A(c Calculatable) Money {
-	return nmr(m.raw+c.Value(), m.Currency)
+	return nmr(m.raw.Add(&m.raw, big.NewInt(c.Value())), m.Currency)
 }
 
-func (m Money) S(other Calculatable) Money {
-	return nmr(m.raw-other.Value(), m.Currency)
+func (m Money) S(c Calculatable) Money {
+	return nmr(m.raw.Sub(&m.raw, big.NewInt(c.Value())), m.Currency)
 }
 
 func (m Money) M(other Calculatable) Money {
-	lhs := m.raw / m.multiplier
-	val := other.Value()
-	rhs := val / m.multiplier
-	return NMI(lhs*rhs, m.Currency)
+	lhs := m.raw.Div(&m.raw, big.NewInt(m.multiplier))
+	rhs := big.NewInt(other.Value())
+	rhs = rhs.Div(rhs, big.NewInt(m.multiplier))
+	return NMI(rhs.Mul(rhs, lhs).Int64(), m.Currency)
 }
 
 func (m Money) D(other Calculatable) Money {
-	return NM((float64(m.raw)/float64(m.multiplier))/(float64(other.Value())/float64(m.multiplier)), m.Currency)
+	return NM((float64(m.raw.Int64())/float64(m.multiplier))/(float64(other.Value())/float64(m.multiplier)), m.Currency)
 }
 
 func (m Money) GT(other Money) bool {
@@ -115,23 +116,23 @@ func (m Money) EQ(other Money) bool {
 }
 
 func (m Money) Zero() bool {
-	return m.raw == 0
+	return m.raw.Int64() == 0
 }
 
 func (m Money) Abs() Money {
-	if m.raw < 0 {
-		return Money{m.Currency, -m.raw}
+	if m.raw.Int64() < 0 {
+		return Money{m.Currency, *m.raw.Neg(&m.raw)}
 	}
 
 	return m
 }
 
 func (m Money) Neg() Money {
-	return Money{m.Currency, -m.raw}
+	return Money{m.Currency, *m.raw.Neg(&m.raw)}
 }
 
 func (m Money) Frac(fraction float64) Money {
-	return Money{m.Currency, int64(float64(m.raw) * fraction)}
+	return Money{m.Currency, *big.NewInt(int64(float64(m.raw.Int64()) * fraction))}
 }
 
 // Returns a money in currency other, at the given exchange rate
@@ -140,7 +141,7 @@ func (m Money) Convert(exchangeRate Money) Money {
 }
 
 func (m Money) Value() int64 {
-	return m.raw
+	return m.raw.Int64()
 }
 
 func (m Money) String() string {
@@ -160,11 +161,11 @@ func (m Money) FormalString() string {
 }
 
 func (m Money) Float() float64 {
-	return float64(m.raw) / float64(m.multiplier)
+	return float64(m.raw.Int64()) / float64(m.multiplier)
 }
 
 func (m Money) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf(`{"Value":%d,"Currency":"%s"}`, m.raw, string(m.Currency.label))), nil
+	return []byte(fmt.Sprintf(`{"Value":%d,"Currency":"%s"}`, m.raw.Int64(), string(m.Currency.label))), nil
 }
 
 func (m *Money) UnmarshalJSON(b []byte) error {
@@ -172,10 +173,11 @@ func (m *Money) UnmarshalJSON(b []byte) error {
 	rawStr := split[0][9:]
 	currencyStr := split[1][12:15]
 
-	var err error
-	m.raw, err = strconv.ParseInt(string(rawStr), 10, 64)
+	r, err := strconv.ParseInt(string(rawStr), 10, 64)
 	if err != nil {
 		return fmt.Errorf("Error parsing Value -> %s", err)
+	} else {
+		m.raw = *big.NewInt(r)
 	}
 
 	m.Currency = CurrencyForName(string(currencyStr))
@@ -188,9 +190,9 @@ func (m Money) cmp(other Money) int {
 		panic(fmt.Errorf("Cannot compare two moneys of different currency"))
 	}
 
-	if m.raw == other.raw {
+	if m.raw.Cmp(&other.raw) == 0 {
 		return 0
-	} else if m.raw < other.raw {
+	} else if m.raw.Cmp(&other.raw) < 0 {
 		return -1
 	}
 	return 1

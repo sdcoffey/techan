@@ -78,7 +78,7 @@ func TestMoney_New(t *testing.T) {
 	})
 
 	t.Run("New with raw", func(t *testing.T) {
-		money := nmr(100, USD)
+		money := NM(1, USD)
 		assert.EqualValues(t, 100, money.Value())
 	})
 }

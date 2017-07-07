@@ -1,7 +1,7 @@
 package talib4g
 
 import (
-	"github.com/sdcoffey/gunviolencecounter/Godeps/_workspace/src/github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
