@@ -1,18 +1,16 @@
 package talib4g
 
-import "math"
-
 type cumulativeIndicator struct {
 	Indicator
 	window int
-	mult   int
+	mult   Decimal
 }
 
 func NewCumulativeGainsIndicator(indicator Indicator, window int) Indicator {
 	return cumulativeIndicator{
 		Indicator: indicator,
 		window:    window,
-		mult:      1,
+		mult:      ONE,
 	}
 }
 
@@ -20,17 +18,17 @@ func NewCumulativeLossesIndicator(indicator Indicator, window int) Indicator {
 	return cumulativeIndicator{
 		Indicator: indicator,
 		window:    window,
-		mult:      -1,
+		mult:      ONE.Neg(),
 	}
 }
 
-func (ci cumulativeIndicator) Calculate(index int) float64 {
-	total := 0.0
+func (ci cumulativeIndicator) Calculate(index int) Decimal {
+	total := NewDecimal(0.0)
 
 	for i := Max(1, index-(ci.window-1)); i <= index; i++ {
-		diff := ci.Indicator.Calculate(i) - ci.Indicator.Calculate(i-1)
-		if diff*float64(ci.mult) > 0 {
-			total += math.Abs(diff)
+		diff := ci.Indicator.Calculate(i).Sub(ci.Indicator.Calculate(i - 1))
+		if diff.Mul(ci.mult).GT(ZERO) {
+			total = total.Add(diff.Abs())
 		}
 	}
 
@@ -45,12 +43,12 @@ func NewPercentChangeIndicator(indicator Indicator) Indicator {
 	return percentChangeIndicator{indicator}
 }
 
-func (pgi percentChangeIndicator) Calculate(index int) float64 {
+func (pgi percentChangeIndicator) Calculate(index int) Decimal {
 	if index == 0 {
-		return 0
+		return ZERO
 	}
 
 	cp := pgi.Indicator.Calculate(index)
 	cplast := pgi.Indicator.Calculate(index - 1)
-	return cp/cplast - 1
+	return cp.Div(cplast).Sub(ONE)
 }

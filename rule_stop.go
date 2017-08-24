@@ -2,7 +2,7 @@ package talib4g
 
 type StopLossRule struct {
 	Indicator
-	tolerance float64
+	tolerance Decimal
 }
 
 // Returns a new stop loss rule based on a timeseries and a loss tolerance
@@ -11,7 +11,7 @@ type StopLossRule struct {
 func NewStopLossRule(series *TimeSeries, lossTolerance float64) Rule {
 	return StopLossRule{
 		Indicator: NewClosePriceIndicator(series),
-		tolerance: lossTolerance,
+		tolerance: NewDecimal(lossTolerance),
 	}
 }
 
@@ -20,6 +20,7 @@ func (slr StopLossRule) IsSatisfied(index int, record *TradingRecord) bool {
 		return false
 	}
 
-	openPrice := record.CurrentTrade().CostBasis().Float()
-	return slr.Indicator.Calculate(index)/openPrice-1 <= slr.tolerance
+	openPrice := record.CurrentTrade().CostBasis()
+	loss := slr.Indicator.Calculate(index).Div(openPrice).Sub(ONE)
+	return loss.LTE(slr.tolerance)
 }

@@ -27,6 +27,6 @@ func NewAverageLossesIndicator(indicator Indicator, window int) Indicator {
 	}
 }
 
-func (ai averageIndicator) Calculate(index int) float64 {
-	return ai.Indicator.Calculate(index) / float64(Min(index+1, ai.window))
+func (ai averageIndicator) Calculate(index int) Decimal {
+	return ai.Indicator.Calculate(index).Div(NewDecimal(float64(Min(index+1, ai.window))))
 }

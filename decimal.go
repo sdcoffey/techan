@@ -1,164 +1,101 @@
 package talib4g
 
 import (
-	"bytes"
-	"fmt"
-	"strconv"
-	"strings"
+	"math/big"
 )
 
-// Decimal represents fixed precision numbers
+var (
+	flZero = *big.NewFloat(0)
+
+	ZERO = NewDecimal(0)
+	ONE  = NewDecimal(1)
+	TEN  = NewDecimal(10)
+)
+
 type Decimal struct {
-	unscaled int64
-	scale    int
+	fl *big.Float
 }
 
-// NewDecimal creates a new decimal number equal to
-// unscaled ** 10 ^ (-scale)
-func NewDecimal(unscaled int64, scale int) Decimal {
-	return Decimal{unscaled: unscaled, scale: scale}
+func NewDecimal(fl float64) Decimal {
+	return Decimal{big.NewFloat(fl)}
 }
 
-func NewDecimalFromString(dec string) (d Decimal, err error) {
-	err = d.UnmarshalText([]byte(dec))
-	return
+func NewDecimalFromString(fl string) Decimal {
+	bfl := new(big.Float)
+	bfl.UnmarshalText([]byte(fl))
+	return Decimal{bfl}
 }
 
-func NewDecimalFromFloat(dec float64) Decimal {
-	b := []byte(fmt.Sprint(dec))
-	d := new(Decimal)
-	d.UnmarshalText(b)
-
-	return *d
+func (d Decimal) Add(other Decimal) Decimal {
+	return Decimal{d.cpy().Add(d.fl, other.fl)}
 }
 
-// MarshalText outputs a decimal representation of the scaled number
-func (d Decimal) MarshalText() (text []byte, err error) {
-	b := new(bytes.Buffer)
-	if d.scale <= 0 {
-		b.WriteString(strconv.FormatInt(d.unscaled, 10))
-		b.WriteString(strings.Repeat("0", -d.scale))
-	} else {
-		str := strconv.FormatInt(d.unscaled, 10)
-		if len(str) < d.scale {
-			str = strings.Repeat("0", d.scale) + str
-		}
-		b.WriteString(str[:len(str)-d.scale])
-		b.WriteString(".")
-		b.WriteString(str[len(str)-d.scale:])
-	}
-	return b.Bytes(), nil
+func (d Decimal) Sub(other Decimal) Decimal {
+	return Decimal{d.cpy().Sub(d.fl, other.fl)}
 }
 
-// UnmarshalText creates a Decimal from a string representation (e.g. 5.20)
-// Currently only supports decimal strings
-func (d *Decimal) UnmarshalText(text []byte) (err error) {
-	var (
-		str            = string(text)
-		unscaled int64 = 0
-		scale    int   = 0
-	)
-
-	if str == "" {
-		return nil
-	}
-
-	if i := strings.Index(str, "."); i != -1 {
-		scale = len(str) - i - 1
-		str = strings.Replace(str, ".", "", 1)
-	}
-
-	if unscaled, err = strconv.ParseInt(str, 10, 64); err != nil {
-		return err
-	}
-
-	d.unscaled = unscaled
-	d.scale = scale
-
-	return nil
+func (d Decimal) Mul(other Decimal) Decimal {
+	return Decimal{d.cpy().Mul(d.fl, other.fl)}
 }
 
-func (x Decimal) cmp(y Decimal) int {
-	xUnscaled, yUnscaled := x.unscaled, y.unscaled
-	xScale, yScale := x.scale, y.scale
-
-	for ; xScale > yScale; xScale-- {
-		yUnscaled = yUnscaled * 10
-	}
-
-	for ; yScale > xScale; yScale-- {
-		xUnscaled = xUnscaled * 10
-	}
-
-	switch {
-	case xUnscaled < yUnscaled:
-		return -1
-	case xUnscaled > yUnscaled:
-		return 1
-	default:
-		return 0
-	}
+func (d Decimal) Div(other Decimal) Decimal {
+	return Decimal{d.cpy().Quo(d.fl, other.fl)}
 }
 
-func (d Decimal) Add(x Decimal) Decimal {
-	maxScale, dRescaled, xRescaled := rescale(d, x)
-	return Decimal{
-		unscaled: dRescaled + xRescaled,
-		scale:    maxScale,
-	}
+func (d Decimal) Frac(f float64) Decimal {
+	return d.Mul(NewDecimal(f))
 }
 
-func (d Decimal) Sub(x Decimal) Decimal {
-	maxScale, dRescaled, xRescaled := rescale(d, x)
-	return Decimal{
-		unscaled: dRescaled - xRescaled,
-		scale:    maxScale,
-	}
+func (d Decimal) Neg() Decimal {
+	return d.Mul(NewDecimal(-1))
 }
 
-func (d Decimal) Mul(x Decimal) Decimal {
-	maxScale, dRescaled, xRescaled := rescale(d, x)
-	if maxRescaled := int64(Max(int(dRescaled), int(xRescaled))); maxRescaled == xRescaled {
-		maxScale += numDigits(int(xRescaled)) - numDigits(int(dRescaled))
-	} else {
-		maxScale += numDigits(int(dRescaled)) - numDigits(int(xRescaled))
-	}
-	return Decimal{
-		unscaled: dRescaled * xRescaled,
-		scale:    maxScale,
-	}
-}
-
-func numDigits(x int) (d int) {
-	for x != 0 {
-		x /= 10
-		d++
+func (d Decimal) Abs() Decimal {
+	if d.LT(ZERO) {
+		return d.Mul(ONE.Neg())
 	}
 
 	return d
 }
 
-func rescale(x, y Decimal) (maxScale int, xRescaled, yRescaled int64) {
-	maxScale = Max(x.scale, y.scale)
-	xRescaled = x.unscaled
-	yRescaled = y.unscaled
-
-	if maxScale == x.scale {
-		xRescaled *= int64(Pow(10, maxScale-y.scale))
-	} else {
-		yRescaled *= int64(Pow(10, maxScale-x.scale))
-	}
-
-	return
+func (d Decimal) EQ(other Decimal) bool {
+	return d.Cmp(other) == 0
 }
 
-// String returns string representation of Decimal
-func (d *Decimal) String() string {
-	b, err := d.MarshalText()
+func (d Decimal) LT(other Decimal) bool {
+	return d.Cmp(other) < 0
+}
 
-	if err != nil {
-		panic(err) //should never happen (see: MarshalText)
-	}
+func (d Decimal) LTE(other Decimal) bool {
+	return d.Cmp(other) <= 0
+}
 
-	return string(b)
+func (d Decimal) GT(other Decimal) bool {
+	return d.Cmp(other) > 0
+}
+
+func (d Decimal) GTE(other Decimal) bool {
+	return d.Cmp(other) >= 0
+}
+
+func (d Decimal) Cmp(other Decimal) int {
+	return d.fl.Cmp(other.fl)
+}
+
+func (d Decimal) Float() float64 {
+	f, _ := d.fl.Float64()
+	return f
+}
+
+func (d Decimal) Zero() bool {
+	return d.fl.Cmp(&flZero) == 0
+}
+
+func (d Decimal) String() string {
+	return d.fl.String()
+}
+
+func (d Decimal) cpy() *big.Float {
+	cpy := new(big.Float)
+	return cpy.Copy(d.fl)
 }

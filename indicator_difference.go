@@ -12,6 +12,6 @@ func NewDifferenceIndicator(minuend, subtrahend Indicator) Indicator {
 	}
 }
 
-func (di differenceIndicator) Calculate(index int) float64 {
-	return di.minuend.Calculate(index) - di.subtrahend.Calculate(index)
+func (di differenceIndicator) Calculate(index int) Decimal {
+	return di.minuend.Calculate(index).Sub(di.subtrahend.Calculate(index))
 }

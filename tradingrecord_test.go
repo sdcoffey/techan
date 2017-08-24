@@ -1,9 +1,10 @@
 package talib4g
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewTradingRecord(t *testing.T) {
@@ -18,7 +19,7 @@ func TestTradingRecord_CurrentTrade(t *testing.T) {
 
 	yesterday := time.Now().Add(-time.Hour * 24)
 
-	record.Enter(NM(1, USD), NS(2), yesterday)
+	record.Enter(NewDecimal(1), NewDecimal(2), yesterday)
 
 	assert.EqualValues(t, 1, record.CurrentTrade().EntranceOrder().Price.Float())
 	assert.EqualValues(t, 2, record.CurrentTrade().EntranceOrder().Amount.Float())
@@ -26,7 +27,7 @@ func TestTradingRecord_CurrentTrade(t *testing.T) {
 		record.CurrentTrade().EntranceOrder().ExecutionTime.UnixNano())
 
 	now := time.Now()
-	record.Exit(NM(3, USD), NS(4), now)
+	record.Exit(NewDecimal(3), NewDecimal(4), now)
 	assert.True(t, record.CurrentTrade().IsNew())
 
 	lastTrade := record.LastTrade()
@@ -42,10 +43,10 @@ func TestTradingRecord_Enter(t *testing.T) {
 		record := NewTradingRecord()
 
 		now := time.Now()
-		record.Enter(NM(1, USD), NS(2), now)
-		record.Exit(NM(2, USD), NS(2), now.Add(time.Minute))
+		record.Enter(NewDecimal(1), NewDecimal(2), now)
+		record.Exit(NewDecimal(2), NewDecimal(2), now.Add(time.Minute))
 
-		record.Enter(NM(2, USD), NS(2), now.Add(-time.Minute))
+		record.Enter(NewDecimal(2), NewDecimal(2), now.Add(-time.Minute))
 
 		assert.True(t, record.CurrentTrade().IsNew())
 		assert.Len(t, record.Trades, 1)
@@ -57,8 +58,8 @@ func TestTradingRecord_Exit(t *testing.T) {
 		record := NewTradingRecord()
 
 		now := time.Now()
-		record.Enter(NM(1, USD), NS(2), now)
-		record.Exit(NM(2, USD), NS(2), now.Add(-time.Minute))
+		record.Enter(NewDecimal(1), NewDecimal(2), now)
+		record.Exit(NewDecimal(2), NewDecimal(2), now.Add(-time.Minute))
 
 		assert.True(t, record.CurrentTrade().IsOpen())
 	})

@@ -1,16 +1,17 @@
 package talib4g
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestStopLossRule(t *testing.T) {
 	t.Run("Returns false when position is new or closed", func(t *testing.T) {
 		record := NewTradingRecord()
 
-		series := MockTimeSeries(1, 2, 3, 4)
+		series := mockTimeSeries(1, 2, 3, 4)
 
 		slr := NewStopLossRule(series, -0.1)
 
@@ -19,9 +20,9 @@ func TestStopLossRule(t *testing.T) {
 
 	t.Run("Returns true when losses exceed tolerance", func(t *testing.T) {
 		record := NewTradingRecord()
-		record.Enter(NM(10, USD), NM(1, BTC), time.Now())
+		record.Enter(NewDecimal(10), NewDecimal(1), time.Now())
 
-		series := MockTimeSeries(10, 9) // Lose 10%
+		series := mockTimeSeries(10, 9) // Lose 10%
 
 		slr := NewStopLossRule(series, -0.05)
 
@@ -30,9 +31,9 @@ func TestStopLossRule(t *testing.T) {
 
 	t.Run("Returns false when losses do not exceed tolerance", func(t *testing.T) {
 		record := NewTradingRecord()
-		record.Enter(NM(10, USD), NM(1, BTC), time.Now())
+		record.Enter(NewDecimal(10), NewDecimal(1), time.Now())
 
-		series := MockTimeSeries(10, 10.1) // Lose 10%
+		series := mockTimeSeries(10, 10.1) // Gain 1%
 
 		slr := NewStopLossRule(series, -0.05)
 

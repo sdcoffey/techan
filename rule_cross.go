@@ -5,7 +5,7 @@ type crossIndicatorRule struct {
 }
 
 func (cir crossIndicatorRule) IsSatisfied(index int, record *TradingRecord) bool {
-	return cir.cross.Calculate(index) > 0
+	return cir.cross.Calculate(index).GT(ZERO)
 }
 
 func NewCrossUpIndicatorRule(upper, lower Indicator) Rule {

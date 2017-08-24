@@ -11,8 +11,8 @@ const (
 
 type order struct {
 	Type          OrderSide
-	Price         Money
-	Amount        Money
+	Price         Decimal
+	Amount        Decimal
 	ExecutionTime time.Time
 }
 

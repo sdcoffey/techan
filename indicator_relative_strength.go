@@ -12,18 +12,19 @@ func NewRelativeStrengthIndicator(indicator Indicator, timeframe int) Indicator 
 	}
 }
 
-func (rsi relativeStrengthIndicator) Calculate(index int) float64 {
+func (rsi relativeStrengthIndicator) Calculate(index int) Decimal {
 	if index == 0 {
-		return 0.0
+		return ZERO
 	}
 
 	averageGain := rsi.avgGain.Calculate(index)
 	averageLoss := rsi.avgLoss.Calculate(index)
 
-	relativeStrength := 0.0
-	if averageLoss > 0 {
-		relativeStrength = averageGain / averageLoss
+	relativeStrength := ZERO
+	if averageLoss.GT(ZERO) {
+		relativeStrength = averageGain.Div(averageLoss)
 	}
 
-	return 100.0 - (100.0 / (1 + relativeStrength))
+	oneHundred := TEN.Mul(TEN)
+	return oneHundred.Sub(oneHundred.Div(ONE.Add(relativeStrength)))
 }

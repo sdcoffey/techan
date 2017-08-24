@@ -14,12 +14,12 @@ type Analysis interface {
 type TotalProfitAnalysis float64
 
 func (tps TotalProfitAnalysis) Analyze(record *TradingRecord) float64 {
-	totalProfit := NM(0, USD)
+	totalProfit := NewDecimal(0)
 	for _, trade := range record.Trades {
 		if trade.IsClosed() {
 			costBasis := trade.CostBasis().Frac(1 + float64(tps))
 			exitValue := trade.ExitValue().Frac(math.Abs(float64(tps) - 1))
-			totalProfit = totalProfit.A(exitValue.S(costBasis))
+			totalProfit = totalProfit.Add(exitValue.Sub(costBasis))
 		}
 	}
 
@@ -30,7 +30,7 @@ type PercentGainAnalysis struct{}
 
 func (pga PercentGainAnalysis) Analyze(record *TradingRecord) float64 {
 	if len(record.Trades) > 0 && record.Trades[0].IsClosed() {
-		return (record.Trades[len(record.Trades)-1].ExitValue().Float() / record.Trades[0].CostBasis().Float()) - 1
+		return (record.Trades[len(record.Trades)-1].ExitValue().Div(record.Trades[0].CostBasis())).Sub(NewDecimal(1)).Float()
 	} else {
 		return 0
 	}
@@ -51,7 +51,7 @@ func (lta LogTradesAnalysis) Analyze(record *TradingRecord) float64 {
 		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - enter with buy (%s @ $%s)", trade.EntranceOrder().ExecutionTime.UTC().Format(time.RFC822), trade.EntranceOrder().Amount, trade.EntranceOrder().Price))
 		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - exit with sell (%s @ $%s)", trade.ExitOrder().ExecutionTime.UTC().Format(time.RFC822), trade.ExitOrder().Amount, trade.ExitOrder().Price))
 
-		profit := trade.ExitValue().S(trade.CostBasis())
+		profit := trade.ExitValue().Sub(trade.CostBasis())
 		fmt.Fprintln(lta.Writer, fmt.Sprintf("Profit: $%s", profit))
 	}
 
@@ -78,8 +78,8 @@ type ProfitableTradesAnalysis string
 func (pta ProfitableTradesAnalysis) Analyze(record *TradingRecord) float64 {
 	var profitableTrades int
 	for _, trade := range record.Trades {
-		costBasis := trade.EntranceOrder().Amount.Convert(trade.EntranceOrder().Price)
-		sellPrice := trade.ExitOrder().Amount.Convert(trade.ExitOrder().Price)
+		costBasis := trade.EntranceOrder().Amount.Mul(trade.EntranceOrder().Price)
+		sellPrice := trade.ExitOrder().Amount.Mul(trade.ExitOrder().Price)
 
 		if sellPrice.GT(costBasis) {
 			profitableTrades++
@@ -109,7 +109,7 @@ func (baha BuyAndHoldAnalysis) Analyze(record *TradingRecord) float64 {
 	}
 
 	openOrder := NewOrder(BUY)
-	openOrder.Amount = NM(baha.StartingMoney/baha.Candles[0].ClosePrice.Float(), baha.Candles[0].Volume.Currency)
+	openOrder.Amount = NewDecimal(baha.StartingMoney).Div(baha.Candles[0].ClosePrice)
 	openOrder.Price = baha.Candles[0].ClosePrice
 
 	closeOrder := NewOrder(SELL)
@@ -119,5 +119,5 @@ func (baha BuyAndHoldAnalysis) Analyze(record *TradingRecord) float64 {
 	pos := NewPosition(openOrder)
 	pos.Exit(closeOrder)
 
-	return pos.ExitValue().S(pos.CostBasis()).Float()
+	return pos.ExitValue().Sub(pos.CostBasis()).Float()
 }

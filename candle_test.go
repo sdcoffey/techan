@@ -1,20 +1,21 @@
 package talib4g
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCandle_AddTrade(t *testing.T) {
 	now := time.Now()
 	candle := NewCandle(NewTimePeriod(now, now.Add(time.Minute)))
 
-	candle.AddTrade(NM(1, security), NM(2, USD)) // Open
-	candle.AddTrade(NM(1, security), NM(5, USD)) // High
-	candle.AddTrade(NM(1, security), NM(1, USD)) // Low
-	candle.AddTrade(NM(1, security), NM(3, USD)) // No Diff
-	candle.AddTrade(NM(1, security), NM(3, USD)) // Close
+	candle.AddTrade(NewDecimal(1), NewDecimal(2)) // Open
+	candle.AddTrade(NewDecimal(1), NewDecimal(5)) // High
+	candle.AddTrade(NewDecimal(1), NewDecimal(1)) // Low
+	candle.AddTrade(NewDecimal(1), NewDecimal(3)) // No Diff
+	candle.AddTrade(NewDecimal(1), NewDecimal(3)) // Close
 
 	assert.EqualValues(t, 2, candle.OpenPrice.Float())
 	assert.EqualValues(t, 5, candle.MaxPrice.Float())

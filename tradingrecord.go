@@ -28,7 +28,7 @@ func (this *TradingRecord) LastTrade() *Position {
 	return this.Trades[len(this.Trades)-1]
 }
 
-func (this *TradingRecord) Enter(price, amount Money, time time.Time) {
+func (this *TradingRecord) Enter(price, amount Decimal, time time.Time) {
 	order := NewOrder(BUY)
 	order.Amount = amount
 	order.Price = price
@@ -37,7 +37,7 @@ func (this *TradingRecord) Enter(price, amount Money, time time.Time) {
 	this.operate(order)
 }
 
-func (this *TradingRecord) Exit(price, amount Money, time time.Time) {
+func (this *TradingRecord) Exit(price, amount Decimal, time time.Time) {
 	order := NewOrder(SELL)
 	order.Amount = amount
 	order.Price = price

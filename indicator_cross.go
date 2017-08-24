@@ -17,14 +17,14 @@ func NewCrossIndicator(upper, lower Indicator) Indicator {
 
 // Walks backward from the current index to determine if the lower indicator
 // has crossed the upper indicator. Returns truthy value if so, zero otherwise
-func (ci crossIndicator) Calculate(index int) float64 {
+func (ci crossIndicator) Calculate(index int) Decimal {
 	if index == 0 {
-		return 0
+		return ZERO
 	}
 
-	if ci.differenceIndicator.Calculate(index) <= 0 && ci.differenceIndicator.Calculate(index-1) > 0 {
-		return 1
+	if ci.differenceIndicator.Calculate(index).LTE(ZERO) && ci.differenceIndicator.Calculate(index-1).GT(ZERO) {
+		return ONE
 	}
 
-	return 0
+	return ZERO
 }

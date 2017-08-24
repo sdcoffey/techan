@@ -1,9 +1,10 @@
 package talib4g
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestPosition_NoOrders_IsNew(t *testing.T) {
@@ -14,8 +15,8 @@ func TestPosition_NoOrders_IsNew(t *testing.T) {
 
 func TestPosition_NewPosition_IsOpen(t *testing.T) {
 	order := NewOrder(BUY)
-	order.Amount = NS(1)
-	order.Price = NM(2, USD)
+	order.Amount = NewDecimal(1)
+	order.Price = NewDecimal(2)
 
 	position := NewPosition(order)
 	assert.True(t, position.IsOpen())
@@ -25,8 +26,8 @@ func TestPosition_NewPosition_IsOpen(t *testing.T) {
 
 func TestNewPosition_WithBuy_IsLong(t *testing.T) {
 	order := NewOrder(BUY)
-	order.Amount = NS(1)
-	order.Price = NM(2, USD)
+	order.Amount = NewDecimal(1)
+	order.Price = NewDecimal(2)
 
 	position := NewPosition(order)
 	assert.True(t, position.IsLong())
@@ -34,8 +35,8 @@ func TestNewPosition_WithBuy_IsLong(t *testing.T) {
 
 func TestNewPosition_WithSell_IsShort(t *testing.T) {
 	order := NewOrder(SELL)
-	order.Amount = NS(1)
-	order.Price = NM(2, USD)
+	order.Amount = NewDecimal(1)
+	order.Price = NewDecimal(2)
 
 	position := NewPosition(order)
 	assert.True(t, position.IsShort())
@@ -45,8 +46,8 @@ func TestPosition_Enter(t *testing.T) {
 	position := newPosition()
 
 	order := NewOrder(BUY)
-	order.Amount = NS(1)
-	order.Price = NM(3, USD)
+	order.Amount = NewDecimal(1)
+	order.Price = NewDecimal(3)
 	order.ExecutionTime = time.Now()
 
 	position.Enter(order)
@@ -61,8 +62,8 @@ func TestPosition_Close(t *testing.T) {
 	position := newPosition()
 
 	entranceOrder := NewOrder(BUY)
-	entranceOrder.Amount = NS(1)
-	entranceOrder.Price = NM(1, USD)
+	entranceOrder.Amount = NewDecimal(1)
+	entranceOrder.Price = NewDecimal(1)
 	entranceOrder.ExecutionTime = time.Now()
 
 	position.Enter(entranceOrder)
@@ -73,8 +74,8 @@ func TestPosition_Close(t *testing.T) {
 	assert.EqualValues(t, entranceOrder.ExecutionTime, position.EntranceOrder().ExecutionTime)
 
 	exitOrder := NewOrder(SELL)
-	entranceOrder.Amount = NS(1)
-	entranceOrder.Price = NM(4, USD)
+	entranceOrder.Amount = NewDecimal(1)
+	entranceOrder.Price = NewDecimal(4)
 	exitOrder.ExecutionTime = time.Now()
 
 	position.Exit(exitOrder)
@@ -90,32 +91,32 @@ func TestPosition_CostBasis(t *testing.T) {
 	p := newPosition()
 
 	order := NewOrder(BUY)
-	order.Amount = NS(1)
-	order.Price = NM(10, USD)
+	order.Amount = NewDecimal(1)
+	order.Price = NewDecimal(10)
 
 	p.Enter(order)
 
-	costBasis := NM(10, USD)
+	costBasis := NewDecimal(10)
 
-	assert.EqualValues(t, costBasis.Value(), p.CostBasis().Value())
+	assert.EqualValues(t, costBasis.Float(), p.CostBasis().Float())
 }
 
 func TestPosition_ExitValue(t *testing.T) {
 	p := newPosition()
 
 	order := NewOrder(BUY)
-	order.Amount = NS(1)
-	order.Price = NM(10, USD)
+	order.Amount = NewDecimal(1)
+	order.Price = NewDecimal(10)
 
 	p.Enter(order)
 
 	order = NewOrder(SELL)
-	order.Amount = NS(1)
-	order.Price = NM(12, USD)
+	order.Amount = NewDecimal(1)
+	order.Price = NewDecimal(12)
 
 	p.Exit(order)
 
-	sellValue := NM(12, USD)
+	sellValue := NewDecimal(12)
 
-	assert.EqualValues(t, sellValue.Value(), p.ExitValue().Value())
+	assert.EqualValues(t, sellValue.Float(), p.ExitValue().Float())
 }

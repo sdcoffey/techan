@@ -27,22 +27,15 @@ func RandomTimeSeries(size int) *TimeSeries {
 		}
 	}
 
-	return MockTimeSeries(vals...)
+	return mockTimeSeries(vals...)
 }
 
-func MockCandle(closePrice float64) *Candle {
-	t := NewCandle(NewTimePeriodD(time.Unix(int64(candleIndex), 0), time.Second))
-	t.ClosePrice = NM(closePrice, USD)
-
-	return t
-}
-
-func MockTimeSeries(values ...float64) *TimeSeries {
+func mockTimeSeries(values ...float64) *TimeSeries {
 	ts := NewTimeSeries()
 	for _, val := range values {
 		candle := NewCandle(NewTimePeriodD(time.Unix(int64(candleIndex), 0), time.Second))
-		candle.ClosePrice = NM(val, USD)
-		candle.Volume = NM(val, BTC)
+		candle.ClosePrice = NewDecimal(val)
+		candle.Volume = NewDecimal(val)
 
 		ts.AddCandle(candle)
 
@@ -52,6 +45,6 @@ func MockTimeSeries(values ...float64) *TimeSeries {
 	return ts
 }
 
-func decimalEquals(t *testing.T, expected float64, actual float64) {
-	assert.Equal(t, fmt.Sprintf("%.4f", actual), fmt.Sprintf("%.4f", actual))
+func decimalEquals(t *testing.T, expected float64, actual Decimal) {
+	assert.Equal(t, fmt.Sprintf("%.4f", expected), fmt.Sprintf("%.4f", actual.Float()))
 }

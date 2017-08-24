@@ -6,6 +6,6 @@ func NewConstantIndicator(constant float64) Indicator {
 	return constantIndicator(constant)
 }
 
-func (ci constantIndicator) Calculate(index int) float64 {
-	return float64(ci)
+func (ci constantIndicator) Calculate(index int) Decimal {
+	return NewDecimal(float64(ci))
 }

@@ -14,10 +14,10 @@ func NewCCIIndicator(ts *TimeSeries, window int) Indicator {
 	}
 }
 
-func (ccii commidityChannelIndexIndicator) Calculate(index int) float64 {
+func (ccii commidityChannelIndexIndicator) Calculate(index int) Decimal {
 	typicalPrice := NewTypicalPriceIndicator(ccii.series)
 	typicalPriceSma := NewSimpleMovingAverage(typicalPrice, ccii.window)
 	meanDeviation := NewMeanDeviationIndicator(NewClosePriceIndicator(ccii.series), ccii.window)
 
-	return (typicalPrice.Calculate(index) - typicalPriceSma.Calculate(index)) / (meanDeviation.Calculate(index) * 0.015)
+	return typicalPrice.Calculate(index).Sub(typicalPriceSma.Calculate(index)).Div(meanDeviation.Calculate(index).Mul(NewDecimal(0.015)))
 }

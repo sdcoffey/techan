@@ -11,6 +11,6 @@ func NewFixedIndicator(vals ...float64) Indicator {
 	return fixedIndicator(slc)
 }
 
-func (fi fixedIndicator) Calculate(index int) float64 {
-	return fi[index]
+func (fi fixedIndicator) Calculate(index int) Decimal {
+	return NewDecimal(fi[index])
 }

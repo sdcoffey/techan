@@ -58,16 +58,16 @@ func (p *Position) ExitOrder() *order {
 	return p.orders[1]
 }
 
-func (p *Position) CostBasis() Money {
+func (p *Position) CostBasis() Decimal {
 	if p.EntranceOrder() != nil {
-		return p.EntranceOrder().Amount.Convert(p.EntranceOrder().Price)
+		return p.EntranceOrder().Amount.Mul(p.EntranceOrder().Price)
 	}
-	return NM(0, USD)
+	return NewDecimal(0)
 }
 
-func (p *Position) ExitValue() Money {
+func (p *Position) ExitValue() Decimal {
 	if p.IsClosed() {
-		return p.ExitOrder().Amount.Convert(p.ExitOrder().Price)
+		return p.ExitOrder().Amount.Mul(p.ExitOrder().Price)
 	}
-	return NM(0, USD)
+	return NewDecimal(0)
 }

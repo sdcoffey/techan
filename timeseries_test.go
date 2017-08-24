@@ -1,9 +1,10 @@
 package talib4g
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTimeSeries_AddCandle(t *testing.T) {
@@ -18,7 +19,7 @@ func TestTimeSeries_AddCandle(t *testing.T) {
 		ts := NewTimeSeries()
 
 		candle := NewCandle(NewTimePeriodD(time.Now(), time.Minute))
-		candle.ClosePrice = NM(1, USD)
+		candle.ClosePrice = NewDecimal(1)
 
 		ts.AddCandle(candle)
 
@@ -30,13 +31,13 @@ func TestTimeSeries_AddCandle(t *testing.T) {
 
 		now := time.Now()
 		candle := NewCandle(NewTimePeriodD(now, time.Minute))
-		candle.ClosePrice = NM(1, USD)
+		candle.ClosePrice = NewDecimal(1)
 
 		ts.AddCandle(candle)
 		then := now.Add(-time.Minute * 10)
 
 		nextCandle := NewCandle(NewTimePeriodD(then, time.Minute))
-		candle.ClosePrice = NM(2, USD)
+		candle.ClosePrice = NewDecimal(2)
 
 		ts.AddCandle(nextCandle)
 
@@ -50,7 +51,7 @@ func TestTimeSeries_LastCandle(t *testing.T) {
 
 	now := time.Now()
 	candle := NewCandle(NewTimePeriodD(now, time.Minute))
-	candle.ClosePrice = NM(1, USD)
+	candle.ClosePrice = NewDecimal(1)
 
 	ts.AddCandle(candle)
 
@@ -59,7 +60,7 @@ func TestTimeSeries_LastCandle(t *testing.T) {
 
 	next := time.Now().Add(time.Minute)
 	newCandle := NewCandle(NewTimePeriodD(next, time.Minute))
-	newCandle.ClosePrice = NM(2, USD)
+	newCandle.ClosePrice = NewDecimal(2)
 
 	ts.AddCandle(newCandle)
 
