@@ -1,5 +1,7 @@
 package talib4g
 
+import "github.com/sdcoffey/big"
+
 type meanDeviationIndicator struct {
 	Indicator
 	movingAverage Indicator
@@ -15,14 +17,14 @@ func NewMeanDeviationIndicator(indicator Indicator, window int) Indicator {
 	}
 }
 
-func (mdi meanDeviationIndicator) Calculate(index int) Decimal {
+func (mdi meanDeviationIndicator) Calculate(index int) big.Decimal {
 	average := mdi.movingAverage.Calculate(index)
 	start := Max(0, index-mdi.window+1)
-	absoluteDeviations := NewDecimal(0)
+	absoluteDeviations := big.NewDecimal(0)
 
 	for i := start; i <= index; i++ {
 		absoluteDeviations = absoluteDeviations.Add(average.Sub(mdi.Indicator.Calculate(i)).Abs())
 	}
 
-	return absoluteDeviations.Div(NewDecimal(float64(Min(mdi.window, index-start+1))))
+	return absoluteDeviations.Div(big.NewDecimal(float64(Min(mdi.window, index-start+1))))
 }

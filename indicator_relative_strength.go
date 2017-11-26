@@ -1,5 +1,7 @@
 package talib4g
 
+import "github.com/sdcoffey/big"
+
 type relativeStrengthIndicator struct {
 	avgGain Indicator
 	avgLoss Indicator
@@ -12,19 +14,19 @@ func NewRelativeStrengthIndicator(indicator Indicator, timeframe int) Indicator 
 	}
 }
 
-func (rsi relativeStrengthIndicator) Calculate(index int) Decimal {
+func (rsi relativeStrengthIndicator) Calculate(index int) big.Decimal {
 	if index == 0 {
-		return ZERO
+		return big.ZERO
 	}
 
 	averageGain := rsi.avgGain.Calculate(index)
 	averageLoss := rsi.avgLoss.Calculate(index)
 
-	relativeStrength := ZERO
-	if averageLoss.GT(ZERO) {
+	relativeStrength := big.ZERO
+	if averageLoss.GT(big.ZERO) {
 		relativeStrength = averageGain.Div(averageLoss)
 	}
 
-	oneHundred := TEN.Mul(TEN)
-	return oneHundred.Sub(oneHundred.Div(ONE.Add(relativeStrength)))
+	oneHundred := big.TEN.Frac(10)
+	return oneHundred.Sub(oneHundred.Div(big.ONE.Add(relativeStrength)))
 }

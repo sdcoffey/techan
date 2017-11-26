@@ -1,5 +1,7 @@
 package talib4g
 
+import "github.com/sdcoffey/big"
+
 type smaIndicator struct {
 	indicator Indicator
 	window    int
@@ -9,20 +11,20 @@ func NewSimpleMovingAverage(indicator Indicator, window int) Indicator {
 	return smaIndicator{indicator, window}
 }
 
-func (sma smaIndicator) Calculate(index int) Decimal {
-	sum := ZERO
+func (sma smaIndicator) Calculate(index int) big.Decimal {
+	sum := big.ZERO
 	for i := Max(0, index-sma.window+1); i <= index; i++ {
 		sum = sum.Add(sma.indicator.Calculate(i))
 	}
 	realwindow := Min(sma.window, index+1)
 
-	return sum.Div(NewDecimal(float64(realwindow)))
+	return sum.Div(big.NewDecimal(float64(realwindow)))
 }
 
 type emaIndicator struct {
 	Indicator
 	window      int
-	resultCache []*Decimal
+	resultCache []*big.Decimal
 }
 
 // Returns a new Exponential Moving Average Calculator
@@ -31,11 +33,11 @@ func NewEMAIndicator(indicator Indicator, window int) Indicator {
 	return &emaIndicator{
 		Indicator:   indicator,
 		window:      window,
-		resultCache: make([]*Decimal, 10000),
+		resultCache: make([]*big.Decimal, 10000),
 	}
 }
 
-func (ema *emaIndicator) Calculate(index int) Decimal {
+func (ema *emaIndicator) Calculate(index int) big.Decimal {
 	if index == 0 {
 		result := ema.Indicator.Calculate(index)
 		return result
@@ -48,14 +50,14 @@ func (ema *emaIndicator) Calculate(index int) Decimal {
 	}
 
 	emaPrev := ema.Calculate(index - 1)
-	mult := NewDecimal(2.0 / float64(ema.window+1))
+	mult := big.NewDecimal(2.0 / float64(ema.window+1))
 	result := ema.Indicator.Calculate(index).Sub(emaPrev).Mul(mult).Add(emaPrev)
 	ema.cacheResult(index, result)
 
 	return result
 }
 
-func (ema *emaIndicator) cacheResult(index int, val Decimal) {
+func (ema *emaIndicator) cacheResult(index int, val big.Decimal) {
 	if index < len(ema.resultCache) {
 		ema.resultCache[index] = &val
 	} else {

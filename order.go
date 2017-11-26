@@ -1,6 +1,10 @@
 package talib4g
 
-import "time"
+import (
+	"time"
+
+	"github.com/sdcoffey/big"
+)
 
 type OrderSide int
 
@@ -11,8 +15,8 @@ const (
 
 type order struct {
 	Type          OrderSide
-	Price         Decimal
-	Amount        Decimal
+	Price         big.Decimal
+	Amount        big.Decimal
 	ExecutionTime time.Time
 }
 

@@ -1,5 +1,7 @@
 package talib4g
 
+import "github.com/sdcoffey/big"
+
 // A pair of two Order objects
 type Position struct {
 	orders [2]*order
@@ -58,16 +60,16 @@ func (p *Position) ExitOrder() *order {
 	return p.orders[1]
 }
 
-func (p *Position) CostBasis() Decimal {
+func (p *Position) CostBasis() big.Decimal {
 	if p.EntranceOrder() != nil {
 		return p.EntranceOrder().Amount.Mul(p.EntranceOrder().Price)
 	}
-	return NewDecimal(0)
+	return big.NewDecimal(0)
 }
 
-func (p *Position) ExitValue() Decimal {
+func (p *Position) ExitValue() big.Decimal {
 	if p.IsClosed() {
 		return p.ExitOrder().Amount.Mul(p.ExitOrder().Price)
 	}
-	return NewDecimal(0)
+	return big.NewDecimal(0)
 }

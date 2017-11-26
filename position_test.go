@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/sdcoffey/big"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -15,8 +16,8 @@ func TestPosition_NoOrders_IsNew(t *testing.T) {
 
 func TestPosition_NewPosition_IsOpen(t *testing.T) {
 	order := NewOrder(BUY)
-	order.Amount = NewDecimal(1)
-	order.Price = NewDecimal(2)
+	order.Amount = big.NewDecimal(1)
+	order.Price = big.NewDecimal(2)
 
 	position := NewPosition(order)
 	assert.True(t, position.IsOpen())
@@ -26,8 +27,8 @@ func TestPosition_NewPosition_IsOpen(t *testing.T) {
 
 func TestNewPosition_WithBuy_IsLong(t *testing.T) {
 	order := NewOrder(BUY)
-	order.Amount = NewDecimal(1)
-	order.Price = NewDecimal(2)
+	order.Amount = big.NewDecimal(1)
+	order.Price = big.NewDecimal(2)
 
 	position := NewPosition(order)
 	assert.True(t, position.IsLong())
@@ -35,8 +36,8 @@ func TestNewPosition_WithBuy_IsLong(t *testing.T) {
 
 func TestNewPosition_WithSell_IsShort(t *testing.T) {
 	order := NewOrder(SELL)
-	order.Amount = NewDecimal(1)
-	order.Price = NewDecimal(2)
+	order.Amount = big.NewDecimal(1)
+	order.Price = big.NewDecimal(2)
 
 	position := NewPosition(order)
 	assert.True(t, position.IsShort())
@@ -46,8 +47,8 @@ func TestPosition_Enter(t *testing.T) {
 	position := newPosition()
 
 	order := NewOrder(BUY)
-	order.Amount = NewDecimal(1)
-	order.Price = NewDecimal(3)
+	order.Amount = big.NewDecimal(1)
+	order.Price = big.NewDecimal(3)
 	order.ExecutionTime = time.Now()
 
 	position.Enter(order)
@@ -62,8 +63,8 @@ func TestPosition_Close(t *testing.T) {
 	position := newPosition()
 
 	entranceOrder := NewOrder(BUY)
-	entranceOrder.Amount = NewDecimal(1)
-	entranceOrder.Price = NewDecimal(1)
+	entranceOrder.Amount = big.NewDecimal(1)
+	entranceOrder.Price = big.NewDecimal(1)
 	entranceOrder.ExecutionTime = time.Now()
 
 	position.Enter(entranceOrder)
@@ -74,8 +75,8 @@ func TestPosition_Close(t *testing.T) {
 	assert.EqualValues(t, entranceOrder.ExecutionTime, position.EntranceOrder().ExecutionTime)
 
 	exitOrder := NewOrder(SELL)
-	entranceOrder.Amount = NewDecimal(1)
-	entranceOrder.Price = NewDecimal(4)
+	entranceOrder.Amount = big.NewDecimal(1)
+	entranceOrder.Price = big.NewDecimal(4)
 	exitOrder.ExecutionTime = time.Now()
 
 	position.Exit(exitOrder)
@@ -91,12 +92,12 @@ func TestPosition_CostBasis(t *testing.T) {
 	p := newPosition()
 
 	order := NewOrder(BUY)
-	order.Amount = NewDecimal(1)
-	order.Price = NewDecimal(10)
+	order.Amount = big.NewDecimal(1)
+	order.Price = big.NewDecimal(10)
 
 	p.Enter(order)
 
-	costBasis := NewDecimal(10)
+	costBasis := big.NewDecimal(10)
 
 	assert.EqualValues(t, costBasis.Float(), p.CostBasis().Float())
 }
@@ -105,18 +106,18 @@ func TestPosition_ExitValue(t *testing.T) {
 	p := newPosition()
 
 	order := NewOrder(BUY)
-	order.Amount = NewDecimal(1)
-	order.Price = NewDecimal(10)
+	order.Amount = big.NewDecimal(1)
+	order.Price = big.NewDecimal(10)
 
 	p.Enter(order)
 
 	order = NewOrder(SELL)
-	order.Amount = NewDecimal(1)
-	order.Price = NewDecimal(12)
+	order.Amount = big.NewDecimal(1)
+	order.Price = big.NewDecimal(12)
 
 	p.Exit(order)
 
-	sellValue := NewDecimal(12)
+	sellValue := big.NewDecimal(12)
 
 	assert.EqualValues(t, sellValue.Float(), p.ExitValue().Float())
 }

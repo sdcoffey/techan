@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/sdcoffey/big"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,7 +20,7 @@ func TestTradingRecord_CurrentTrade(t *testing.T) {
 
 	yesterday := time.Now().Add(-time.Hour * 24)
 
-	record.Enter(NewDecimal(1), NewDecimal(2), yesterday)
+	record.Enter(big.NewDecimal(1), big.NewDecimal(2), yesterday)
 
 	assert.EqualValues(t, 1, record.CurrentTrade().EntranceOrder().Price.Float())
 	assert.EqualValues(t, 2, record.CurrentTrade().EntranceOrder().Amount.Float())
@@ -27,7 +28,7 @@ func TestTradingRecord_CurrentTrade(t *testing.T) {
 		record.CurrentTrade().EntranceOrder().ExecutionTime.UnixNano())
 
 	now := time.Now()
-	record.Exit(NewDecimal(3), NewDecimal(4), now)
+	record.Exit(big.NewDecimal(3), big.NewDecimal(4), now)
 	assert.True(t, record.CurrentTrade().IsNew())
 
 	lastTrade := record.LastTrade()
@@ -43,10 +44,10 @@ func TestTradingRecord_Enter(t *testing.T) {
 		record := NewTradingRecord()
 
 		now := time.Now()
-		record.Enter(NewDecimal(1), NewDecimal(2), now)
-		record.Exit(NewDecimal(2), NewDecimal(2), now.Add(time.Minute))
+		record.Enter(big.NewDecimal(1), big.NewDecimal(2), now)
+		record.Exit(big.NewDecimal(2), big.NewDecimal(2), now.Add(time.Minute))
 
-		record.Enter(NewDecimal(2), NewDecimal(2), now.Add(-time.Minute))
+		record.Enter(big.NewDecimal(2), big.NewDecimal(2), now.Add(-time.Minute))
 
 		assert.True(t, record.CurrentTrade().IsNew())
 		assert.Len(t, record.Trades, 1)
@@ -58,8 +59,8 @@ func TestTradingRecord_Exit(t *testing.T) {
 		record := NewTradingRecord()
 
 		now := time.Now()
-		record.Enter(NewDecimal(1), NewDecimal(2), now)
-		record.Exit(NewDecimal(2), NewDecimal(2), now.Add(-time.Minute))
+		record.Enter(big.NewDecimal(1), big.NewDecimal(2), now)
+		record.Exit(big.NewDecimal(2), big.NewDecimal(2), now.Add(-time.Minute))
 
 		assert.True(t, record.CurrentTrade().IsOpen())
 	})

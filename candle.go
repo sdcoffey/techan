@@ -2,30 +2,32 @@ package talib4g
 
 import (
 	"fmt"
+
+	"github.com/sdcoffey/big"
 )
 
 type Candle struct {
 	Period     TimePeriod
-	OpenPrice  Decimal `json:",string"`
-	ClosePrice Decimal `json:",string"`
-	MaxPrice   Decimal `json:",string"`
-	MinPrice   Decimal `json:",string"`
-	Volume     Decimal `json:",string"`
+	OpenPrice  big.Decimal `json:",string"`
+	ClosePrice big.Decimal `json:",string"`
+	MaxPrice   big.Decimal `json:",string"`
+	MinPrice   big.Decimal `json:",string"`
+	Volume     big.Decimal `json:",string"`
 	TradeCount uint
 }
 
 func NewCandle(period TimePeriod) (c *Candle) {
 	return &Candle{
 		Period:     period,
-		OpenPrice:  ZERO,
-		ClosePrice: ZERO,
-		MaxPrice:   ZERO,
-		MinPrice:   ZERO,
-		Volume:     ZERO,
+		OpenPrice:  big.ZERO,
+		ClosePrice: big.ZERO,
+		MaxPrice:   big.ZERO,
+		MinPrice:   big.ZERO,
+		Volume:     big.ZERO,
 	}
 }
 
-func (c *Candle) AddTrade(tradeAmount, tradePrice Decimal) {
+func (c *Candle) AddTrade(tradeAmount, tradePrice big.Decimal) {
 	if c.OpenPrice.Zero() {
 		c.OpenPrice = tradePrice
 	}

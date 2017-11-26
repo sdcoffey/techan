@@ -1,5 +1,7 @@
 package talib4g
 
+import "github.com/sdcoffey/big"
+
 type fixedIndicator []float64
 
 func NewFixedIndicator(vals ...float64) Indicator {
@@ -11,6 +13,6 @@ func NewFixedIndicator(vals ...float64) Indicator {
 	return fixedIndicator(slc)
 }
 
-func (fi fixedIndicator) Calculate(index int) Decimal {
-	return NewDecimal(fi[index])
+func (fi fixedIndicator) Calculate(index int) big.Decimal {
+	return big.NewDecimal(fi[index])
 }

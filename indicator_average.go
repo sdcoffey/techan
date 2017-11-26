@@ -1,5 +1,7 @@
 package talib4g
 
+import "github.com/sdcoffey/big"
+
 type averageIndicator struct {
 	Indicator
 	window int
@@ -27,6 +29,6 @@ func NewAverageLossesIndicator(indicator Indicator, window int) Indicator {
 	}
 }
 
-func (ai averageIndicator) Calculate(index int) Decimal {
-	return ai.Indicator.Calculate(index).Div(NewDecimal(float64(Min(index+1, ai.window))))
+func (ai averageIndicator) Calculate(index int) big.Decimal {
+	return ai.Indicator.Calculate(index).Div(big.NewDecimal(float64(Min(index+1, ai.window))))
 }

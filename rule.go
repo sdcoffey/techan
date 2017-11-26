@@ -1,5 +1,7 @@
 package talib4g
 
+import "github.com/sdcoffey/big"
+
 type Rule interface {
 	IsSatisfied(index int, record *TradingRecord) bool
 }
@@ -50,7 +52,7 @@ func (this UnderIndicatorRule) IsSatisfied(index int, record *TradingRecord) boo
 
 type percentChangeRule struct {
 	indicator Indicator
-	percent   Decimal
+	percent   big.Decimal
 }
 
 func (pgr percentChangeRule) IsSatisfied(index int, record *TradingRecord) bool {
@@ -60,6 +62,6 @@ func (pgr percentChangeRule) IsSatisfied(index int, record *TradingRecord) bool 
 func NewPercentChangeRule(indicator Indicator, percent float64) Rule {
 	return percentChangeRule{
 		indicator: NewPercentChangeIndicator(indicator),
-		percent:   NewDecimal(percent),
+		percent:   big.NewDecimal(percent),
 	}
 }

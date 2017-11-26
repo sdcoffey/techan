@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/sdcoffey/big"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -34,8 +35,8 @@ func mockTimeSeries(values ...float64) *TimeSeries {
 	ts := NewTimeSeries()
 	for _, val := range values {
 		candle := NewCandle(NewTimePeriodD(time.Unix(int64(candleIndex), 0), time.Second))
-		candle.ClosePrice = NewDecimal(val)
-		candle.Volume = NewDecimal(val)
+		candle.ClosePrice = big.NewDecimal(val)
+		candle.Volume = big.NewDecimal(val)
 
 		ts.AddCandle(candle)
 
@@ -45,6 +46,6 @@ func mockTimeSeries(values ...float64) *TimeSeries {
 	return ts
 }
 
-func decimalEquals(t *testing.T, expected float64, actual Decimal) {
+func decimalEquals(t *testing.T, expected float64, actual big.Decimal) {
 	assert.Equal(t, fmt.Sprintf("%.4f", expected), fmt.Sprintf("%.4f", actual.Float()))
 }

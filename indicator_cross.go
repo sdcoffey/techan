@@ -1,5 +1,7 @@
 package talib4g
 
+import "github.com/sdcoffey/big"
+
 type crossIndicator struct {
 	differenceIndicator
 }
@@ -17,14 +19,14 @@ func NewCrossIndicator(upper, lower Indicator) Indicator {
 
 // Walks backward from the current index to determine if the lower indicator
 // has crossed the upper indicator. Returns truthy value if so, zero otherwise
-func (ci crossIndicator) Calculate(index int) Decimal {
+func (ci crossIndicator) Calculate(index int) big.Decimal {
 	if index == 0 {
-		return ZERO
+		return big.ZERO
 	}
 
-	if ci.differenceIndicator.Calculate(index).LTE(ZERO) && ci.differenceIndicator.Calculate(index-1).GT(ZERO) {
-		return ONE
+	if ci.differenceIndicator.Calculate(index).LTE(big.ZERO) && ci.differenceIndicator.Calculate(index-1).GT(big.ZERO) {
+		return big.ONE
 	}
 
-	return ZERO
+	return big.ZERO
 }
