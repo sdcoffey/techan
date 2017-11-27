@@ -2,7 +2,7 @@ clean:
 	go fmt ./...
 
 test: clean
-	go test -v
+	go test
 
 bench: clean
 	go test -bench .
