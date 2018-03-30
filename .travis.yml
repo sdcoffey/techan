@@ -1,0 +1,13 @@
+language: go
+
+go:
+	- 1.8
+  - 1.9
+	- 1.10
+  - master
+
+before_script:
+  - dep ensure
+
+script:
+  - go test ./...
