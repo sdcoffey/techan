@@ -2,24 +2,29 @@
 
 set -euf -o pipefail
 
-make test
-
 echo -n "Version: "
 read newversion
 
-existing_tag_count=`g tag --list | grep 0.2.0 | wc -l | tr -d '[:space:]'`
+tag_count=`git tag --list | grep "$newversion" | wc -l | tr -d '[:space:]' || true`
 
-if [[ $existing_tag_count -gt "0" ]]; then
+if [[ $tag_count -gt 0 ]]; then
   echo "Tag: $newversion already exists"
+  exit 1
+else
+  echo "Releasing $newversion"
 fi
 
 echo "Update CHANGELOG.md" and press enter
 read
 
-git add -A
-git commit -m"Release version $newversion"
+git add CHANGELOG.md
 
-git tag -m $newversion
+added_count=`git status --porcelain | grep "CHANGELOG.md" | wc -l | tr -d '[:space:]' || true`
+if [[ $added_count -gt 0 ]]; then
+  git commit -m"Release version $newversion"
+fi
+
+git tag "$newversion" -m "$newversion"
 
 git push origin master
 git push --tags

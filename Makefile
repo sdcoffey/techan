@@ -11,3 +11,6 @@ bench: clean
 
 commit: test
 	git commit
+
+release: test
+	./scripts/release.sh
