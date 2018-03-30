@@ -1,5 +1,7 @@
+files := $(shell find . -name "*.go" | grep -v vendor)
+
 clean:
-	go fmt ./...
+	goimports -w $(files)
 
 test: clean
 	go test
