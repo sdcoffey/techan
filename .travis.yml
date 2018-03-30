@@ -1,9 +1,9 @@
 language: go
 
 go:
-  - 1.8
-  - 1.9
-  - 1.10
+  - "1.8"
+  - "1.9"
+  - "1.10"
   - master
 
 before_install:
@@ -14,4 +14,4 @@ install:
   - dep ensure
 
 script:
-  - go test ./...
+  - go test github.com/sdcoffey/talib4g
