@@ -1,4 +1,4 @@
-## Talib4g
+## Talib4g ![](https://travis-ci.org/sdcoffey/talib4g.svg?branch=master)
 
 Talib4g is a library for technical analysis for Go! It provides a suite of tools and frameworks to analyze financial data and make trading decisions. 
 
