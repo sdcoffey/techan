@@ -15,7 +15,7 @@ func (this RuleStrategy) ShouldEnter(index int, record *TradingRecord) bool {
 	if this.EntryRule == nil {
 		panic("entryrule is nil")
 	}
-	if index > this.UnstablePeriod && record.CurrentTrade().IsNew() {
+	if index > this.UnstablePeriod && record.CurrentPosition().IsNew() {
 		return this.EntryRule.IsSatisfied(index, record)
 	}
 
@@ -23,7 +23,7 @@ func (this RuleStrategy) ShouldEnter(index int, record *TradingRecord) bool {
 }
 
 func (this RuleStrategy) ShouldExit(index int, record *TradingRecord) bool {
-	if index > this.UnstablePeriod && record.CurrentTrade().IsOpen() {
+	if index > this.UnstablePeriod && record.CurrentPosition().IsOpen() {
 		return this.ExitRule.IsSatisfied(index, record)
 	}
 

@@ -5,7 +5,7 @@ import (
 )
 
 func TestSimpleMovingAverage(t *testing.T) {
-	ts := mockTimeSeries(1, 2, 3, 4, 3, 4, 5, 4, 3, 3, 4, 3, 2)
+	ts := mockTimeSeriesFl(1, 2, 3, 4, 3, 4, 5, 4, 3, 3, 4, 3, 2)
 
 	sma := NewSimpleMovingAverage(NewClosePriceIndicator(ts), 3)
 
@@ -26,7 +26,7 @@ func TestSimpleMovingAverage(t *testing.T) {
 }
 
 func TestExponentialMovingAverage(t *testing.T) {
-	ts := mockTimeSeries(
+	ts := mockTimeSeriesFl(
 		64.75, 63.79, 63.73,
 		63.73, 63.55, 63.19,
 		63.91, 63.85, 62.95,

@@ -6,7 +6,7 @@ import (
 
 func TestAverageGainsIndicator(t *testing.T) {
 	t.Run("Basic", func(t *testing.T) {
-		ts := mockTimeSeries(1, 2, 3, 5, 8, 13)
+		ts := mockTimeSeriesFl(1, 2, 3, 5, 8, 13)
 
 		avgGains := NewAverageGainsIndicator(NewClosePriceIndicator(ts), 6)
 
@@ -19,7 +19,7 @@ func TestAverageGainsIndicator(t *testing.T) {
 	})
 
 	t.Run("Oscillating indicator", func(t *testing.T) {
-		ts := mockTimeSeries(0, 5, 2, 10, 12, 11)
+		ts := mockTimeSeriesFl(0, 5, 2, 10, 12, 11)
 
 		cumGains := NewAverageGainsIndicator(NewClosePriceIndicator(ts), 6)
 
@@ -32,7 +32,7 @@ func TestAverageGainsIndicator(t *testing.T) {
 	})
 
 	t.Run("Rolling window", func(t *testing.T) {
-		ts := mockTimeSeries(0, 5, 2, 10, 12, 11)
+		ts := mockTimeSeriesFl(0, 5, 2, 10, 12, 11)
 
 		cumGains := NewAverageGainsIndicator(NewClosePriceIndicator(ts), 3)
 
@@ -47,7 +47,7 @@ func TestAverageGainsIndicator(t *testing.T) {
 
 func TestNewAverageLossesIndicator(t *testing.T) {
 	t.Run("Basic", func(t *testing.T) {
-		ts := mockTimeSeries(13, 8, 5, 3, 2, 1)
+		ts := mockTimeSeriesFl(13, 8, 5, 3, 2, 1)
 
 		cumLosses := NewAverageLossesIndicator(NewClosePriceIndicator(ts), 6)
 
@@ -60,7 +60,7 @@ func TestNewAverageLossesIndicator(t *testing.T) {
 	})
 
 	t.Run("Oscillating indicator", func(t *testing.T) {
-		ts := mockTimeSeries(13, 16, 10, 8, 9, 8)
+		ts := mockTimeSeriesFl(13, 16, 10, 8, 9, 8)
 
 		cumLosses := NewAverageLossesIndicator(NewClosePriceIndicator(ts), 6)
 
@@ -73,7 +73,7 @@ func TestNewAverageLossesIndicator(t *testing.T) {
 	})
 
 	t.Run("Rolling window", func(t *testing.T) {
-		ts := mockTimeSeries(13, 16, 10, 8, 9, 8)
+		ts := mockTimeSeriesFl(13, 16, 10, 8, 9, 8)
 
 		cumLosses := NewAverageLossesIndicator(NewClosePriceIndicator(ts), 3)
 

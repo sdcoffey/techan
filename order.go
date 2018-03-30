@@ -13,15 +13,17 @@ const (
 	SELL
 )
 
-type order struct {
+type Order struct {
 	Type          OrderSide
+	Security      string
 	Price         big.Decimal
 	Amount        big.Decimal
 	ExecutionTime time.Time
+	FeePercentage big.Decimal
 }
 
-func NewOrder(orderType OrderSide) (o *order) {
-	o = new(order)
+func NewOrder(orderType OrderSide) (o *Order) {
+	o = new(Order)
 	o.Type = orderType
 
 	return o

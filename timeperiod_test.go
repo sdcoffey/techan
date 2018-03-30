@@ -108,3 +108,16 @@ func TestTimePeriod_Since(t *testing.T) {
 		assert.EqualValues(t, time.Minute, since)
 	})
 }
+
+func TestTimePeriod_Advance(t *testing.T) {
+	now := time.Now()
+
+	t.Run("Advances by correct amount", func(t *testing.T) {
+		tp := NewTimePeriod(now, now.Add(time.Minute))
+
+		tp = tp.Advance(1)
+
+		assert.EqualValues(t, now.Add(time.Minute).UnixNano(), tp.Start.UnixNano())
+		assert.EqualValues(t, now.Add(time.Minute*2).UnixNano(), tp.End.UnixNano())
+	})
+}

@@ -5,7 +5,7 @@ import (
 )
 
 func TestMeanDeviationIndicator(t *testing.T) {
-	ts := mockTimeSeries(1, 2, 7, 6, 3, 4, 5, 11, 3, 0, 9)
+	ts := mockTimeSeriesFl(1, 2, 7, 6, 3, 4, 5, 11, 3, 0, 9)
 
 	meanDeviation := NewMeanDeviationIndicator(NewClosePriceIndicator(ts), 5)
 

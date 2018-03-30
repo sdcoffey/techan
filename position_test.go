@@ -9,7 +9,7 @@ import (
 )
 
 func TestPosition_NoOrders_IsNew(t *testing.T) {
-	position := newPosition()
+	position := new(Position)
 
 	assert.True(t, position.IsNew())
 }
@@ -44,7 +44,7 @@ func TestNewPosition_WithSell_IsShort(t *testing.T) {
 }
 
 func TestPosition_Enter(t *testing.T) {
-	position := newPosition()
+	position := new(Position)
 
 	order := NewOrder(BUY)
 	order.Amount = big.NewDecimal(1)
@@ -60,7 +60,7 @@ func TestPosition_Enter(t *testing.T) {
 }
 
 func TestPosition_Close(t *testing.T) {
-	position := newPosition()
+	position := new(Position)
 
 	entranceOrder := NewOrder(BUY)
 	entranceOrder.Amount = big.NewDecimal(1)
@@ -89,7 +89,7 @@ func TestPosition_Close(t *testing.T) {
 }
 
 func TestPosition_CostBasis(t *testing.T) {
-	p := newPosition()
+	p := new(Position)
 
 	order := NewOrder(BUY)
 	order.Amount = big.NewDecimal(1)
@@ -103,7 +103,7 @@ func TestPosition_CostBasis(t *testing.T) {
 }
 
 func TestPosition_ExitValue(t *testing.T) {
-	p := newPosition()
+	p := new(Position)
 
 	order := NewOrder(BUY)
 	order.Amount = big.NewDecimal(1)

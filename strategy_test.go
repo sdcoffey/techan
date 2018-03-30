@@ -29,7 +29,7 @@ func TestRuleStrategy_ShouldEnter(t *testing.T) {
 
 	t.Run("Returns false if a position is open", func(t *testing.T) {
 		record := NewTradingRecord()
-		record.Enter(big.NewDecimal(0), big.NewDecimal(0), time.Now())
+		record.Enter(big.NewDecimal(0), big.NewDecimal(0), big.ZERO, example, time.Now())
 
 		s := RuleStrategy{
 			alwaysSatisfiedRule(0),
@@ -56,7 +56,7 @@ func TestRuleStrategy_ShouldEnter(t *testing.T) {
 func TestRuleStrategy_ShouldExit(t *testing.T) {
 	t.Run("Returns false if index < unstablePeriod", func(t *testing.T) {
 		record := NewTradingRecord()
-		record.Enter(big.NewDecimal(0), big.NewDecimal(0), time.Now())
+		record.Enter(big.NewDecimal(0), big.NewDecimal(0), big.ZERO, example, time.Now())
 
 		s := RuleStrategy{
 			alwaysSatisfiedRule(0),
@@ -81,7 +81,7 @@ func TestRuleStrategy_ShouldExit(t *testing.T) {
 
 	t.Run("Returns true when position is open", func(t *testing.T) {
 		record := NewTradingRecord()
-		record.Enter(big.NewDecimal(0), big.NewDecimal(0), time.Now())
+		record.Enter(big.NewDecimal(0), big.NewDecimal(0), big.ZERO, example, time.Now())
 
 		s := RuleStrategy{
 			alwaysSatisfiedRule(0),

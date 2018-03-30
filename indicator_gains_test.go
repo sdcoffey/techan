@@ -6,7 +6,7 @@ import (
 
 func TestCumulativeGainsIndicator(t *testing.T) {
 	t.Run("Basic", func(t *testing.T) {
-		ts := mockTimeSeries(1, 2, 3, 5, 8, 13)
+		ts := mockTimeSeriesFl(1, 2, 3, 5, 8, 13)
 
 		cumGains := NewCumulativeGainsIndicator(NewClosePriceIndicator(ts), 6)
 
@@ -19,7 +19,7 @@ func TestCumulativeGainsIndicator(t *testing.T) {
 	})
 
 	t.Run("Oscillating scale", func(t *testing.T) {
-		ts := mockTimeSeries(0, 5, 2, 10, 12, 11)
+		ts := mockTimeSeriesFl(0, 5, 2, 10, 12, 11)
 
 		cumGains := NewCumulativeGainsIndicator(NewClosePriceIndicator(ts), 6)
 
@@ -32,7 +32,7 @@ func TestCumulativeGainsIndicator(t *testing.T) {
 	})
 
 	t.Run("Rolling timeframe", func(t *testing.T) {
-		ts := mockTimeSeries(0, 5, 2, 10, 12, 11)
+		ts := mockTimeSeriesFl(0, 5, 2, 10, 12, 11)
 
 		cumGains := NewCumulativeGainsIndicator(NewClosePriceIndicator(ts), 3)
 
@@ -47,7 +47,7 @@ func TestCumulativeGainsIndicator(t *testing.T) {
 
 func TestCumulativeLossesIndicator(t *testing.T) {
 	t.Run("Basic", func(t *testing.T) {
-		ts := mockTimeSeries(13, 8, 5, 3, 2, 1)
+		ts := mockTimeSeriesFl(13, 8, 5, 3, 2, 1)
 
 		cumLosses := NewCumulativeLossesIndicator(NewClosePriceIndicator(ts), 6)
 
@@ -60,7 +60,7 @@ func TestCumulativeLossesIndicator(t *testing.T) {
 	})
 
 	t.Run("Oscillating indicator", func(t *testing.T) {
-		ts := mockTimeSeries(13, 16, 10, 8, 9, 8)
+		ts := mockTimeSeriesFl(13, 16, 10, 8, 9, 8)
 
 		cumLosses := NewCumulativeLossesIndicator(NewClosePriceIndicator(ts), 6)
 
@@ -73,7 +73,7 @@ func TestCumulativeLossesIndicator(t *testing.T) {
 	})
 
 	t.Run("Rolling timeframe", func(t *testing.T) {
-		ts := mockTimeSeries(13, 16, 10, 8, 9, 8)
+		ts := mockTimeSeriesFl(13, 16, 10, 8, 9, 8)
 
 		cumLosses := NewCumulativeLossesIndicator(NewClosePriceIndicator(ts), 3)
 
@@ -88,7 +88,7 @@ func TestCumulativeLossesIndicator(t *testing.T) {
 
 func TestPercentGainIndicator(t *testing.T) {
 	t.Run("Up", func(t *testing.T) {
-		ts := mockTimeSeries(1, 1.5, 2.25, 2.25)
+		ts := mockTimeSeriesFl(1, 1.5, 2.25, 2.25)
 
 		pgi := NewPercentChangeIndicator(NewClosePriceIndicator(ts))
 
@@ -99,7 +99,7 @@ func TestPercentGainIndicator(t *testing.T) {
 	})
 
 	t.Run("Down", func(t *testing.T) {
-		ts := mockTimeSeries(10, 5, 2.5, 2.5)
+		ts := mockTimeSeriesFl(10, 5, 2.5, 2.5)
 
 		pgi := NewPercentChangeIndicator(NewClosePriceIndicator(ts))
 

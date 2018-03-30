@@ -7,19 +7,19 @@ import (
 )
 
 type TradingRecord struct {
-	Trades       []*Position
-	currentTrade *Position
+	Trades          []*Position
+	currentPosition *Position
 }
 
 func NewTradingRecord() (t *TradingRecord) {
 	t = new(TradingRecord)
 	t.Trades = make([]*Position, 0)
-	t.currentTrade = newPosition()
+	t.currentPosition = new(Position)
 	return t
 }
 
-func (this *TradingRecord) CurrentTrade() *Position {
-	return this.currentTrade
+func (this *TradingRecord) CurrentPosition() *Position {
+	return this.currentPosition
 }
 
 func (this *TradingRecord) LastTrade() *Position {
@@ -30,38 +30,42 @@ func (this *TradingRecord) LastTrade() *Position {
 	return this.Trades[len(this.Trades)-1]
 }
 
-func (this *TradingRecord) Enter(price, amount big.Decimal, time time.Time) {
+func (this *TradingRecord) Enter(price, amount, feePercentage big.Decimal, security string, time time.Time) {
 	order := NewOrder(BUY)
 	order.Amount = amount
 	order.Price = price
 	order.ExecutionTime = time
+	order.Security = security
+	order.FeePercentage = feePercentage
 
 	this.operate(order)
 }
 
-func (this *TradingRecord) Exit(price, amount big.Decimal, time time.Time) {
+func (this *TradingRecord) Exit(price, amount, feePercentage big.Decimal, security string, time time.Time) {
 	order := NewOrder(SELL)
 	order.Amount = amount
 	order.Price = price
 	order.ExecutionTime = time
+	order.Security = security
+	order.FeePercentage = feePercentage
 
 	this.operate(order)
 }
 
-func (this *TradingRecord) operate(order *order) {
-	if this.currentTrade.IsOpen() {
-		if order.ExecutionTime.Before(this.CurrentTrade().EntranceOrder().ExecutionTime) {
+func (this *TradingRecord) operate(order *Order) {
+	if this.currentPosition.IsOpen() {
+		if order.ExecutionTime.Before(this.CurrentPosition().EntranceOrder().ExecutionTime) {
 			return
 		}
 
-		this.currentTrade.Exit(order)
-		this.Trades = append(this.Trades, this.currentTrade)
-		this.currentTrade = newPosition()
-	} else if this.currentTrade.IsNew() {
+		this.currentPosition.Exit(order)
+		this.Trades = append(this.Trades, this.currentPosition)
+		this.currentPosition = new(Position)
+	} else if this.currentPosition.IsNew() {
 		if this.LastTrade() != nil && order.ExecutionTime.Before(this.LastTrade().ExitOrder().ExecutionTime) {
 			return
 		}
 
-		this.currentTrade.Enter(order)
+		this.currentPosition.Enter(order)
 	}
 }

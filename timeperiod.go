@@ -67,6 +67,13 @@ func (tp TimePeriod) Format(layout string) string {
 	return fmt.Sprintf("%s -> %s", tp.Start.Format(layout), tp.End.Format(layout))
 }
 
+func (tp TimePeriod) Advance(iterations int) TimePeriod {
+	return TimePeriod{
+		Start: tp.Start.Add(tp.Length() * time.Duration(iterations)),
+		End:   tp.End.Add(tp.Length() * time.Duration(iterations)),
+	}
+}
+
 func (tp TimePeriod) String() string {
 	return tp.Format(SimpleDateTimeFormat)
 }

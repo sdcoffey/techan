@@ -1,6 +1,29 @@
 package talib4g
 
-import "github.com/sdcoffey/big"
+import (
+	"github.com/sdcoffey/big"
+)
+
+type relativeStrengthIndexIndicator struct {
+	rsIndicator Indicator
+}
+
+func NewRelativeStrengthIndexIndicator(indicator Indicator, timeframe int) Indicator {
+	return relativeStrengthIndexIndicator{
+		rsIndicator: NewRelativeStrengthIndicator(indicator, timeframe),
+	}
+}
+
+func (rsi relativeStrengthIndexIndicator) Calculate(index int) big.Decimal {
+	if index == 0 {
+		return big.ZERO
+	}
+
+	relativeStrength := rsi.rsIndicator.Calculate(index)
+	oneHundred := big.NewFromString("100")
+
+	return oneHundred.Sub(oneHundred.Div(big.ONE.Add(relativeStrength)))
+}
 
 type relativeStrengthIndicator struct {
 	avgGain Indicator
@@ -14,19 +37,9 @@ func NewRelativeStrengthIndicator(indicator Indicator, timeframe int) Indicator 
 	}
 }
 
-func (rsi relativeStrengthIndicator) Calculate(index int) big.Decimal {
-	if index == 0 {
-		return big.ZERO
-	}
+func (rs relativeStrengthIndicator) Calculate(index int) big.Decimal {
+	avgGain := rs.avgGain.Calculate(index)
+	avgLoss := rs.avgLoss.Calculate(index)
 
-	averageGain := rsi.avgGain.Calculate(index)
-	averageLoss := rsi.avgLoss.Calculate(index)
-
-	relativeStrength := big.ZERO
-	if averageLoss.GT(big.ZERO) {
-		relativeStrength = averageGain.Div(averageLoss)
-	}
-
-	oneHundred := big.TEN.Frac(10)
-	return oneHundred.Sub(oneHundred.Div(big.ONE.Add(relativeStrength)))
+	return avgGain.Div(avgLoss)
 }

@@ -4,29 +4,23 @@ import "github.com/sdcoffey/big"
 
 // A pair of two Order objects
 type Position struct {
-	orders [2]*order
+	orders [2]*Order
 }
 
-func newPosition() (t *Position) {
-	return &Position{
-		orders: [2]*order{nil, nil},
-	}
-}
-
-func NewPosition(openOrder *order) (t *Position) {
+func NewPosition(openOrder *Order) (t *Position) {
 	t = new(Position)
 	t.orders[0] = openOrder
 
 	return t
 }
 
-func (p *Position) Enter(order *order) {
+func (p *Position) Enter(order *Order) {
 	if order != nil {
 		p.orders[0] = order
 	}
 }
 
-func (p *Position) Exit(order *order) {
+func (p *Position) Exit(order *Order) {
 	if order != nil {
 		p.orders[1] = order
 	}
@@ -52,11 +46,11 @@ func (p *Position) IsNew() bool {
 	return p.EntranceOrder() == nil && p.ExitOrder() == nil
 }
 
-func (p *Position) EntranceOrder() *order {
+func (p *Position) EntranceOrder() *Order {
 	return p.orders[0]
 }
 
-func (p *Position) ExitOrder() *order {
+func (p *Position) ExitOrder() *Order {
 	return p.orders[1]
 }
 

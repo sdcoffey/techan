@@ -18,11 +18,11 @@ func NewStopLossRule(series *TimeSeries, lossTolerance float64) Rule {
 }
 
 func (slr StopLossRule) IsSatisfied(index int, record *TradingRecord) bool {
-	if !record.CurrentTrade().IsOpen() {
+	if !record.CurrentPosition().IsOpen() {
 		return false
 	}
 
-	openPrice := record.CurrentTrade().CostBasis()
+	openPrice := record.CurrentPosition().CostBasis()
 	loss := slr.Indicator.Calculate(index).Div(openPrice).Sub(big.ONE)
 	return loss.LTE(slr.tolerance)
 }

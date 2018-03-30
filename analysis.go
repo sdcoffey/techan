@@ -50,8 +50,8 @@ type LogTradesAnalysis struct {
 
 func (lta LogTradesAnalysis) Analyze(record *TradingRecord) float64 {
 	logOrder := func(trade *Position) {
-		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - enter with buy (%s @ $%s)", trade.EntranceOrder().ExecutionTime.UTC().Format(time.RFC822), trade.EntranceOrder().Amount, trade.EntranceOrder().Price))
-		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - exit with sell (%s @ $%s)", trade.ExitOrder().ExecutionTime.UTC().Format(time.RFC822), trade.ExitOrder().Amount, trade.ExitOrder().Price))
+		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - enter with buy %s (%s @ $%s)", trade.EntranceOrder().ExecutionTime.UTC().Format(time.RFC822), trade.EntranceOrder().Security, trade.EntranceOrder().Amount, trade.EntranceOrder().Price))
+		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - exit with sell %s (%s @ $%s)", trade.ExitOrder().ExecutionTime.UTC().Format(time.RFC822), trade.ExitOrder().Security, trade.ExitOrder().Amount, trade.ExitOrder().Price))
 
 		profit := trade.ExitValue().Sub(trade.CostBasis())
 		fmt.Fprintln(lta.Writer, fmt.Sprintf("Profit: $%s", profit))

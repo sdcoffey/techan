@@ -12,7 +12,7 @@ func TestStopLossRule(t *testing.T) {
 	t.Run("Returns false when position is new or closed", func(t *testing.T) {
 		record := NewTradingRecord()
 
-		series := mockTimeSeries(1, 2, 3, 4)
+		series := mockTimeSeriesFl(1, 2, 3, 4)
 
 		slr := NewStopLossRule(series, -0.1)
 
@@ -21,9 +21,9 @@ func TestStopLossRule(t *testing.T) {
 
 	t.Run("Returns true when losses exceed tolerance", func(t *testing.T) {
 		record := NewTradingRecord()
-		record.Enter(big.NewDecimal(10), big.NewDecimal(1), time.Now())
+		record.Enter(big.NewDecimal(10), big.NewDecimal(1), big.ZERO, example, time.Now())
 
-		series := mockTimeSeries(10, 9) // Lose 10%
+		series := mockTimeSeriesFl(10, 9) // Lose 10%
 
 		slr := NewStopLossRule(series, -0.05)
 
@@ -32,9 +32,9 @@ func TestStopLossRule(t *testing.T) {
 
 	t.Run("Returns false when losses do not exceed tolerance", func(t *testing.T) {
 		record := NewTradingRecord()
-		record.Enter(big.NewDecimal(10), big.NewDecimal(1), time.Now())
+		record.Enter(big.NewDecimal(10), big.NewDecimal(1), big.ZERO, example, time.Now())
 
-		series := mockTimeSeries(10, 10.1) // Gain 1%
+		series := mockTimeSeriesFl(10, 10.1) // Gain 1%
 
 		slr := NewStopLossRule(series, -0.05)
 

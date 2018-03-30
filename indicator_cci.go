@@ -21,5 +21,5 @@ func (ccii commidityChannelIndexIndicator) Calculate(index int) big.Decimal {
 	typicalPriceSma := NewSimpleMovingAverage(typicalPrice, ccii.window)
 	meanDeviation := NewMeanDeviationIndicator(NewClosePriceIndicator(ccii.series), ccii.window)
 
-	return typicalPrice.Calculate(index).Sub(typicalPriceSma.Calculate(index)).Div(meanDeviation.Calculate(index).Mul(big.NewDecimal(0.015)))
+	return typicalPrice.Calculate(index).Sub(typicalPriceSma.Calculate(index)).Div(meanDeviation.Calculate(index).Mul(big.NewFromString("0.015")))
 }
