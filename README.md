@@ -75,4 +75,4 @@ Talib4g is heavily influenced by the great [ta4j](https://github.com/ta4j/ta4j).
 
 ### License
 
-Talib4g is released under the MIT license. See LICENSE for details.
+Talib4g is released under the MIT license. See [LICENSE](./LICENSE) for details.
