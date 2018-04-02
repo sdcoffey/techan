@@ -6,11 +6,13 @@ import (
 	"github.com/sdcoffey/big"
 )
 
+// TradingRecord is an object describing a series of trades made and a current position
 type TradingRecord struct {
 	Trades          []*Position
 	currentPosition *Position
 }
 
+// NewTradingRecord returns a new TradingRecord
 func NewTradingRecord() (t *TradingRecord) {
 	t = new(TradingRecord)
 	t.Trades = make([]*Position, 0)
@@ -18,19 +20,22 @@ func NewTradingRecord() (t *TradingRecord) {
 	return t
 }
 
-func (this *TradingRecord) CurrentPosition() *Position {
-	return this.currentPosition
+// CurrentPosition returns the current position in this record
+func (tr *TradingRecord) CurrentPosition() *Position {
+	return tr.currentPosition
 }
 
-func (this *TradingRecord) LastTrade() *Position {
-	if len(this.Trades) == 0 {
+// LastTrade returns the last trade executed in this record
+func (tr *TradingRecord) LastTrade() *Position {
+	if len(tr.Trades) == 0 {
 		return nil
 	}
 
-	return this.Trades[len(this.Trades)-1]
+	return tr.Trades[len(tr.Trades)-1]
 }
 
-func (this *TradingRecord) Enter(price, amount, feePercentage big.Decimal, security string, time time.Time) {
+// Enter records an entrance order in the current position of this trading record
+func (tr *TradingRecord) Enter(price, amount, feePercentage big.Decimal, security string, time time.Time) {
 	order := NewOrder(BUY)
 	order.Amount = amount
 	order.Price = price
@@ -38,10 +43,11 @@ func (this *TradingRecord) Enter(price, amount, feePercentage big.Decimal, secur
 	order.Security = security
 	order.FeePercentage = feePercentage
 
-	this.operate(order)
+	tr.operate(order)
 }
 
-func (this *TradingRecord) Exit(price, amount, feePercentage big.Decimal, security string, time time.Time) {
+// Exit records an exit order in the current position of this trading record
+func (tr *TradingRecord) Exit(price, amount, feePercentage big.Decimal, security string, time time.Time) {
 	order := NewOrder(SELL)
 	order.Amount = amount
 	order.Price = price
@@ -49,23 +55,23 @@ func (this *TradingRecord) Exit(price, amount, feePercentage big.Decimal, securi
 	order.Security = security
 	order.FeePercentage = feePercentage
 
-	this.operate(order)
+	tr.operate(order)
 }
 
-func (this *TradingRecord) operate(order *Order) {
-	if this.currentPosition.IsOpen() {
-		if order.ExecutionTime.Before(this.CurrentPosition().EntranceOrder().ExecutionTime) {
+func (tr *TradingRecord) operate(order *Order) {
+	if tr.currentPosition.IsOpen() {
+		if order.ExecutionTime.Before(tr.CurrentPosition().EntranceOrder().ExecutionTime) {
 			return
 		}
 
-		this.currentPosition.Exit(order)
-		this.Trades = append(this.Trades, this.currentPosition)
-		this.currentPosition = new(Position)
-	} else if this.currentPosition.IsNew() {
-		if this.LastTrade() != nil && order.ExecutionTime.Before(this.LastTrade().ExitOrder().ExecutionTime) {
+		tr.currentPosition.Exit(order)
+		tr.Trades = append(tr.Trades, tr.currentPosition)
+		tr.currentPosition = new(Position)
+	} else if tr.currentPosition.IsNew() {
+		if tr.LastTrade() != nil && order.ExecutionTime.Before(tr.LastTrade().ExitOrder().ExecutionTime) {
 			return
 		}
 
-		this.currentPosition.Enter(order)
+		tr.currentPosition.Enter(order)
 	}
 }

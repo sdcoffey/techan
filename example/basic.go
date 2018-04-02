@@ -19,7 +19,7 @@ func BasicEma() talib4g.Indicator {
 
 	for _, datum := range dataset {
 		start, _ := strconv.ParseInt(datum[0], 10, 64)
-		period := talib4g.NewTimePeriodD(time.Unix(start, 0), time.Hour*24)
+		period := talib4g.NewTimePeriod(time.Unix(start, 0), time.Hour*24)
 
 		candle := talib4g.NewCandle(period)
 		candle.OpenPrice = big.NewFromString(datum[1])

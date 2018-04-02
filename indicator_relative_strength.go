@@ -8,6 +8,9 @@ type relativeStrengthIndexIndicator struct {
 	rsIndicator Indicator
 }
 
+// NewRelativeStrengthIndexIndicator returns a derivative Indicator which returns the relative strength index of the base indicator
+// in a given time frame. A more in-depth explanation of relative strength index can be found here:
+// https://www.investopedia.com/terms/r/rsi.asp
 func NewRelativeStrengthIndexIndicator(indicator Indicator, timeframe int) Indicator {
 	return relativeStrengthIndexIndicator{
 		rsIndicator: NewRelativeStrengthIndicator(indicator, timeframe),
@@ -30,6 +33,9 @@ type relativeStrengthIndicator struct {
 	avgLoss Indicator
 }
 
+// NewRelativeStrengthIndicator returns a derivative Indicator which returns the relative strength of the base indicator
+// in a given time frame. Relative strength is the average again of up periods during the time frame divided by the
+// average loss of down period during the same time frame
 func NewRelativeStrengthIndicator(indicator Indicator, timeframe int) Indicator {
 	return relativeStrengthIndicator{
 		avgGain: NewAverageGainsIndicator(indicator, timeframe),

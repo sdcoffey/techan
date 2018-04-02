@@ -8,6 +8,8 @@ type cumulativeIndicator struct {
 	mult   big.Decimal
 }
 
+// NewCumulativeGainsIndicator returns a derivative indicator which returns all gains made in a base indicator for a given
+// window.
 func NewCumulativeGainsIndicator(indicator Indicator, window int) Indicator {
 	return cumulativeIndicator{
 		Indicator: indicator,
@@ -16,6 +18,8 @@ func NewCumulativeGainsIndicator(indicator Indicator, window int) Indicator {
 	}
 }
 
+// NewCumulativeLossesIndicator returns a derivative indicator which returns all losses in a base indicator for a given
+// window.
 func NewCumulativeLossesIndicator(indicator Indicator, window int) Indicator {
 	return cumulativeIndicator{
 		Indicator: indicator,
@@ -41,6 +45,8 @@ type percentChangeIndicator struct {
 	Indicator
 }
 
+// NewPercentChangeIndicator returns a derivative indicator which returns the percent change (positive or negative)
+// made in a base indicator up until the given indicator
 func NewPercentChangeIndicator(indicator Indicator) Indicator {
 	return percentChangeIndicator{indicator}
 }

@@ -19,7 +19,7 @@ func TestTimeSeries_AddCandle(t *testing.T) {
 	t.Run("Adds candle if last is nil", func(t *testing.T) {
 		ts := NewTimeSeries()
 
-		candle := NewCandle(NewTimePeriodD(time.Now(), time.Minute))
+		candle := NewCandle(NewTimePeriod(time.Now(), time.Minute))
 		candle.ClosePrice = big.NewDecimal(1)
 
 		ts.AddCandle(candle)
@@ -31,13 +31,13 @@ func TestTimeSeries_AddCandle(t *testing.T) {
 		ts := NewTimeSeries()
 
 		now := time.Now()
-		candle := NewCandle(NewTimePeriodD(now, time.Minute))
+		candle := NewCandle(NewTimePeriod(now, time.Minute))
 		candle.ClosePrice = big.NewDecimal(1)
 
 		ts.AddCandle(candle)
 		then := now.Add(-time.Minute * 10)
 
-		nextCandle := NewCandle(NewTimePeriodD(then, time.Minute))
+		nextCandle := NewCandle(NewTimePeriod(then, time.Minute))
 		candle.ClosePrice = big.NewDecimal(2)
 
 		ts.AddCandle(nextCandle)
@@ -51,7 +51,7 @@ func TestTimeSeries_LastCandle(t *testing.T) {
 	ts := NewTimeSeries()
 
 	now := time.Now()
-	candle := NewCandle(NewTimePeriodD(now, time.Minute))
+	candle := NewCandle(NewTimePeriod(now, time.Minute))
 	candle.ClosePrice = big.NewDecimal(1)
 
 	ts.AddCandle(candle)
@@ -60,7 +60,7 @@ func TestTimeSeries_LastCandle(t *testing.T) {
 	assert.EqualValues(t, 1, ts.LastCandle().ClosePrice.Float())
 
 	next := time.Now().Add(time.Minute)
-	newCandle := NewCandle(NewTimePeriodD(next, time.Minute))
+	newCandle := NewCandle(NewTimePeriod(next, time.Minute))
 	newCandle.ClosePrice = big.NewDecimal(2)
 
 	ts.AddCandle(newCandle)
@@ -74,12 +74,12 @@ func TestTimeSeries_LastCandle(t *testing.T) {
 func TestTimeSeries_LastIndex(t *testing.T) {
 	ts := NewTimeSeries()
 
-	candle := NewCandle(NewTimePeriodD(time.Now(), time.Minute))
+	candle := NewCandle(NewTimePeriod(time.Now(), time.Minute))
 	ts.AddCandle(candle)
 
 	assert.EqualValues(t, 0, ts.LastIndex())
 
-	candle = NewCandle(NewTimePeriodD(time.Now().Add(time.Minute), time.Minute))
+	candle = NewCandle(NewTimePeriod(time.Now().Add(time.Minute), time.Minute))
 	ts.AddCandle(candle)
 
 	assert.EqualValues(t, 1, ts.LastIndex())

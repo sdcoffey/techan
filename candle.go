@@ -6,6 +6,7 @@ import (
 	"github.com/sdcoffey/big"
 )
 
+// Candle represents basic market information for a security over a given time period
 type Candle struct {
 	Period     TimePeriod
 	OpenPrice  big.Decimal `json:",string"`
@@ -16,6 +17,7 @@ type Candle struct {
 	TradeCount uint
 }
 
+// NewCandle returns a new *Candle for a given time period
 func NewCandle(period TimePeriod) (c *Candle) {
 	return &Candle{
 		Period:     period,
@@ -27,6 +29,8 @@ func NewCandle(period TimePeriod) (c *Candle) {
 	}
 }
 
+// AddTrade adds a trade to this candle. It will determine if the current price is higher or lower than the min or max
+// price and increment the tradecount.
 func (c *Candle) AddTrade(tradeAmount, tradePrice big.Decimal) {
 	if c.OpenPrice.Zero() {
 		c.OpenPrice = tradePrice

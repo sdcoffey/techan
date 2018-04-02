@@ -7,6 +7,10 @@ type relativeVigorIndexIndicator struct {
 	denominator Indicator
 }
 
+// NewRelativeVigorIndexIndicator returns an Indicator which returns the index of the relative vigor of the prices of
+// a sercurity. Relative Vigor Index is simply the difference of the previous four days' close and open prices divided
+// by the difference between the previous four days high and low prices. A more in-depth explanation of relative vigor
+// index can be found here: https://www.fidelity.com/learning-center/trading-investing/technical-analysis/technical-indicator-guide/relative-vigor-index
 func NewRelativeVigorIndexIndicator(series *TimeSeries) Indicator {
 	return relativeVigorIndexIndicator{
 		numerator:   NewDifferenceIndicator(NewClosePriceIndicator(series), NewOpenPriceIndicator(series)),
@@ -42,6 +46,8 @@ type relativeVigorIndexSignalLine struct {
 	relativeVigorIndex Indicator
 }
 
+// NewRelativeVigorSignalLine returns an Indicator intended to be used in conjunction with Relative vigor index, which
+// returns the average value of the last 4 indices of the RVI indicator.
 func NewRelativeVigorSignalLine(series *TimeSeries) Indicator {
 	return relativeVigorIndexSignalLine{
 		relativeVigorIndex: NewRelativeVigorIndexIndicator(series),

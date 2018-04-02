@@ -1,30 +1,35 @@
 package talib4g
 
+// Strategy is an interface that describes desired entry and exit trading behavior
 type Strategy interface {
 	ShouldEnter(index int, record *TradingRecord) bool
 	ShouldExit(index int, record *TradingRecord) bool
 }
 
+// RuleStrategy is a strategy based on rules and an unstable period. The two rules determine whether a position should
+// be created or closed, and the unstable period is an index before no positions should be created or exited
 type RuleStrategy struct {
 	EntryRule      Rule
 	ExitRule       Rule
 	UnstablePeriod int
 }
 
-func (this RuleStrategy) ShouldEnter(index int, record *TradingRecord) bool {
-	if this.EntryRule == nil {
+// ShouldEnter will return true when the index is less than the unstable period and the entry rule is satisfied
+func (rs RuleStrategy) ShouldEnter(index int, record *TradingRecord) bool {
+	if rs.EntryRule == nil {
 		panic("entryrule is nil")
 	}
-	if index > this.UnstablePeriod && record.CurrentPosition().IsNew() {
-		return this.EntryRule.IsSatisfied(index, record)
+	if index > rs.UnstablePeriod && record.CurrentPosition().IsNew() {
+		return rs.EntryRule.IsSatisfied(index, record)
 	}
 
 	return false
 }
 
-func (this RuleStrategy) ShouldExit(index int, record *TradingRecord) bool {
-	if index > this.UnstablePeriod && record.CurrentPosition().IsOpen() {
-		return this.ExitRule.IsSatisfied(index, record)
+// ShouldExit will return true when the index is less than the unstable period and the exit rule is satisfied
+func (rs RuleStrategy) ShouldExit(index int, record *TradingRecord) bool {
+	if index > rs.UnstablePeriod && record.CurrentPosition().IsOpen() {
+		return rs.ExitRule.IsSatisfied(index, record)
 	}
 
 	return false

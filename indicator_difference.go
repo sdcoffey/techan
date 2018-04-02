@@ -7,6 +7,8 @@ type differenceIndicator struct {
 	subtrahend Indicator
 }
 
+// NewDifferenceIndicator returns an indicator which returns the difference between one indicator (minuend) and a second
+// indicator (subtrahend).
 func NewDifferenceIndicator(minuend, subtrahend Indicator) Indicator {
 	return differenceIndicator{
 		minuend:    minuend,

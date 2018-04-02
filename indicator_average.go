@@ -7,10 +7,8 @@ type averageIndicator struct {
 	window int
 }
 
-// Returns a new average gains indicator, which returns the average gains
-// up until that index.
-// @param price indicator should not be > 1 derivation removed from a
-// timeseries, i.e., a ClosePriceIndicator, VolumeIndicator, etc
+// NewAverageGainsIndicator Returns a new average gains indicator, which returns the average gains
+// in the given window based on the given indicator.
 func NewAverageGainsIndicator(indicator Indicator, window int) Indicator {
 	return averageIndicator{
 		NewCumulativeGainsIndicator(indicator, window),
@@ -18,10 +16,8 @@ func NewAverageGainsIndicator(indicator Indicator, window int) Indicator {
 	}
 }
 
-// Returns a new average losses indicator, which returns the average losses
-// up until that index.
-// @param price indicator should not be > 1 derivation removed from a
-// timeseries, i.e., a ClosePriceIndicator, VolumeIndicator, etc
+// NewAverageLossesIndicator Returns a new average losses indicator, which returns the average losses
+// in the given window based on the given indicator.
 func NewAverageLossesIndicator(indicator Indicator, window int) Indicator {
 	return averageIndicator{
 		NewCumulativeLossesIndicator(indicator, window),

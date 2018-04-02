@@ -6,13 +6,16 @@ import (
 	"github.com/sdcoffey/big"
 )
 
+// OrderSide is a simple enumeration representing the side of an Order (buy or sell)
 type OrderSide int
 
+// BUY and SELL enumerations
 const (
 	BUY OrderSide = iota
 	SELL
 )
 
+// Order represents a trade execution (buy or sell) with associated metadata
 type Order struct {
 	Type          OrderSide
 	Security      string
@@ -22,6 +25,7 @@ type Order struct {
 	FeePercentage big.Decimal
 }
 
+// NewOrder returns a new *Order with the designated side
 func NewOrder(orderType OrderSide) (o *Order) {
 	o = new(Order)
 	o.Type = orderType

@@ -7,6 +7,8 @@ type smaIndicator struct {
 	window    int
 }
 
+// NewSimpleMovingAverage returns a derivative Indicator which returns the average of the current value and preceding
+// values in the given window.
 func NewSimpleMovingAverage(indicator Indicator, window int) Indicator {
 	return smaIndicator{indicator, window}
 }
@@ -27,7 +29,8 @@ type emaIndicator struct {
 	resultCache []*big.Decimal
 }
 
-// Returns a new Exponential Moving Average Calculator
+// NewEMAIndicator returns a derivative indicator which returns the average of the current and preceding values in
+// the given window, with values closer to current index given more weight. A more in-depth explanation can be found here:
 // http://www.investopedia.com/terms/e/ema.asp
 func NewEMAIndicator(indicator Indicator, window int) Indicator {
 	return &emaIndicator{
@@ -69,14 +72,15 @@ func (ema emaIndicator) multiplier(index int) float64 {
 	return 2.0 / (float64(index) + 1)
 }
 
-// Returns a new Moving Average Convergence-Divergence indicator
+// NewMACDIndicator returns a derivative Indicator which returns the difference between two EMAIndicators with long and
+// short windows. It's useful for gauging the strength of price movements. A more in-depth explanation can be found here:
 // http://www.investopedia.com/terms/m/macd.asp
 func NewMACDIndicator(baseIndicator Indicator, shortwindow, longwindow int) Indicator {
 	return NewDifferenceIndicator(NewEMAIndicator(baseIndicator, shortwindow), NewEMAIndicator(baseIndicator, longwindow))
 }
 
-// Returns a new Moving Average Convergence-Divergence histogram incicator, the result of which is
-// the macd indicator minus it's @param signalLinewindow EMA
+// NewMACDHistogramIndicator returns a derivative Indicator based on the MACDIndicator, the result of which is
+// the macd indicator minus it's signalLinewindow EMA. A more in-depth explanation can be found here:
 // http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:macd-histogram
 func NewMACDHistogramIndicator(macdIdicator Indicator, signalLinewindow int) Indicator {
 	return NewDifferenceIndicator(macdIdicator, NewEMAIndicator(macdIdicator, signalLinewindow))

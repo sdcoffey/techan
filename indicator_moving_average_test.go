@@ -41,7 +41,7 @@ func TestExponentialMovingAverage(t *testing.T) {
 
 func BenchmarkExponetialMovingAverage(b *testing.B) {
 	size := 10000
-	ts := RandomTimeSeries(size)
+	ts := randomTimeSeries(size)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

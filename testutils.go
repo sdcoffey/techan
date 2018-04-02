@@ -14,7 +14,7 @@ import (
 
 var candleIndex int
 
-func RandomTimeSeries(size int) *TimeSeries {
+func randomTimeSeries(size int) *TimeSeries {
 	vals := make([]string, size)
 	rand.Seed(time.Now().Unix())
 	for i := 0; i < size; i++ {
@@ -37,7 +37,7 @@ func RandomTimeSeries(size int) *TimeSeries {
 func mockTimeSeriesOCHL(values ...[]string) *TimeSeries {
 	ts := NewTimeSeries()
 	for i, ochl := range values {
-		candle := NewCandle(NewTimePeriodD(time.Unix(int64(i), 0), time.Second))
+		candle := NewCandle(NewTimePeriod(time.Unix(int64(i), 0), time.Second))
 		candle.OpenPrice = big.NewFromString(ochl[0])
 		candle.ClosePrice = big.NewFromString(ochl[1])
 		candle.MaxPrice = big.NewFromString(ochl[2])
@@ -53,7 +53,7 @@ func mockTimeSeriesOCHL(values ...[]string) *TimeSeries {
 func mockTimeSeries(values ...string) *TimeSeries {
 	ts := NewTimeSeries()
 	for _, val := range values {
-		candle := NewCandle(NewTimePeriodD(time.Unix(int64(candleIndex), 0), time.Second))
+		candle := NewCandle(NewTimePeriod(time.Unix(int64(candleIndex), 0), time.Second))
 		candle.OpenPrice = big.NewFromString(val)
 		candle.ClosePrice = big.NewFromString(val)
 		candle.MaxPrice = big.NewFromString(val)

@@ -8,7 +8,8 @@ type meanDeviationIndicator struct {
 	window        int
 }
 
-// Returns a new mean deviation indicator
+// NewMeanDeviationIndicator returns a derivative Indicator which returns the mean deviation of a base indicator
+// in a given window. Mean deviation is an average of all values on the base indicator from the mean of that indicator.
 func NewMeanDeviationIndicator(indicator Indicator, window int) Indicator {
 	return meanDeviationIndicator{
 		Indicator:     indicator,
