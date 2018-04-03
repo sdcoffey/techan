@@ -10,7 +10,10 @@ import (
 
 func TestCandle_AddTrade(t *testing.T) {
 	now := time.Now()
-	candle := NewCandle(NewTimePeriod(now, now.Add(time.Minute)))
+	candle := NewCandle(TimePeriod{
+		Start: now,
+		End:   now.Add(time.Minute),
+	})
 
 	candle.AddTrade(big.NewDecimal(1), big.NewDecimal(2)) // Open
 	candle.AddTrade(big.NewDecimal(1), big.NewDecimal(5)) // High

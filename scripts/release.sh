@@ -2,6 +2,18 @@
 
 set -euf -o pipefail
 
+make test
+
+golint_count=`golint | wc -l | tr -d '[:space:]' || true`
+echo $golint_count
+exit 1
+
+if [[ $golint_count -gt 0 ]]; then
+  echo "golint failed. Please fix the following issues:"
+  golint
+  exit 1
+fi
+
 echo -n "Version: "
 read newversion
 
@@ -14,7 +26,7 @@ else
   echo "Releasing $newversion"
 fi
 
-echo "Update CHANGELOG.md" and press enter
+echo "Update CHANGELOG.md and press enter"
 read
 
 git add CHANGELOG.md

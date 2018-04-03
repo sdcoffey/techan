@@ -83,25 +83,41 @@ func TestParse(t *testing.T) {
 
 func TestTimePeriod_Length(t *testing.T) {
 	now := time.Now()
-	TimePeriod := NewTimePeriod(now.Add(-time.Minute*10), now)
+	tp := TimePeriod{
+		Start: now.Add(-time.Minute * 10),
+		End:   now,
+	}
 
-	assert.EqualValues(t, time.Minute*10, TimePeriod.Length())
+	assert.EqualValues(t, time.Minute*10, tp.Length())
 }
 
 func TestTimePeriod_Since(t *testing.T) {
 	now := time.Now()
 
 	t.Run("0", func(t *testing.T) {
-		tp := NewTimePeriod(now, now.Add(time.Minute))
-		previousTimePeriod := NewTimePeriod(now.Add(-time.Minute), now)
+		tp := TimePeriod{
+			Start: now,
+			End:   now.Add(time.Minute),
+		}
+		previousTimePeriod := TimePeriod{
+			Start: now.Add(-time.Minute),
+			End:   now,
+		}
 
 		since := tp.Since(previousTimePeriod)
 		assert.EqualValues(t, 0, since)
 	})
 
 	t.Run("Positive", func(t *testing.T) {
-		tp := NewTimePeriod(now, now.Add(time.Minute))
-		previousTimePeriod := NewTimePeriod(now.Add(-time.Minute*2), now.Add(-time.Minute))
+		tp := TimePeriod{
+			Start: now,
+			End:   now.Add(time.Minute),
+		}
+
+		previousTimePeriod := TimePeriod{
+			Start: now.Add(-time.Minute * 2),
+			End:   now.Add(-time.Minute),
+		}
 
 		since := tp.Since(previousTimePeriod)
 
@@ -113,7 +129,10 @@ func TestTimePeriod_Advance(t *testing.T) {
 	now := time.Now()
 
 	t.Run("Advances by correct amount", func(t *testing.T) {
-		tp := NewTimePeriod(now, now.Add(time.Minute))
+		tp := TimePeriod{
+			Start: now,
+			End:   now.Add(time.Minute),
+		}
 
 		tp = tp.Advance(1)
 
