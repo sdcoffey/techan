@@ -1,5 +1,8 @@
 # Talib4g Release notes
 
+## 0.1.1
+* Update documentation
+
 ## 0.1.0
 * Initial release of talib4g
 * Support for basic indicators
