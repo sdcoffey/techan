@@ -2,6 +2,8 @@ package talib4g
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSimpleMovingAverage(t *testing.T) {
@@ -26,17 +28,57 @@ func TestSimpleMovingAverage(t *testing.T) {
 }
 
 func TestExponentialMovingAverage(t *testing.T) {
-	ts := mockTimeSeriesFl(
-		64.75, 63.79, 63.73,
-		63.73, 63.55, 63.19,
-		63.91, 63.85, 62.95,
-		63.37, 61.33, 61.51)
+	t.Run("if index == 0, returns base indicator", func(t *testing.T) {
+		ts := mockTimeSeriesFl(
+			64.75, 63.79, 63.73,
+			63.73, 63.55, 63.19,
+			63.91, 63.85, 62.95,
+			63.37, 61.33, 61.51)
 
-	ema := NewEMAIndicator(NewClosePriceIndicator(ts), 10)
+		ema := NewEMAIndicator(NewClosePriceIndicator(ts), 10)
 
-	decimalEquals(t, 63.6536, ema.Calculate(9))
-	decimalEquals(t, 63.2312, ema.Calculate(10))
-	decimalEquals(t, 62.9182, ema.Calculate(11))
+		decimalEquals(t, 64.75, ema.Calculate(0))
+	})
+
+	t.Run("if index > 0, calculates ema", func(t *testing.T) {
+		ts := mockTimeSeriesFl(
+			64.75, 63.79, 63.73,
+			63.73, 63.55, 63.19,
+			63.91, 63.85, 62.95,
+			63.37, 61.33, 61.51)
+
+		ema := NewEMAIndicator(NewClosePriceIndicator(ts), 10)
+
+		decimalEquals(t, 63.6536, ema.Calculate(9))
+		decimalEquals(t, 63.2312, ema.Calculate(10))
+		decimalEquals(t, 62.9182, ema.Calculate(11))
+	})
+
+	t.Run("expands result cache when > 10000 candles added", func(t *testing.T) {
+		series := randomTimeSeries(10001)
+		ema := NewEMAIndicator(NewClosePriceIndicator(series), 10)
+
+		ema.Calculate(10000)
+
+		assert.EqualValues(t, 10001, len(ema.(*emaIndicator).resultCache))
+	})
+}
+
+func TestNewMACDIndicator(t *testing.T) {
+	series := randomTimeSeries(100)
+
+	macd := NewMACDIndicator(NewClosePriceIndicator(series), 12, 26)
+
+	assert.NotNil(t, macd)
+}
+
+func TestNewMACDHistogramIndicator(t *testing.T) {
+	series := randomTimeSeries(100)
+
+	macd := NewMACDIndicator(NewClosePriceIndicator(series), 12, 26)
+	macdHistogram := NewMACDHistogramIndicator(macd, 9)
+
+	assert.NotNil(t, macdHistogram)
 }
 
 func BenchmarkExponetialMovingAverage(b *testing.B) {

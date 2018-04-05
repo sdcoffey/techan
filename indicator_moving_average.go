@@ -68,10 +68,6 @@ func (ema *emaIndicator) cacheResult(index int, val big.Decimal) {
 	}
 }
 
-func (ema emaIndicator) multiplier(index int) float64 {
-	return 2.0 / (float64(index) + 1)
-}
-
 // NewMACDIndicator returns a derivative Indicator which returns the difference between two EMAIndicators with long and
 // short windows. It's useful for gauging the strength of price movements. A more in-depth explanation can be found here:
 // http://www.investopedia.com/terms/m/macd.asp

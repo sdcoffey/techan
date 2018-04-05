@@ -2,6 +2,7 @@ package talib4g
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/sdcoffey/big"
 )
@@ -59,20 +60,20 @@ func (c *Candle) AddTrade(tradeAmount, tradePrice big.Decimal) {
 }
 
 func (c *Candle) String() string {
-	return fmt.Sprintf(
+	return strings.TrimSpace(fmt.Sprintf(
 		`
-	Time:	%s
-	Open: 	%s
-	Close: 	%s
-	High: 	%s
-	Low: 	%s
-	Volume: %s
+Time:	%s
+Open:	%s
+Close:	%s
+High:	%s
+Low:	%s
+Volume:	%s
 	`,
 		c.Period,
-		c.OpenPrice,
-		c.ClosePrice,
-		c.MaxPrice,
-		c.MinPrice,
-		c.Volume,
-	)
+		c.OpenPrice.FormattedString(2),
+		c.ClosePrice.FormattedString(2),
+		c.MaxPrice.FormattedString(2),
+		c.MinPrice.FormattedString(2),
+		c.Volume.FormattedString(2),
+	))
 }

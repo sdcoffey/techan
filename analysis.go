@@ -3,7 +3,6 @@ package talib4g
 import (
 	"fmt"
 	"io"
-	"math"
 	"time"
 
 	"github.com/sdcoffey/big"
@@ -16,15 +15,16 @@ type Analysis interface {
 }
 
 // TotalProfitAnalysis analyzes the trading record for total profit.
-type TotalProfitAnalysis float64
+type TotalProfitAnalysis struct{}
 
 // Analyze analyzes the trading record for total profit.
 func (tps TotalProfitAnalysis) Analyze(record *TradingRecord) float64 {
 	totalProfit := big.NewDecimal(0)
 	for _, trade := range record.Trades {
 		if trade.IsClosed() {
-			costBasis := trade.CostBasis().Frac(1 + float64(tps))
-			exitValue := trade.ExitValue().Frac(math.Abs(float64(tps) - 1))
+			costBasis := trade.CostBasis()
+			exitValue := trade.ExitValue()
+
 			totalProfit = totalProfit.Add(exitValue.Sub(costBasis))
 		}
 	}
@@ -78,19 +78,21 @@ func (lta LogTradesAnalysis) Analyze(record *TradingRecord) float64 {
 // PeriodProfitAnalysis analyzes the trading record for the average profit based on the time period provided.
 // i.e., if the trading record spans a year of trading, and PeriodProfitAnalysis wraps one month, Analyze will return
 // the total profit for the whole time period divided by 12.
-type PeriodProfitAnalysis time.Duration
+type PeriodProfitAnalysis struct {
+	Period time.Duration
+}
 
 // Analyze returns the average profit for the trading record based on the given duration
 func (ppa PeriodProfitAnalysis) Analyze(record *TradingRecord) float64 {
 	var tp TotalProfitAnalysis
 	totalProfit := tp.Analyze(record)
 
-	periods := record.Trades[len(record.Trades)-1].ExitOrder().ExecutionTime.Sub(record.Trades[0].EntranceOrder().ExecutionTime) / time.Duration(ppa)
+	periods := record.Trades[len(record.Trades)-1].ExitOrder().ExecutionTime.Sub(record.Trades[0].EntranceOrder().ExecutionTime) / ppa.Period
 	return totalProfit / float64(periods)
 }
 
 // ProfitableTradesAnalysis analyzes the trading record for the number of profitable trades
-type ProfitableTradesAnalysis string
+type ProfitableTradesAnalysis struct{}
 
 // Analyze returns the number of profitable trades in a trading record
 func (pta ProfitableTradesAnalysis) Analyze(record *TradingRecord) float64 {
@@ -109,7 +111,7 @@ func (pta ProfitableTradesAnalysis) Analyze(record *TradingRecord) float64 {
 
 // AverageProfitAnalysis returns the average profit for the trading record. Average profit is represented as the total
 // profit divided by the number of trades executed.
-type AverageProfitAnalysis string
+type AverageProfitAnalysis struct{}
 
 // Analyze returns the average profit of the trading record
 func (apa AverageProfitAnalysis) Analyze(record *TradingRecord) float64 {
@@ -123,7 +125,7 @@ func (apa AverageProfitAnalysis) Analyze(record *TradingRecord) float64 {
 // and held until the date on the last trade of the trading record. It's useful for comparing the performance of your strategy
 // against a simple long position.
 type BuyAndHoldAnalysis struct {
-	*TimeSeries
+	TimeSeries    *TimeSeries
 	StartingMoney float64
 }
 
@@ -134,12 +136,14 @@ func (baha BuyAndHoldAnalysis) Analyze(record *TradingRecord) float64 {
 	}
 
 	openOrder := NewOrder(BUY)
-	openOrder.Amount = big.NewDecimal(baha.StartingMoney).Div(baha.Candles[0].ClosePrice)
-	openOrder.Price = baha.Candles[0].ClosePrice
+	openOrder.Amount = big.NewDecimal(baha.StartingMoney).Div(baha.TimeSeries.Candles[0].ClosePrice)
+	openOrder.Price = baha.TimeSeries.Candles[0].ClosePrice
+	openOrder.FeePercentage = big.ZERO
 
 	closeOrder := NewOrder(SELL)
 	closeOrder.Amount = openOrder.Amount
-	closeOrder.Price = baha.Candles[len(baha.Candles)-1].ClosePrice
+	closeOrder.Price = baha.TimeSeries.Candles[len(baha.TimeSeries.Candles)-1].ClosePrice
+	closeOrder.FeePercentage = big.ZERO
 
 	pos := NewPosition(openOrder)
 	pos.Exit(closeOrder)

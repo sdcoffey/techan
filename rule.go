@@ -66,7 +66,8 @@ func (pgr percentChangeRule) IsSatisfied(index int, record *TradingRecord) bool 
 	return pgr.indicator.Calculate(index).Abs().GT(pgr.percent.Abs())
 }
 
-// NewPercentChangeRule returns a rule whereby the given Indicator must have changed by a given percentage to be satisfied
+// NewPercentChangeRule returns a rule whereby the given Indicator must have changed by a given percentage to be satisfied.
+// You should specify percent as a float value between -1 and 1
 func NewPercentChangeRule(indicator Indicator, percent float64) Rule {
 	return percentChangeRule{
 		indicator: NewPercentChangeIndicator(indicator),

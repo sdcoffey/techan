@@ -89,35 +89,57 @@ func TestPosition_Close(t *testing.T) {
 }
 
 func TestPosition_CostBasis(t *testing.T) {
-	p := new(Position)
+	t.Run("When entrance order nil, returns 0", func(t *testing.T) {
+		p := new(Position)
+		assert.EqualValues(t, "0", p.CostBasis().String())
+	})
 
-	order := NewOrder(BUY)
-	order.Amount = big.NewDecimal(1)
-	order.Price = big.NewDecimal(10)
+	t.Run("When entracne order not nil, returns cost basis", func(t *testing.T) {
+		p := new(Position)
 
-	p.Enter(order)
+		order := NewOrder(BUY)
+		order.Amount = big.NewDecimal(1)
+		order.Price = big.NewDecimal(10)
 
-	costBasis := big.NewDecimal(10)
+		p.Enter(order)
 
-	assert.EqualValues(t, costBasis.Float(), p.CostBasis().Float())
+		costBasis := big.NewDecimal(10)
+
+		assert.EqualValues(t, costBasis.Float(), p.CostBasis().Float())
+	})
 }
 
 func TestPosition_ExitValue(t *testing.T) {
-	p := new(Position)
+	t.Run("when not closed, returns 0", func(t *testing.T) {
+		p := new(Position)
 
-	order := NewOrder(BUY)
-	order.Amount = big.NewDecimal(1)
-	order.Price = big.NewDecimal(10)
+		order := NewOrder(BUY)
+		order.Amount = big.NewDecimal(1)
+		order.Price = big.NewDecimal(10)
+		order.FeePercentage = big.NewFromString("0")
 
-	p.Enter(order)
+		p.Enter(order)
 
-	order = NewOrder(SELL)
-	order.Amount = big.NewDecimal(1)
-	order.Price = big.NewDecimal(12)
+		assert.EqualValues(t, "0", p.ExitValue().String())
+	})
 
-	p.Exit(order)
+	t.Run("when closed, returns exit value", func(t *testing.T) {
+		p := new(Position)
 
-	sellValue := big.NewDecimal(12)
+		order := NewOrder(BUY)
+		order.Amount = big.NewDecimal(1)
+		order.Price = big.NewDecimal(10)
+		order.FeePercentage = big.NewFromString("0")
 
-	assert.EqualValues(t, sellValue.Float(), p.ExitValue().Float())
+		p.Enter(order)
+
+		order = NewOrder(SELL)
+		order.Amount = big.NewDecimal(1)
+		order.Price = big.NewDecimal(12)
+		order.FeePercentage = big.NewFromString("0.01")
+
+		p.Exit(order)
+
+		assert.EqualValues(t, "11.88", p.ExitValue().FormattedString(2))
+	})
 }

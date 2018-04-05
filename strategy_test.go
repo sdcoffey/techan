@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type alwaysSatisfiedRule int
+type alwaysSatisfiedRule struct{}
 
 func (a alwaysSatisfiedRule) IsSatisfied(index int, record *TradingRecord) bool {
 	return true
@@ -19,8 +19,8 @@ func TestRuleStrategy_ShouldEnter(t *testing.T) {
 		record := NewTradingRecord()
 
 		s := RuleStrategy{
-			alwaysSatisfiedRule(0),
-			alwaysSatisfiedRule(0),
+			alwaysSatisfiedRule{},
+			alwaysSatisfiedRule{},
 			5,
 		}
 
@@ -32,8 +32,8 @@ func TestRuleStrategy_ShouldEnter(t *testing.T) {
 		record.Enter(big.NewDecimal(0), big.NewDecimal(0), big.ZERO, example, time.Now())
 
 		s := RuleStrategy{
-			alwaysSatisfiedRule(0),
-			alwaysSatisfiedRule(0),
+			alwaysSatisfiedRule{},
+			alwaysSatisfiedRule{},
 			5,
 		}
 
@@ -44,12 +44,23 @@ func TestRuleStrategy_ShouldEnter(t *testing.T) {
 		record := NewTradingRecord()
 
 		s := RuleStrategy{
-			alwaysSatisfiedRule(0),
-			alwaysSatisfiedRule(0),
+			alwaysSatisfiedRule{},
+			alwaysSatisfiedRule{},
 			5,
 		}
 
 		assert.True(t, s.ShouldEnter(6, record))
+	})
+
+	t.Run("panics when entry rule is nil", func(t *testing.T) {
+		s := RuleStrategy{
+			ExitRule:       alwaysSatisfiedRule{},
+			UnstablePeriod: 10,
+		}
+
+		assert.PanicsWithValue(t, "entry rule cannot be nil", func() {
+			s.ShouldEnter(0, nil)
+		})
 	})
 }
 
@@ -59,8 +70,8 @@ func TestRuleStrategy_ShouldExit(t *testing.T) {
 		record.Enter(big.NewDecimal(0), big.NewDecimal(0), big.ZERO, example, time.Now())
 
 		s := RuleStrategy{
-			alwaysSatisfiedRule(0),
-			alwaysSatisfiedRule(0),
+			alwaysSatisfiedRule{},
+			alwaysSatisfiedRule{},
 			5,
 		}
 
@@ -71,8 +82,8 @@ func TestRuleStrategy_ShouldExit(t *testing.T) {
 		record := NewTradingRecord()
 
 		s := RuleStrategy{
-			alwaysSatisfiedRule(0),
-			alwaysSatisfiedRule(0),
+			alwaysSatisfiedRule{},
+			alwaysSatisfiedRule{},
 			5,
 		}
 
@@ -84,11 +95,22 @@ func TestRuleStrategy_ShouldExit(t *testing.T) {
 		record.Enter(big.NewDecimal(0), big.NewDecimal(0), big.ZERO, example, time.Now())
 
 		s := RuleStrategy{
-			alwaysSatisfiedRule(0),
-			alwaysSatisfiedRule(0),
+			alwaysSatisfiedRule{},
+			alwaysSatisfiedRule{},
 			5,
 		}
 
 		assert.True(t, s.ShouldExit(6, record))
+	})
+
+	t.Run("panics when exit rule is nil", func(t *testing.T) {
+		s := RuleStrategy{
+			EntryRule:      alwaysSatisfiedRule{},
+			UnstablePeriod: 10,
+		}
+
+		assert.PanicsWithValue(t, "exit rule cannot be nil", func() {
+			s.ShouldExit(0, nil)
+		})
 	})
 }

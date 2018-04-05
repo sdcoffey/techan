@@ -8,6 +8,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestNewVolumeIndicator(t *testing.T) {
+	assert.NotNil(t, NewVolumeIndicator(NewTimeSeries()))
+}
+
+func TestVolumeIndicator_Calculate(t *testing.T) {
+	series := NewTimeSeries()
+
+	candle := NewCandle(TimePeriod{
+		Start: time.Now(),
+		End:   time.Now().Add(time.Minute),
+	})
+	candle.Volume = big.NewFromString("1.2080")
+
+	series.AddCandle(candle)
+
+	indicator := NewVolumeIndicator(series)
+	assert.EqualValues(t, "1.208", indicator.Calculate(0).FormattedString(3))
+}
+
 func TestTypicalPriceIndicator_Calculate(t *testing.T) {
 	series := NewTimeSeries()
 

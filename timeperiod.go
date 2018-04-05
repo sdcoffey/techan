@@ -44,18 +44,18 @@ func Parse(timerange string) (tr TimePeriod, err error) {
 		start = string(timerange[:len(SimpleDateFormat)])
 		end = ""
 	default:
-		err = fmt.Errorf("Could not parse timerange string %s", timerange)
+		err = fmt.Errorf("could not parse timerange string %s", timerange)
 		return
 	}
 
 	if tr.Start, err = time.Parse(layout, start); err != nil {
-		err = fmt.Errorf("Could not parse timerange string %s -> %s", timerange, err)
+		err = fmt.Errorf("could not parse time string %s", start)
 	}
 
 	if end == "" {
 		tr.End = time.Now()
 	} else if tr.End, err = time.Parse(layout, end); err != nil {
-		err = fmt.Errorf("Could not parse timerange string %s -> %s", timerange, err)
+		err = fmt.Errorf("could not parse time string %s", end)
 	}
 
 	return

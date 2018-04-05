@@ -31,12 +31,12 @@ func (p *Position) Exit(order *Order) {
 
 // IsLong returns true if the entrance order is a buy order
 func (p *Position) IsLong() bool {
-	return p.EntranceOrder() != nil && p.EntranceOrder().Type == BUY
+	return p.EntranceOrder() != nil && p.EntranceOrder().Side == BUY
 }
 
 // IsShort returns true if the entrance order is a sell order
 func (p *Position) IsShort() bool {
-	return p.EntranceOrder() != nil && p.EntranceOrder().Type == SELL
+	return p.EntranceOrder() != nil && p.EntranceOrder().Side == SELL
 }
 
 // IsOpen returns true if there is an entrance order but no exit order
@@ -67,7 +67,7 @@ func (p *Position) ExitOrder() *Order {
 // CostBasis returns the price to enter this order
 func (p *Position) CostBasis() big.Decimal {
 	if p.EntranceOrder() != nil {
-		return p.EntranceOrder().Amount.Mul(p.EntranceOrder().Price)
+		return p.EntranceOrder().Cost()
 	}
 	return big.NewDecimal(0)
 }
@@ -75,7 +75,8 @@ func (p *Position) CostBasis() big.Decimal {
 // ExitValue returns the value accrued by closing the position
 func (p *Position) ExitValue() big.Decimal {
 	if p.IsClosed() {
-		return p.ExitOrder().Amount.Mul(p.ExitOrder().Price)
+		return p.ExitOrder().Profit()
 	}
+
 	return big.NewDecimal(0)
 }

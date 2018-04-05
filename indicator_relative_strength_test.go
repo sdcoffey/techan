@@ -25,10 +25,19 @@ var rsTestMockSeries = mockTimeSeries(
 )
 
 func TestRelativeStrengthIndexIndicator(t *testing.T) {
-	closeIndicator := NewClosePriceIndicator(rsTestMockSeries)
-	indicator := NewRelativeStrengthIndexIndicator(closeIndicator, 14)
+	t.Run("when index == 0, returns 0", func(t *testing.T) {
+		closeIndicator := NewClosePriceIndicator(rsTestMockSeries)
+		indicator := NewRelativeStrengthIndexIndicator(closeIndicator, 14)
 
-	assert.EqualValues(t, "70.46", indicator.Calculate(14).FormattedString(2))
+		assert.EqualValues(t, "0.00", indicator.Calculate(0).FormattedString(2))
+	})
+
+	t.Run("when index > 0, returns rsi index", func(t *testing.T) {
+		closeIndicator := NewClosePriceIndicator(rsTestMockSeries)
+		indicator := NewRelativeStrengthIndexIndicator(closeIndicator, 14)
+
+		assert.EqualValues(t, "70.46", indicator.Calculate(14).FormattedString(2))
+	})
 }
 
 func TestRelativeStrengthIndicator(t *testing.T) {

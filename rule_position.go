@@ -1,25 +1,17 @@
 package talib4g
 
-type positionNewRule struct{}
+// PositionNewRule is satisfied when the current position in the trading record is new (no
+// open positions).
+type PositionNewRule struct{}
 
-func (pnr positionNewRule) IsSatisfied(index int, record *TradingRecord) bool {
+func (pnr PositionNewRule) IsSatisfied(index int, record *TradingRecord) bool {
 	return record.CurrentPosition().IsNew()
 }
 
-// NewPositionNewRule returns a new Rule that is satisfied when the current position in the trading record is new (no
-// open positions).
-func NewPositionNewRule() Rule {
-	return positionNewRule{}
-}
-
-type positionOpenRule struct{}
-
-// NewPositionOpenRule returns a new Rule that is satisfied when the current position in the trading record is open (position
+//PositionOpenRule is satisfied when the current position in the trading record is open (position
 // has been entered but not exited).
-func NewPositionOpenRule() Rule {
-	return positionOpenRule{}
-}
+type PositionOpenRule struct{}
 
-func (pnr positionOpenRule) IsSatisfied(index int, record *TradingRecord) bool {
+func (pnr PositionOpenRule) IsSatisfied(index int, record *TradingRecord) bool {
 	return record.CurrentPosition().IsOpen()
 }
