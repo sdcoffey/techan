@@ -1,5 +1,10 @@
 # Talib4g Release notes
 
+## 0.2.0
+* Remove NewOrder methods and prefer struct initializer
+* Add missing test coverage
+* Add godoc
+
 ## 0.1.1
 * Update documentation
 
