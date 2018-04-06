@@ -2,7 +2,6 @@ package talib4g
 
 import (
 	"testing"
-	"time"
 
 	"github.com/sdcoffey/big"
 	"github.com/stretchr/testify/assert"
@@ -29,7 +28,12 @@ func TestRuleStrategy_ShouldEnter(t *testing.T) {
 
 	t.Run("Returns false if a position is open", func(t *testing.T) {
 		record := NewTradingRecord()
-		record.Enter(big.NewDecimal(0), big.NewDecimal(0), big.ZERO, example, time.Now())
+
+		record.Operate(Order{
+			Side:   BUY,
+			Amount: big.ONE,
+			Price:  big.ONE,
+		})
 
 		s := RuleStrategy{
 			alwaysSatisfiedRule{},
@@ -67,7 +71,12 @@ func TestRuleStrategy_ShouldEnter(t *testing.T) {
 func TestRuleStrategy_ShouldExit(t *testing.T) {
 	t.Run("Returns false if index < unstablePeriod", func(t *testing.T) {
 		record := NewTradingRecord()
-		record.Enter(big.NewDecimal(0), big.NewDecimal(0), big.ZERO, example, time.Now())
+
+		record.Operate(Order{
+			Side:   BUY,
+			Amount: big.ONE,
+			Price:  big.ONE,
+		})
 
 		s := RuleStrategy{
 			alwaysSatisfiedRule{},
@@ -92,7 +101,12 @@ func TestRuleStrategy_ShouldExit(t *testing.T) {
 
 	t.Run("Returns true when position is open", func(t *testing.T) {
 		record := NewTradingRecord()
-		record.Enter(big.NewDecimal(0), big.NewDecimal(0), big.ZERO, example, time.Now())
+
+		record.Operate(Order{
+			Side:   BUY,
+			Amount: big.ONE,
+			Price:  big.ONE,
+		})
 
 		s := RuleStrategy{
 			alwaysSatisfiedRule{},

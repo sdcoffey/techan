@@ -19,22 +19,31 @@ func TestTradingRecord_CurrentTrade(t *testing.T) {
 	record := NewTradingRecord()
 
 	yesterday := time.Now().Add(-time.Hour * 24)
+	record.Operate(Order{
+		Side:          BUY,
+		Amount:        big.ONE,
+		Price:         big.NewFromString("2"),
+		ExecutionTime: yesterday,
+	})
 
-	record.Enter(big.NewDecimal(1), big.NewDecimal(2), big.ZERO, example, yesterday)
-
-	assert.EqualValues(t, 1, record.CurrentPosition().EntranceOrder().Price.Float())
-	assert.EqualValues(t, 2, record.CurrentPosition().EntranceOrder().Amount.Float())
+	assert.EqualValues(t, "1", record.CurrentPosition().EntranceOrder().Amount.String())
+	assert.EqualValues(t, "2", record.CurrentPosition().EntranceOrder().Price.String())
 	assert.EqualValues(t, yesterday.UnixNano(),
 		record.CurrentPosition().EntranceOrder().ExecutionTime.UnixNano())
 
 	now := time.Now()
-	record.Exit(big.NewDecimal(3), big.NewDecimal(4), big.ZERO, example, now)
+	record.Operate(Order{
+		Side:          SELL,
+		Amount:        big.NewFromString("3"),
+		Price:         big.NewFromString("4"),
+		ExecutionTime: now,
+	})
 	assert.True(t, record.CurrentPosition().IsNew())
 
 	lastTrade := record.LastTrade()
 
-	assert.EqualValues(t, 3, lastTrade.ExitOrder().Price.Float())
-	assert.EqualValues(t, 4, lastTrade.ExitOrder().Amount.Float())
+	assert.EqualValues(t, "3", lastTrade.ExitOrder().Amount.String())
+	assert.EqualValues(t, "4", lastTrade.ExitOrder().Price.String())
 	assert.EqualValues(t, now.UnixNano(),
 		lastTrade.ExitOrder().ExecutionTime.UnixNano())
 }
@@ -44,10 +53,27 @@ func TestTradingRecord_Enter(t *testing.T) {
 		record := NewTradingRecord()
 
 		now := time.Now()
-		record.Enter(big.NewDecimal(1), big.NewDecimal(2), big.ZERO, example, now)
-		record.Exit(big.NewDecimal(2), big.NewDecimal(2), big.ZERO, example, now.Add(time.Minute))
 
-		record.Enter(big.NewDecimal(2), big.NewDecimal(2), big.ZERO, example, now.Add(-time.Minute))
+		record.Operate(Order{
+			Side:          BUY,
+			Amount:        big.ONE,
+			Price:         big.NewFromString("2"),
+			ExecutionTime: now,
+		})
+
+		record.Operate(Order{
+			Side:          SELL,
+			Amount:        big.NewFromString("2"),
+			Price:         big.NewFromString("2"),
+			ExecutionTime: now.Add(time.Minute),
+		})
+
+		record.Operate(Order{
+			Side:          BUY,
+			Amount:        big.NewFromString("2"),
+			Price:         big.NewFromString("2"),
+			ExecutionTime: now.Add(-time.Minute),
+		})
 
 		assert.True(t, record.CurrentPosition().IsNew())
 		assert.Len(t, record.Trades, 1)
@@ -59,8 +85,20 @@ func TestTradingRecord_Exit(t *testing.T) {
 		record := NewTradingRecord()
 
 		now := time.Now()
-		record.Enter(big.NewDecimal(1), big.NewDecimal(2), big.ZERO, example, now)
-		record.Exit(big.NewDecimal(2), big.NewDecimal(2), big.ZERO, example, now.Add(-time.Minute))
+		record.Operate(Order{
+
+			Side:          BUY,
+			Amount:        big.ONE,
+			Price:         big.NewFromString("2"),
+			ExecutionTime: now,
+		})
+
+		record.Operate(Order{
+			Side:          SELL,
+			Amount:        big.NewFromString("2"),
+			Price:         big.NewFromString("2"),
+			ExecutionTime: now.Add(-time.Minute),
+		})
 
 		assert.True(t, record.CurrentPosition().IsOpen())
 	})

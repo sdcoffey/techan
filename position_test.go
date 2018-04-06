@@ -15,9 +15,11 @@ func TestPosition_NoOrders_IsNew(t *testing.T) {
 }
 
 func TestPosition_NewPosition_IsOpen(t *testing.T) {
-	order := NewOrder(BUY)
-	order.Amount = big.NewDecimal(1)
-	order.Price = big.NewDecimal(2)
+	order := Order{
+		Side:   BUY,
+		Amount: big.ONE,
+		Price:  big.NewFromString("2"),
+	}
 
 	position := NewPosition(order)
 	assert.True(t, position.IsOpen())
@@ -26,18 +28,22 @@ func TestPosition_NewPosition_IsOpen(t *testing.T) {
 }
 
 func TestNewPosition_WithBuy_IsLong(t *testing.T) {
-	order := NewOrder(BUY)
-	order.Amount = big.NewDecimal(1)
-	order.Price = big.NewDecimal(2)
+	order := Order{
+		Side:   BUY,
+		Amount: big.ONE,
+		Price:  big.NewFromString("2"),
+	}
 
 	position := NewPosition(order)
 	assert.True(t, position.IsLong())
 }
 
 func TestNewPosition_WithSell_IsShort(t *testing.T) {
-	order := NewOrder(SELL)
-	order.Amount = big.NewDecimal(1)
-	order.Price = big.NewDecimal(2)
+	order := Order{
+		Side:   SELL,
+		Amount: big.ONE,
+		Price:  big.NewFromString("2"),
+	}
 
 	position := NewPosition(order)
 	assert.True(t, position.IsShort())
@@ -46,10 +52,11 @@ func TestNewPosition_WithSell_IsShort(t *testing.T) {
 func TestPosition_Enter(t *testing.T) {
 	position := new(Position)
 
-	order := NewOrder(BUY)
-	order.Amount = big.NewDecimal(1)
-	order.Price = big.NewDecimal(3)
-	order.ExecutionTime = time.Now()
+	order := Order{
+		Side:   BUY,
+		Amount: big.ONE,
+		Price:  big.NewFromString("2"),
+	}
 
 	position.Enter(order)
 
@@ -62,10 +69,11 @@ func TestPosition_Enter(t *testing.T) {
 func TestPosition_Close(t *testing.T) {
 	position := new(Position)
 
-	entranceOrder := NewOrder(BUY)
-	entranceOrder.Amount = big.NewDecimal(1)
-	entranceOrder.Price = big.NewDecimal(1)
-	entranceOrder.ExecutionTime = time.Now()
+	entranceOrder := Order{
+		Side:   BUY,
+		Amount: big.ONE,
+		Price:  big.NewFromString("2"),
+	}
 
 	position.Enter(entranceOrder)
 
@@ -74,10 +82,12 @@ func TestPosition_Close(t *testing.T) {
 	assert.EqualValues(t, entranceOrder.Price, position.EntranceOrder().Price)
 	assert.EqualValues(t, entranceOrder.ExecutionTime, position.EntranceOrder().ExecutionTime)
 
-	exitOrder := NewOrder(SELL)
-	entranceOrder.Amount = big.NewDecimal(1)
-	entranceOrder.Price = big.NewDecimal(4)
-	exitOrder.ExecutionTime = time.Now()
+	exitOrder := Order{
+		Side:          SELL,
+		Amount:        big.ONE,
+		Price:         big.NewFromString("4"),
+		ExecutionTime: time.Now(),
+	}
 
 	position.Exit(exitOrder)
 
@@ -97,15 +107,15 @@ func TestPosition_CostBasis(t *testing.T) {
 	t.Run("When entracne order not nil, returns cost basis", func(t *testing.T) {
 		p := new(Position)
 
-		order := NewOrder(BUY)
-		order.Amount = big.NewDecimal(1)
-		order.Price = big.NewDecimal(10)
+		order := Order{
+			Side:   BUY,
+			Amount: big.ONE,
+			Price:  big.NewFromString("2"),
+		}
 
 		p.Enter(order)
 
-		costBasis := big.NewDecimal(10)
-
-		assert.EqualValues(t, costBasis.Float(), p.CostBasis().Float())
+		assert.EqualValues(t, "2.00", p.CostBasis().FormattedString(2))
 	})
 }
 
@@ -113,33 +123,36 @@ func TestPosition_ExitValue(t *testing.T) {
 	t.Run("when not closed, returns 0", func(t *testing.T) {
 		p := new(Position)
 
-		order := NewOrder(BUY)
-		order.Amount = big.NewDecimal(1)
-		order.Price = big.NewDecimal(10)
-		order.FeePercentage = big.NewFromString("0")
+		order := Order{
+			Side:   BUY,
+			Amount: big.ONE,
+			Price:  big.NewFromString("2"),
+		}
 
 		p.Enter(order)
 
-		assert.EqualValues(t, "0", p.ExitValue().String())
+		assert.EqualValues(t, "0.00", p.ExitValue().FormattedString(2))
 	})
 
 	t.Run("when closed, returns exit value", func(t *testing.T) {
 		p := new(Position)
 
-		order := NewOrder(BUY)
-		order.Amount = big.NewDecimal(1)
-		order.Price = big.NewDecimal(10)
-		order.FeePercentage = big.NewFromString("0")
+		order := Order{
+			Side:   BUY,
+			Amount: big.ONE,
+			Price:  big.NewFromString("2"),
+		}
 
 		p.Enter(order)
 
-		order = NewOrder(SELL)
-		order.Amount = big.NewDecimal(1)
-		order.Price = big.NewDecimal(12)
-		order.FeePercentage = big.NewFromString("0.01")
+		order = Order{
+			Side:   SELL,
+			Amount: big.ONE,
+			Price:  big.NewFromString("12"),
+		}
 
 		p.Exit(order)
 
-		assert.EqualValues(t, "11.88", p.ExitValue().FormattedString(2))
+		assert.EqualValues(t, "12.00", p.ExitValue().FormattedString(2))
 	})
 }

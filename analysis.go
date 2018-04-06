@@ -135,15 +135,17 @@ func (baha BuyAndHoldAnalysis) Analyze(record *TradingRecord) float64 {
 		return 0
 	}
 
-	openOrder := NewOrder(BUY)
-	openOrder.Amount = big.NewDecimal(baha.StartingMoney).Div(baha.TimeSeries.Candles[0].ClosePrice)
-	openOrder.Price = baha.TimeSeries.Candles[0].ClosePrice
-	openOrder.FeePercentage = big.ZERO
+	openOrder := Order{
+		Side:   BUY,
+		Amount: big.NewDecimal(baha.StartingMoney).Div(baha.TimeSeries.Candles[0].ClosePrice),
+		Price:  baha.TimeSeries.Candles[0].ClosePrice,
+	}
 
-	closeOrder := NewOrder(SELL)
-	closeOrder.Amount = openOrder.Amount
-	closeOrder.Price = baha.TimeSeries.Candles[len(baha.TimeSeries.Candles)-1].ClosePrice
-	closeOrder.FeePercentage = big.ZERO
+	closeOrder := Order{
+		Side:   SELL,
+		Amount: openOrder.Amount,
+		Price:  baha.TimeSeries.Candles[len(baha.TimeSeries.Candles)-1].ClosePrice,
+	}
 
 	pos := NewPosition(openOrder)
 	pos.Exit(closeOrder)

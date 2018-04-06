@@ -3,8 +3,6 @@ package talib4g
 import (
 	"testing"
 
-	"time"
-
 	"github.com/sdcoffey/big"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,7 +17,12 @@ func TestPositionNewRule(t *testing.T) {
 
 	t.Run("returns false when position open", func(t *testing.T) {
 		record := NewTradingRecord()
-		record.Enter(big.ONE, big.ONE, big.ZERO, example, time.Now())
+
+		record.Operate(Order{
+			Side:   BUY,
+			Amount: big.ONE,
+			Price:  big.ONE,
+		})
 
 		rule := PositionNewRule{}
 
@@ -38,7 +41,12 @@ func TestPositionOpenRule(t *testing.T) {
 
 	t.Run("returns true when position open", func(t *testing.T) {
 		record := NewTradingRecord()
-		record.Enter(big.ONE, big.ONE, big.ZERO, example, time.Now())
+
+		record.Operate(Order{
+			Side:   BUY,
+			Amount: big.ONE,
+			Price:  big.ONE,
+		})
 
 		rule := PositionOpenRule{}
 

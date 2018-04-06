@@ -8,25 +8,21 @@ type Position struct {
 }
 
 // NewPosition returns a new Position with the passed-in order as the open order
-func NewPosition(openOrder *Order) (t *Position) {
+func NewPosition(openOrder Order) (t *Position) {
 	t = new(Position)
-	t.orders[0] = openOrder
+	t.orders[0] = &openOrder
 
 	return t
 }
 
 // Enter sets the open order to the order passed in
-func (p *Position) Enter(order *Order) {
-	if order != nil {
-		p.orders[0] = order
-	}
+func (p *Position) Enter(order Order) {
+	p.orders[0] = &order
 }
 
 // Exit sets the exit order to the order passed in
-func (p *Position) Exit(order *Order) {
-	if order != nil {
-		p.orders[1] = order
-	}
+func (p *Position) Exit(order Order) {
+	p.orders[1] = &order
 }
 
 // IsLong returns true if the entrance order is a buy order
@@ -67,16 +63,16 @@ func (p *Position) ExitOrder() *Order {
 // CostBasis returns the price to enter this order
 func (p *Position) CostBasis() big.Decimal {
 	if p.EntranceOrder() != nil {
-		return p.EntranceOrder().Cost()
+		return p.EntranceOrder().Amount.Mul(p.EntranceOrder().Price)
 	}
-	return big.NewDecimal(0)
+	return big.ZERO
 }
 
 // ExitValue returns the value accrued by closing the position
 func (p *Position) ExitValue() big.Decimal {
 	if p.IsClosed() {
-		return p.ExitOrder().Profit()
+		return p.ExitOrder().Amount.Mul(p.ExitOrder().Price)
 	}
 
-	return big.NewDecimal(0)
+	return big.ZERO
 }

@@ -21,13 +21,44 @@ func TestTotalProfitAnalysis(t *testing.T) {
 		record := NewTradingRecord()
 		tpa := TotalProfitAnalysis{}
 
-		record.Enter(big.NewDecimal(1), big.NewDecimal(1), big.ZERO, example, time.Now())
-		record.Exit(big.NewDecimal(2), big.NewDecimal(1), big.ZERO, example, time.Now()) // Gain 1
+		orders := []Order{
+			{
+				Side:          BUY,
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(1),
+				Security:      example,
+				ExecutionTime: time.Now(),
+			},
+			{
+				Side:          SELL,
+				Amount:        big.NewDecimal(2),
+				Price:         big.NewDecimal(1),
+				Security:      example,
+				ExecutionTime: time.Now(),
+			},
+		}
+
+		for _, order := range orders {
+			record.Operate(order)
+		}
 
 		assert.EqualValues(t, 1, tpa.Analyze(record))
 
-		record.Enter(big.NewDecimal(1), big.NewDecimal(1), big.ZERO, example, time.Now())
-		record.Exit(big.NewDecimal(.5), big.NewDecimal(1), big.ZERO, example, time.Now()) // Lose .5
+		record.Operate(Order{
+			Side:          BUY,
+			Amount:        big.ONE,
+			Price:         big.ONE,
+			Security:      example,
+			ExecutionTime: time.Now(),
+		})
+
+		record.Operate(Order{
+			Side:          SELL,
+			Amount:        big.NewFromString("0.5"),
+			Price:         big.ONE,
+			Security:      example,
+			ExecutionTime: time.Now(),
+		})
 
 		assert.EqualValues(t, .5, tpa.Analyze(record))
 	})
@@ -47,8 +78,26 @@ func TestPercentGainAnalysis(t *testing.T) {
 
 		pga := PercentGainAnalysis{}
 
-		record.Enter(big.NewDecimal(1), big.NewDecimal(1), big.ZERO, example, time.Now())
-		record.Exit(big.NewDecimal(2), big.NewDecimal(1), big.ZERO, example, time.Now())
+		orders := []Order{
+			{
+				Side:          BUY,
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(1),
+				Security:      example,
+				ExecutionTime: time.Now(),
+			},
+			{
+				Side:          SELL,
+				Amount:        big.NewDecimal(2),
+				Price:         big.NewDecimal(1),
+				Security:      example,
+				ExecutionTime: time.Now(),
+			},
+		}
+
+		for _, order := range orders {
+			record.Operate(order)
+		}
 
 		gain := pga.Analyze(record)
 		assert.EqualValues(t, 1, gain)
@@ -59,8 +108,26 @@ func TestPercentGainAnalysis(t *testing.T) {
 
 		pga := PercentGainAnalysis{}
 
-		record.Enter(big.NewDecimal(2), big.NewDecimal(1), big.ZERO, example, time.Now())
-		record.Exit(big.NewDecimal(1), big.NewDecimal(1), big.ZERO, example, time.Now())
+		orders := []Order{
+			{
+				Side:          BUY,
+				Amount:        big.NewDecimal(2),
+				Price:         big.NewDecimal(1),
+				Security:      example,
+				ExecutionTime: time.Now(),
+			},
+			{
+				Side:          SELL,
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(1),
+				Security:      example,
+				ExecutionTime: time.Now(),
+			},
+		}
+
+		for _, order := range orders {
+			record.Operate(order)
+		}
 
 		gain := pga.Analyze(record)
 		assert.EqualValues(t, -.5, gain)
@@ -71,11 +138,40 @@ func TestPercentGainAnalysis(t *testing.T) {
 
 		pga := PercentGainAnalysis{}
 
-		record.Enter(big.NewDecimal(2), big.NewDecimal(1), big.ZERO, example, time.Now())
-		record.Exit(big.NewDecimal(1), big.NewDecimal(1), big.ZERO, example, time.Now())
+		orders := []Order{
+			{
+				Side:          BUY,
+				Amount:        big.NewDecimal(2),
+				Price:         big.NewDecimal(1),
+				Security:      example,
+				ExecutionTime: time.Now(),
+			},
+			{
+				Side:          SELL,
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(1),
+				Security:      example,
+				ExecutionTime: time.Now(),
+			},
+			{
+				Side:          BUY,
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(1),
+				Security:      example,
+				ExecutionTime: time.Now(),
+			},
+			{
+				Side:          SELL,
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(1.25),
+				Security:      example,
+				ExecutionTime: time.Now(),
+			},
+		}
 
-		record.Enter(big.NewDecimal(1), big.NewDecimal(1), big.ZERO, example, time.Now())
-		record.Exit(big.NewDecimal(1.25), big.NewDecimal(1), big.ZERO, example, time.Now())
+		for _, order := range orders {
+			record.Operate(order)
+		}
 
 		gain := pga.Analyze(record)
 		assert.EqualValues(t, -.375, gain)
@@ -107,11 +203,40 @@ func TestLogTradesAnalysis(t *testing.T) {
 		now.AddDate(0, 0, 3),
 	}
 
-	record.Enter(big.NewDecimal(2), big.NewDecimal(1), big.ZERO, example, dates[0])
-	record.Exit(big.NewDecimal(1), big.NewDecimal(1), big.ZERO, example, dates[1])
+	orders := []Order{
+		{
+			Side:          BUY,
+			Amount:        big.NewDecimal(1),
+			Price:         big.NewDecimal(2),
+			Security:      example,
+			ExecutionTime: dates[0],
+		},
+		{
+			Side:          SELL,
+			Amount:        big.NewDecimal(1),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: dates[1],
+		},
+		{
+			Side:          BUY,
+			Amount:        big.NewDecimal(1),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: dates[2],
+		},
+		{
+			Side:          SELL,
+			Amount:        big.NewDecimal(1),
+			Price:         big.NewDecimal(1.25),
+			Security:      example,
+			ExecutionTime: dates[3],
+		},
+	}
 
-	record.Enter(big.NewDecimal(1), big.NewDecimal(1), big.ZERO, example, dates[2])
-	record.Exit(big.NewDecimal(1.25), big.NewDecimal(1), big.ZERO, example, dates[3])
+	for _, order := range orders {
+		record.Operate(order)
+	}
 
 	val := logger.Analyze(record)
 	assert.EqualValues(t, 0, val)
@@ -154,11 +279,40 @@ func TestPeriodProfitAnalysis(t *testing.T) {
 
 	now := time.Now().Add(-time.Minute * 5)
 
-	record.Enter(big.NewDecimal(1), big.NewDecimal(1), big.ZERO, example, now)
-	record.Exit(big.NewDecimal(2), big.NewDecimal(1), big.ZERO, example, now.Add(time.Minute))
+	orders := []Order{
+		{
+			Side:          BUY,
+			Amount:        big.NewDecimal(1),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: now,
+		},
+		{
+			Side:          SELL,
+			Amount:        big.NewDecimal(2),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: now.Add(time.Minute),
+		},
+		{
+			Side:          BUY,
+			Amount:        big.NewDecimal(2),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: now.Add(time.Minute * 2),
+		},
+		{
+			Side:          SELL,
+			Amount:        big.NewDecimal(3),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: now.Add(time.Minute * 3),
+		},
+	}
 
-	record.Enter(big.NewDecimal(2), big.NewDecimal(1), big.ZERO, example, now.Add(time.Minute*2))
-	record.Exit(big.NewDecimal(3), big.NewDecimal(1), big.ZERO, example, now.Add(time.Minute*3))
+	for _, order := range orders {
+		record.Operate(order)
+	}
 
 	ppa := PeriodProfitAnalysis{
 		Period: time.Minute * 2,
@@ -170,11 +324,40 @@ func TestPeriodProfitAnalysis(t *testing.T) {
 func TestProfitableTradesAnalysis(t *testing.T) {
 	record := NewTradingRecord()
 
-	record.Enter(big.NewDecimal(1), big.NewDecimal(1), big.ZERO, example, time.Now())
-	record.Exit(big.NewDecimal(2), big.NewDecimal(1), big.ZERO, example, time.Now())
+	orders := []Order{
+		{
+			Side:          BUY,
+			Amount:        big.NewDecimal(1),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: time.Now(),
+		},
+		{
+			Side:          SELL,
+			Amount:        big.NewDecimal(2),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: time.Now(),
+		},
+		{
+			Side:          BUY,
+			Amount:        big.NewDecimal(2),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: time.Now(),
+		},
+		{
+			Side:          SELL,
+			Amount:        big.NewDecimal(1),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: time.Now(),
+		},
+	}
 
-	record.Enter(big.NewDecimal(2), big.NewDecimal(1), big.ZERO, example, time.Now())
-	record.Exit(big.NewDecimal(1), big.NewDecimal(1), big.ZERO, example, time.Now())
+	for _, order := range orders {
+		record.Operate(order)
+	}
 
 	pta := ProfitableTradesAnalysis{}
 
@@ -184,11 +367,40 @@ func TestProfitableTradesAnalysis(t *testing.T) {
 func TestAverageProfitAnalysis(t *testing.T) {
 	record := NewTradingRecord()
 
-	record.Enter(big.NewDecimal(1), big.NewDecimal(1), big.ZERO, example, time.Now())
-	record.Exit(big.NewDecimal(2), big.NewDecimal(1), big.ZERO, example, time.Now())
+	orders := []Order{
+		{
+			Side:          BUY,
+			Amount:        big.NewDecimal(1),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: time.Now(),
+		},
+		{
+			Side:          SELL,
+			Amount:        big.NewDecimal(2),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: time.Now(),
+		},
+		{
+			Side:          BUY,
+			Amount:        big.NewDecimal(2),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: time.Now(),
+		},
+		{
+			Side:          SELL,
+			Amount:        big.NewDecimal(5),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: time.Now(),
+		},
+	}
 
-	record.Enter(big.NewDecimal(2), big.NewDecimal(1), big.ZERO, example, time.Now())
-	record.Exit(big.NewDecimal(5), big.NewDecimal(1), big.ZERO, example, time.Now())
+	for _, order := range orders {
+		record.Operate(order)
+	}
 
 	pta := AverageProfitAnalysis{}
 
@@ -209,11 +421,40 @@ func TestBuyAndHoldAnalysis(t *testing.T) {
 	})
 
 	t.Run("> 0 trades", func(t *testing.T) {
-		record.Enter(big.NewDecimal(1), big.NewDecimal(1), big.ZERO, example, time.Now())
-		record.Exit(big.NewDecimal(2), big.NewDecimal(1), big.ZERO, example, time.Now())
+		orders := []Order{
+			{
+				Side:          BUY,
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(1),
+				Security:      example,
+				ExecutionTime: time.Now(),
+			},
+			{
+				Side:          SELL,
+				Amount:        big.NewDecimal(2),
+				Price:         big.NewDecimal(1),
+				Security:      example,
+				ExecutionTime: time.Now(),
+			},
+			{
+				Side:          BUY,
+				Amount:        big.NewDecimal(3),
+				Price:         big.NewDecimal(1),
+				Security:      example,
+				ExecutionTime: time.Now(),
+			},
+			{
+				Side:          SELL,
+				Amount:        big.NewDecimal(6),
+				Price:         big.NewDecimal(1),
+				Security:      example,
+				ExecutionTime: time.Now(),
+			},
+		}
 
-		record.Enter(big.NewDecimal(3), big.NewDecimal(1), big.ZERO, example, time.Now())
-		record.Exit(big.NewDecimal(6), big.NewDecimal(1), big.ZERO, example, time.Now())
+		for _, order := range orders {
+			record.Operate(order)
+		}
 
 		buyAndHoldAnalysis := BuyAndHoldAnalysis{
 			TimeSeries:    series,

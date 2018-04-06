@@ -2,7 +2,6 @@ package talib4g
 
 import (
 	"testing"
-	"time"
 
 	"github.com/sdcoffey/big"
 	"github.com/stretchr/testify/assert"
@@ -21,7 +20,11 @@ func TestStopLossRule(t *testing.T) {
 
 	t.Run("Returns true when losses exceed tolerance", func(t *testing.T) {
 		record := NewTradingRecord()
-		record.Enter(big.NewDecimal(10), big.NewDecimal(1), big.ZERO, example, time.Now())
+		record.Operate(Order{
+			Side:   BUY,
+			Amount: big.NewFromString("10"),
+			Price:  big.ONE,
+		})
 
 		series := mockTimeSeriesFl(10, 9) // Lose 10%
 
@@ -32,7 +35,12 @@ func TestStopLossRule(t *testing.T) {
 
 	t.Run("Returns false when losses do not exceed tolerance", func(t *testing.T) {
 		record := NewTradingRecord()
-		record.Enter(big.NewDecimal(10), big.NewDecimal(1), big.ZERO, example, time.Now())
+
+		record.Operate(Order{
+			Side:   BUY,
+			Amount: big.NewFromString("10"),
+			Price:  big.ONE,
+		})
 
 		series := mockTimeSeriesFl(10, 10.1) // Gain 1%
 
