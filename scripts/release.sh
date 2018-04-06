@@ -2,8 +2,6 @@
 
 set -euf -o pipefail
 
-make test
-
 golint_count=`golint | wc -l | tr -d '[:space:]' || true`
 
 if [[ $golint_count -gt 0 ]]; then
