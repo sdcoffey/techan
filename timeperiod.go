@@ -71,7 +71,7 @@ func (tp TimePeriod) Since(other TimePeriod) time.Duration {
 	return tp.Start.Sub(other.End)
 }
 
-// Format returns the string representaion of this timePeriod in the given format
+// Format returns the string representation of this timePeriod in the given format
 func (tp TimePeriod) Format(layout string) string {
 	return fmt.Sprintf("%s -> %s", tp.Start.Format(layout), tp.End.Format(layout))
 }
