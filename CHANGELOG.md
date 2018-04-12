@@ -1,4 +1,4 @@
-# TechAn Release notes
+# Techan Release notes
 
 ## 0.3.0
 * Rename talib4g to techan
