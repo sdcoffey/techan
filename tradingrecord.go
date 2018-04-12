@@ -1,4 +1,4 @@
-package talib4g
+package techan
 
 // TradingRecord is an object describing a series of trades made and a current position
 type TradingRecord struct {

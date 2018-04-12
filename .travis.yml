@@ -14,7 +14,7 @@ install:
   - dep ensure
 
 script:
-  - go test -race -coverprofile=coverage.txt -covermode=atomic github.com/sdcoffey/talib4g
+  - go test -race -coverprofile=coverage.txt -covermode=atomic github.com/sdcoffey/techan
 
 after_success:
     - bash <(curl -s https://codecov.io/bash)

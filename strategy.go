@@ -1,4 +1,4 @@
-package talib4g
+package techan
 
 // Strategy is an interface that describes desired entry and exit trading behavior
 type Strategy interface {

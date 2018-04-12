@@ -1,4 +1,4 @@
-package talib4g
+package techan
 
 // NewCrossUpIndicatorRule returns a new rule that is satisfied when the lower indicator has crossed above the upper
 // indicator.

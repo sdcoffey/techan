@@ -5,11 +5,11 @@ import (
 	"time"
 
 	"github.com/sdcoffey/big"
-	"github.com/sdcoffey/talib4g"
+	"github.com/sdcoffey/techan"
 )
 
-func BasicEma() talib4g.Indicator {
-	series := talib4g.NewTimeSeries()
+func BasicEma() techan.Indicator {
+	series := techan.NewTimeSeries()
 
 	// fetch this from your preferred exchange
 	dataset := [][]string{
@@ -19,9 +19,9 @@ func BasicEma() talib4g.Indicator {
 
 	for _, datum := range dataset {
 		start, _ := strconv.ParseInt(datum[0], 10, 64)
-		period := talib4g.NewTimePeriod(time.Unix(start, 0), time.Hour*24)
+		period := techan.NewTimePeriod(time.Unix(start, 0), time.Hour*24)
 
-		candle := talib4g.NewCandle(period)
+		candle := techan.NewCandle(period)
 		candle.OpenPrice = big.NewFromString(datum[1])
 		candle.ClosePrice = big.NewFromString(datum[2])
 		candle.MaxPrice = big.NewFromString(datum[3])
@@ -30,8 +30,8 @@ func BasicEma() talib4g.Indicator {
 		series.AddCandle(candle)
 	}
 
-	closePrices := talib4g.NewClosePriceIndicator(series)
-	movingAverage := talib4g.NewEMAIndicator(closePrices, 10) // Create an exponential moving average with a window of 10
+	closePrices := techan.NewClosePriceIndicator(series)
+	movingAverage := techan.NewEMAIndicator(closePrices, 10) // Create an exponential moving average with a window of 10
 
 	return movingAverage
 }

@@ -1,4 +1,4 @@
-package talib4g
+package techan
 
 // Min returns the smaller integer of the two integers passed in
 func Min(i, j int) int {

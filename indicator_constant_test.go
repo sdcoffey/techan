@@ -1,4 +1,4 @@
-package talib4g
+package techan
 
 import (
 	"math"

@@ -1,4 +1,4 @@
-package talib4g
+package techan
 
 // IncreaseRule is satisfied when the given Indicator at the given index is greater than the value at the previous
 // index.

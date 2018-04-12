@@ -1,4 +1,7 @@
-# Talib4g Release notes
+# TechAn Release notes
+
+## 0.3.0
+* Rename talib4g to techan
 
 ## 0.2.0
 * Remove NewOrder methods and prefer struct initializer

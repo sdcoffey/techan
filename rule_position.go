@@ -1,4 +1,4 @@
-package talib4g
+package techan
 
 // PositionNewRule is satisfied when the current position in the trading record is new (no
 // open positions).

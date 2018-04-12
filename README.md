@@ -1,9 +1,9 @@
-## Talib4g 
-![](https://travis-ci.org/sdcoffey/talib4g.svg?branch=master)
+## TechAn
+![](https://travis-ci.org/sdcoffey/techan.svg?branch=master)
 
-[![codecov](https://codecov.io/gh/sdcoffey/talib4g/branch/master/graph/badge.svg)](https://codecov.io/gh/sdcoffey/talib4g)
+[![codecov](https://codecov.io/gh/sdcoffey/techan/branch/master/graph/badge.svg)](https://codecov.io/gh/sdcoffey/techan)
 
-Talib4g is a library for technical analysis for Go! It provides a suite of tools and frameworks to analyze financial data and make trading decisions. 
+TechAn is a  Go! It provides a suite of tools and frameworks to analyze financial data and make trading decisions.
 
 ## Features 
 * Basic and advanced technical analysis indicators
@@ -12,12 +12,12 @@ Talib4g is a library for technical analysis for Go! It provides a suite of tools
 
 ### Installation
 ```sh
-$ go get github.com/sdcoffey/talib4g
+$ go get github.com/sdcoffey/techan
 ```
 
 ### Quickstart
 ```go
-series := talib4g.NewTimeSeries()
+series := techan.NewTimeSeries()
 
 // fetch this from your preferred exchange
 dataset := [][]string{
@@ -27,9 +27,9 @@ dataset := [][]string{
 
 for _, datum := range dataset {
 	start, _ := strconv.ParseInt(datum[0], 10, 64)
-	period := talib4g.NewTimePeriodD(time.Unix(start, 0), time.Hour*24)
+	period := techan.NewTimePeriodD(time.Unix(start, 0), time.Hour*24)
 
-	candle := talib4g.NewCandle(period)
+	candle := techan.NewCandle(period)
 	candle.OpenPrice = big.NewFromString(datum[1])
 	candle.ClosePrice = big.NewFromString(datum[2])
 	candle.MaxPrice = big.NewFromString(datum[3])
@@ -38,33 +38,33 @@ for _, datum := range dataset {
 	series.AddCandle(candle)
 }
 
-closePrices := talib4g.NewClosePriceIndicator(series)
-movingAverage := talib4g.NewEMAIndicator(closePrices, 10) // Create an exponential moving average with a window of 10
+closePrices := techan.NewClosePriceIndicator(series)
+movingAverage := techan.NewEMAIndicator(closePrices, 10) // Create an exponential moving average with a window of 10
 
 fmt.Println(movingAverage.Calculate(0).FormattedString(2))
 ```
 
 ### Creating trading strategies
 ```go
-indicator := talib4g.NewClosePriceIndicator(series)
+indicator := techan.NewClosePriceIndicator(series)
 
 // record trades on this object
-record := talib4g.NewTradingRecord()
+record := techan.NewTradingRecord()
 
-entryConstant := talib4g.NewConstantIndicator(30)
-exitConstant := talib4g.NewConstantIndicator(10)
+entryConstant := techan.NewConstantIndicator(30)
+exitConstant := techan.NewConstantIndicator(10)
 
 // Is satisfied when the price ema moves above 30 and the current position is new
-entryRule := talib4g.And(
-	talib4g.NewCrossUpIndicatorRule(entryConstant, indicator),
-	talib4g.NewPositionNewRule())
+entryRule := techan.And(
+	techan.NewCrossUpIndicatorRule(entryConstant, indicator),
+	techan.NewPositionNewRule())
 	
 // Is satisfied when the price ema moves below 10 and the current position is open
-exitRule := talib4g.And(
-	talib4g.NewCrossDownIndicatorRule(indicator, exitConstant),
-	talib4g.NewPositionOpenRule()) 
+exitRule := techan.And(
+	techan.NewCrossDownIndicatorRule(indicator, exitConstant),
+	techan.NewPositionOpenRule())
 
-strategy := talib4g.RuleStrategy{
+strategy := techan.RuleStrategy{
 	UnstablePeriod: 10, // Period before which ShouldEnter and ShouldExit will always return false
 	EntryRule:      entryRule,
 	ExitRule:       exitRule,
