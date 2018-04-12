@@ -1,4 +1,4 @@
-## TechAn
+## Techan
 ![](https://travis-ci.org/sdcoffey/techan.svg?branch=master)
 
 [![codecov](https://codecov.io/gh/sdcoffey/techan/branch/master/graph/badge.svg)](https://codecov.io/gh/sdcoffey/techan)
@@ -74,8 +74,8 @@ strategy.ShouldEnter(0, record) // returns false
 ```
 
 ### Credits
-Talib4g is heavily influenced by the great [ta4j](https://github.com/ta4j/ta4j). Many of the ideas and frameworks in this library owe their genesis to the great work done over there.
+Techan is heavily influenced by the great [ta4j](https://github.com/ta4j/ta4j). Many of the ideas and frameworks in this library owe their genesis to the great work done over there.
 
 ### License
 
-Talib4g is released under the MIT license. See [LICENSE](./LICENSE) for details.
+Techan is released under the MIT license. See [LICENSE](./LICENSE) for details.
