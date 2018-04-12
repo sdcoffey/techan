@@ -3,7 +3,7 @@
 
 [![codecov](https://codecov.io/gh/sdcoffey/techan/branch/master/graph/badge.svg)](https://codecov.io/gh/sdcoffey/techan)
 
-TechAn is a  Go! It provides a suite of tools and frameworks to analyze financial data and make trading decisions.
+TechAn is a **tech**nical **an**alysis library for Go! It provides a suite of tools and frameworks to analyze financial data and make trading decisions.
 
 ## Features 
 * Basic and advanced technical analysis indicators
@@ -57,12 +57,12 @@ exitConstant := techan.NewConstantIndicator(10)
 // Is satisfied when the price ema moves above 30 and the current position is new
 entryRule := techan.And(
 	techan.NewCrossUpIndicatorRule(entryConstant, indicator),
-	techan.NewPositionNewRule())
+	techan.PositionNewRule{})
 	
 // Is satisfied when the price ema moves below 10 and the current position is open
 exitRule := techan.And(
 	techan.NewCrossDownIndicatorRule(indicator, exitConstant),
-	techan.NewPositionOpenRule())
+	techan.PositionOpenRule{})
 
 strategy := techan.RuleStrategy{
 	UnstablePeriod: 10, // Period before which ShouldEnter and ShouldExit will always return false
