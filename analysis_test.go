@@ -251,22 +251,16 @@ func TestLogTradesAnalysis(t *testing.T) {
 		switch i {
 		case 0:
 			expected = fmt.Sprintf("%s - enter with buy EXM (1 @ $2)", dates[0].Format(time.RFC822))
-			break
 		case 1:
 			expected = fmt.Sprintf("%s - exit with sell EXM (1 @ $1)", dates[1].Format(time.RFC822))
-			break
 		case 2:
 			expected = fmt.Sprintf("Profit: $-1")
-			break
 		case 3:
 			expected = fmt.Sprintf("%s - enter with buy EXM (1 @ $1)", dates[2].Format(time.RFC822))
-			break
 		case 4:
 			expected = fmt.Sprintf("%s - exit with sell EXM (1 @ $1.25)", dates[3].Format(time.RFC822))
-			break
 		case 5:
 			expected = "Profit: $0.25"
-			break
 		}
 
 		assert.EqualValues(t, expected, text)

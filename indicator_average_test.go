@@ -13,7 +13,7 @@ func TestAverageGainsIndicator(t *testing.T) {
 		decimalEquals(t, 0, avgGains.Calculate(0))
 		decimalEquals(t, 1.0/2.0, avgGains.Calculate(1))
 		decimalEquals(t, 2.0/3.0, avgGains.Calculate(2))
-		decimalEquals(t, 4.0/4.0, avgGains.Calculate(3))
+		decimalEquals(t, 1.0, avgGains.Calculate(3))
 		decimalEquals(t, 7.0/5.0, avgGains.Calculate(4))
 		decimalEquals(t, 12.0/6.0, avgGains.Calculate(5))
 	})
@@ -82,6 +82,6 @@ func TestNewAverageLossesIndicator(t *testing.T) {
 		decimalEquals(t, 6.0/3.0, cumLosses.Calculate(2))
 		decimalEquals(t, 8.0/3.0, cumLosses.Calculate(3))
 		decimalEquals(t, 8.0/3.0, cumLosses.Calculate(4))
-		decimalEquals(t, 3.0/3.0, cumLosses.Calculate(5))
+		decimalEquals(t, 1.0, cumLosses.Calculate(5))
 	})
 }
