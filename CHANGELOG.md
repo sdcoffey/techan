@@ -1,5 +1,8 @@
 # Techan Release notes
 
+## 0.4.0
+* Add DerivativeIndicator
+
 ## 0.3.0
 * Rename talib4g to techan
 
