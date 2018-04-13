@@ -2,14 +2,6 @@
 
 set -euf -o pipefail
 
-golint_count=`golint | wc -l | tr -d '[:space:]' || true`
-
-if [[ $golint_count -gt 0 ]]; then
-  echo "golint failed. Please fix the following issues:"
-  golint
-  exit 1
-fi
-
 echo -n "Version: "
 read newversion
 

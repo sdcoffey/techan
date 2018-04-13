@@ -8,13 +8,17 @@ clean:
 test: clean
 	go test
 
+lint: clean
+	golint -set_exit_status
+	golint -set_exit_status example
+
 bench: clean
 	go test -bench .
 
 commit: test
 	git commit
 
-release: test
+release: test lint
 	./scripts/release.sh
 
 coverage: clean
