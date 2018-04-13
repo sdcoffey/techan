@@ -6,14 +6,12 @@ bootstrap:
 	go get honnef.co/go/tools/cmd/megacheck
 
 clean:
-	rm -rf bin
 	goimports -w $(files)
-	mkdir bin
 
 test: clean
 	go test
 
-lint: clean
+lint:
 	golint -set_exit_status
 	golint -set_exit_status example
 	megacheck github.com/sdcoffey/techan
@@ -25,7 +23,7 @@ bench: clean
 commit: test
 	git commit
 
-release: test lint
+release: clean test lint
 	./scripts/release.sh
 
 coverage: clean
