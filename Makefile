@@ -14,8 +14,8 @@ test: clean
 lint:
 	golint -set_exit_status
 	golint -set_exit_status example
-	megacheck github.com/sdcoffey/techan
-	megacheck github.com/sdcoffey/techan/example
+	megacheck -ignore 'github.com/sdcoffey/techan/vendor/*.go:' github.com/sdcoffey/techan
+	megacheck -ignore 'github.com/sdcoffey/techan/vendor/*.go:' github.com/sdcoffey/techan/example
 
 bench: clean
 	go test -bench .
