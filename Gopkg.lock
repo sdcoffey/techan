@@ -16,8 +16,8 @@
 [[projects]]
   name = "github.com/sdcoffey/big"
   packages = ["."]
-  revision = "16b323fc2d29a4a8ead5d5690338aeae7742a487"
-  version = "0.2.0"
+  revision = "438f3d83db4cb76017594a4d90ddd63793772709"
+  version = "0.3.0"
 
 [[projects]]
   name = "github.com/stretchr/testify"
@@ -28,6 +28,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "219aef44509d4d8a0459d5fae0f742e00426a3d000654d219c8229ae3f95e32b"
+  inputs-digest = "33f766413b6b968db7efe094505f8006e02a4648831dc6bddc60e15112384bae"
   solver-name = "gps-cdcl"
   solver-version = 1
