@@ -1,5 +1,9 @@
 # Techan Release notes
 
+## 0.5.0
+* Add StandardDeviationIndicator
+* Add VarianceIndicator
+
 ## 0.4.0
 * Add DerivativeIndicator
 
