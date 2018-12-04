@@ -24,8 +24,11 @@ func (tps TotalProfitAnalysis) Analyze(record *TradingRecord) float64 {
 		if trade.IsClosed() {
 			costBasis := trade.CostBasis()
 			exitValue := trade.ExitValue()
-
-			totalProfit = totalProfit.Add(exitValue.Sub(costBasis))
+			if trade.IsLong() {
+				totalProfit = totalProfit.Add(exitValue.Sub(costBasis))
+			} else {
+				totalProfit = totalProfit.Add(costBasis.Sub(exitValue))
+			}
 		}
 	}
 
