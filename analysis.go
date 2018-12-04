@@ -64,8 +64,12 @@ func (lta LogTradesAnalysis) Analyze(record *TradingRecord) float64 {
 			trade.EntranceOrder().ExecutionTime.Format(time.RFC822), trade.EntranceOrder().Side, trade.EntranceOrder().Security, trade.EntranceOrder().Amount, trade.EntranceOrder().Price))
 		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - exit with %s %s (%s @ $%s)",
 			trade.ExitOrder().ExecutionTime.Format(time.RFC822), trade.EntranceOrder().Side, trade.ExitOrder().Security, trade.ExitOrder().Amount, trade.ExitOrder().Price))
-
-		profit := trade.ExitValue().Sub(trade.CostBasis())
+		profit := big.ZERO
+		if trade.IsLong() {
+			profit = trade.ExitValue().Sub(trade.CostBasis())
+		} else {
+			profit = trade.CostBasis().Sub(trade.ExitValue())
+		}
 		fmt.Fprintln(lta.Writer, fmt.Sprintf("Profit: $%s", profit))
 	}
 
