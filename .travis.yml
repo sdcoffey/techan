@@ -3,16 +3,11 @@ language: go
 go:
   - "1.12"
 
-before_install:
-  - go get golang.org/x/lint/golint
-  - go get github.com/go-tools/cmd/staticcheck
-
 install:
   - go get
 
 script:
-  - go test -race -coverprofile=coverage.txt -covermode=atomic github.com/sdcoffey/techan
-  - make lint
+  - make test-with-coverage
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

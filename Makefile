@@ -25,6 +25,8 @@ commit: test
 release: clean test lint
 	./scripts/release.sh
 
-coverage: clean
-	go test -race -cover -covermode=atomic -coverprofile=bin/coverage.txt
-	go tool cover -html bin/coverage.txt
+test-with-coverage:
+	go test -race -cover -covermode=atomic -coverprofile=coverage.txt github.com/sdcoffey/techan
+
+view-coverage: test-with-coverage
+	go tool cover -html coverage.txt
