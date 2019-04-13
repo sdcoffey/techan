@@ -1,9 +1,8 @@
 files := $(shell find . -name "*.go" | grep -v vendor)
 
 bootstrap:
-	go get github.com/golang/dep/cmd/dep
-	go get github.com/golang/lint/golint
-	go get honnef.co/go/tools/cmd/megacheck
+	go get golang.org/x/lint/golint
+	go get github.com/go-tools/cmd/staticcheck
 
 clean:
 	goimports -w $(files)
@@ -14,8 +13,8 @@ test: clean
 lint:
 	golint -set_exit_status
 	golint -set_exit_status example
-	megacheck -ignore 'github.com/sdcoffey/techan/vendor/*.go:' github.com/sdcoffey/techan
-	megacheck -ignore 'github.com/sdcoffey/techan/vendor/*.go:' github.com/sdcoffey/techan/example
+	staticcheck github.com/sdcoffey/techan
+	staticcheck github.com/sdcoffey/techan/example
 
 bench: clean
 	go test -bench .
