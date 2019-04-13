@@ -1,5 +1,9 @@
 # Techan Release notes
 
+## 0.6.0
+* **BREAKING**: Standard Deviation Indicator and Variance indicator now use the NewXIndicator pattern used throughout the library. Any usages creating the struct directly will need to be udpated.
+* Migrate to go module
+
 ## 0.5.0
 * Add StandardDeviationIndicator
 * Add VarianceIndicator
