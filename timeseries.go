@@ -21,7 +21,7 @@ func NewTimeSeries() (t *TimeSeries) {
 // If the candle is added, AddCandle will return true, otherwise it will return false.
 func (ts *TimeSeries) AddCandle(candle *Candle) bool {
 	if candle == nil {
-		panic(fmt.Errorf("Error adding Candle: candle cannot be nil"))
+		panic(fmt.Errorf("error adding Candle: candle cannot be nil"))
 	}
 
 	if ts.LastCandle() == nil || candle.Period.Since(ts.LastCandle().Period) >= 0 {

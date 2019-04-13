@@ -2,14 +2,20 @@ package techan
 
 import "github.com/sdcoffey/big"
 
-// VarianceIndicator provides a way to find the variance in a base indicator, where variances is the sum of squared
+// NewVarianceIndicator provides a way to find the variance in a base indicator, where variances is the sum of squared
 // deviations from the mean at any given index in the time series.
-type VarianceIndicator struct {
+func NewVarianceIndicator(ind Indicator) Indicator {
+	return varianceIndicator{
+		Indicator: ind,
+	}
+}
+
+type varianceIndicator struct {
 	Indicator Indicator
 }
 
 // Calculate returns the Variance for this indicator at the given index
-func (vi VarianceIndicator) Calculate(index int) big.Decimal {
+func (vi varianceIndicator) Calculate(index int) big.Decimal {
 	if index < 1 {
 		return big.ZERO
 	}
