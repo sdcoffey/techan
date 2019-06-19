@@ -22,10 +22,16 @@ func (tps TotalProfitAnalysis) Analyze(record *TradingRecord) float64 {
 	totalProfit := big.NewDecimal(0)
 	for _, trade := range record.Trades {
 		if trade.IsClosed() {
+
 			costBasis := trade.CostBasis()
 			exitValue := trade.ExitValue()
 
-			totalProfit = totalProfit.Add(exitValue.Sub(costBasis))
+			if trade.IsLong() {
+				totalProfit = totalProfit.Add(exitValue.Sub(costBasis))
+			} else if trade.IsShort() {
+				totalProfit = totalProfit.Sub(exitValue.Sub(costBasis))
+			}
+
 		}
 	}
 
