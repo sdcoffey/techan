@@ -27,7 +27,7 @@ dataset := [][]string{
 
 for _, datum := range dataset {
 	start, _ := strconv.ParseInt(datum[0], 10, 64)
-	period := techan.NewTimePeriodD(time.Unix(start, 0), time.Hour*24)
+	period := techan.NewTimePeriod(time.Unix(start, 0), time.Hour*24)
 
 	candle := techan.NewCandle(period)
 	candle.OpenPrice = big.NewFromString(datum[1])
