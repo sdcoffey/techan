@@ -24,7 +24,7 @@ func TestTimeSeries_AddCandle(t *testing.T) {
 
 		ts.AddCandle(candle)
 
-		assert.Len(t, ts.Candles, 1)
+		assert.Len(t, ts.GetCandleData(), 1)
 	})
 
 	t.Run("Does not add candle if before last candle", func(t *testing.T) {
@@ -42,8 +42,8 @@ func TestTimeSeries_AddCandle(t *testing.T) {
 
 		ts.AddCandle(nextCandle)
 
-		assert.Len(t, ts.Candles, 1)
-		assert.EqualValues(t, now.UnixNano(), ts.Candles[0].Period.Start.UnixNano())
+		assert.Len(t, ts.GetCandleData(), 1)
+		assert.EqualValues(t, now.UnixNano(), ts.FirstCandle().Period.Start.UnixNano())
 	})
 }
 
@@ -65,7 +65,7 @@ func TestTimeSeries_LastCandle(t *testing.T) {
 
 	ts.AddCandle(newCandle)
 
-	assert.Len(t, ts.Candles, 2)
+	assert.Len(t, ts.GetCandleData(), 2)
 
 	assert.EqualValues(t, next.UnixNano(), ts.LastCandle().Period.Start.UnixNano())
 	assert.EqualValues(t, 2, ts.LastCandle().ClosePrice.Float())

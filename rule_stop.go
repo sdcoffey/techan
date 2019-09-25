@@ -9,7 +9,7 @@ type stopLossRule struct {
 
 // NewStopLossRule returns a new rule that is satisfied when the given loss tolerance (a percentage) is met or exceeded.
 // Loss tolerance should be a value between -1 and 1.
-func NewStopLossRule(series *TimeSeries, lossTolerance float64) Rule {
+func NewStopLossRule(series TimeSeries, lossTolerance float64) Rule {
 	return stopLossRule{
 		Indicator: NewClosePriceIndicator(series),
 		tolerance: big.NewDecimal(lossTolerance),

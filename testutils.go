@@ -14,7 +14,7 @@ import (
 
 var candleIndex int
 
-func randomTimeSeries(size int) *TimeSeries {
+func randomTimeSeries(size int) TimeSeries {
 	vals := make([]string, size)
 	rand.Seed(time.Now().Unix())
 	for i := 0; i < size; i++ {
@@ -34,7 +34,7 @@ func randomTimeSeries(size int) *TimeSeries {
 	return mockTimeSeries(vals...)
 }
 
-func mockTimeSeriesOCHL(values ...[]string) *TimeSeries {
+func mockTimeSeriesOCHL(values ...[]string) TimeSeries {
 	ts := NewTimeSeries()
 	for i, ochl := range values {
 		candle := NewCandle(NewTimePeriod(time.Unix(int64(i), 0), time.Second))
@@ -50,7 +50,7 @@ func mockTimeSeriesOCHL(values ...[]string) *TimeSeries {
 	return ts
 }
 
-func mockTimeSeries(values ...string) *TimeSeries {
+func mockTimeSeries(values ...string) TimeSeries {
 	ts := NewTimeSeries()
 	for _, val := range values {
 		candle := NewCandle(NewTimePeriod(time.Unix(int64(candleIndex), 0), time.Second))
@@ -68,7 +68,7 @@ func mockTimeSeries(values ...string) *TimeSeries {
 	return ts
 }
 
-func mockTimeSeriesFl(values ...float64) *TimeSeries {
+func mockTimeSeriesFl(values ...float64) TimeSeries {
 	strVals := make([]string, len(values))
 
 	for i, val := range values {
