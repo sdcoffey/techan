@@ -19,8 +19,8 @@ func TestDerivativeIndicator(t *testing.T) {
 	t.Run("returns the derivative", func(t *testing.T) {
 		assert.EqualValues(t, "0", indicator.Calculate(1).String())
 
-		for i := 2; i < len(series.Candles); i++ {
-			expected := series.Candles[i-2].ClosePrice
+		for i := 2; i < series.LastIndex(); i++ {
+			expected := series.GetCandle(i - 2).ClosePrice
 
 			assert.EqualValues(t, expected.String(), indicator.Calculate(i).String())
 		}

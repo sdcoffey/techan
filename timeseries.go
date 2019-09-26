@@ -5,21 +5,36 @@ import (
 )
 
 // TimeSeries represents an array of candles
-type TimeSeries struct {
-	Candles []*Candle
+type TimeSeries interface {
+	LastIndex() int
+	FirstCandle() *Candle
+	LastCandle() *Candle
+	GetCandle(int) *Candle
+	GetCandleData() []*Candle
+	AddCandle(*Candle) bool
 }
 
 // NewTimeSeries returns a new, empty, TimeSeries
-func NewTimeSeries() (t *TimeSeries) {
-	t = new(TimeSeries)
-	t.Candles = make([]*Candle, 0)
+func NewTimeSeries() TimeSeries {
+	return new(BaseTimeSeries)
+}
 
-	return t
+// BaseTimeSeries implements TimeSeries using in-memory slice
+type BaseTimeSeries struct {
+	Candles []*Candle
+}
+
+func (ts *BaseTimeSeries) GetCandle(idx int) *Candle {
+	return ts.Candles[idx]
+}
+
+func (ts *BaseTimeSeries) GetCandleData() []*Candle {
+	return ts.Candles
 }
 
 // AddCandle adds the given candle to this TimeSeries if it is not nil and after the last candle in this timeseries.
 // If the candle is added, AddCandle will return true, otherwise it will return false.
-func (ts *TimeSeries) AddCandle(candle *Candle) bool {
+func (ts *BaseTimeSeries) AddCandle(candle *Candle) bool {
 	if candle == nil {
 		panic(fmt.Errorf("error adding Candle: candle cannot be nil"))
 	}
@@ -32,8 +47,17 @@ func (ts *TimeSeries) AddCandle(candle *Candle) bool {
 	return false
 }
 
+// FirstCandle will return the firstCandle in this series, or nil if this series is empty
+func (ts *BaseTimeSeries) FirstCandle() *Candle {
+	if len(ts.Candles) > 0 {
+		return ts.Candles[0]
+	}
+
+	return nil
+}
+
 // LastCandle will return the lastCandle in this series, or nil if this series is empty
-func (ts *TimeSeries) LastCandle() *Candle {
+func (ts *BaseTimeSeries) LastCandle() *Candle {
 	if len(ts.Candles) > 0 {
 		return ts.Candles[len(ts.Candles)-1]
 	}
@@ -42,6 +66,6 @@ func (ts *TimeSeries) LastCandle() *Candle {
 }
 
 // LastIndex will return the index of the last candle in this series
-func (ts *TimeSeries) LastIndex() int {
+func (ts *BaseTimeSeries) LastIndex() int {
 	return len(ts.Candles) - 1
 }
