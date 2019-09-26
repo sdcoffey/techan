@@ -16,6 +16,11 @@ func TestTimeSeries_AddCandle(t *testing.T) {
 		})
 	})
 
+	t.Run("Empty timeseries returns nil candle", func(t *testing.T) {
+		ts := NewTimeSeries()
+		assert.Nil(t, ts.FirstCandle())
+	})
+
 	t.Run("Adds candle if last is nil", func(t *testing.T) {
 		ts := NewTimeSeries()
 
