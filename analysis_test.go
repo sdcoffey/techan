@@ -36,13 +36,27 @@ func TestTotalProfitAnalysis(t *testing.T) {
 				Security:      example,
 				ExecutionTime: time.Now(),
 			},
+			{
+				Side:          SELL,
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(2),
+				Security:      example,
+				ExecutionTime: time.Now(),
+			},
+			{
+				Side:          BUY,
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(1),
+				Security:      example,
+				ExecutionTime: time.Now(),
+			},
 		}
 
 		for _, order := range orders {
 			record.Operate(order)
 		}
 
-		assert.EqualValues(t, 1, tpa.Analyze(record))
+		assert.EqualValues(t, 2.0, tpa.Analyze(record))
 
 		record.Operate(Order{
 			Side:          BUY,
@@ -60,7 +74,7 @@ func TestTotalProfitAnalysis(t *testing.T) {
 			ExecutionTime: time.Now(),
 		})
 
-		assert.EqualValues(t, .5, tpa.Analyze(record))
+		assert.EqualValues(t, 1.5, tpa.Analyze(record))
 	})
 }
 

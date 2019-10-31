@@ -1,20 +1,13 @@
 language: go
 
 go:
-  - "1.10"
-
-before_install:
-  - curl -L -s https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64 -o $GOPATH/bin/dep
-  - chmod +x $GOPATH/bin/dep
-  - go get github.com/golang/lint/golint
-  - go get honnef.co/go/tools/cmd/megacheck
+  - "1.12"
 
 install:
-  - dep ensure
+  - go get
 
 script:
-  - go test -race -coverprofile=coverage.txt -covermode=atomic github.com/sdcoffey/techan
-  - make lint
+  - make test-with-coverage
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

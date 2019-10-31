@@ -9,9 +9,7 @@ import (
 func TestStandardDeviationIndicator(t *testing.T) {
 	t.Run("when index is less than 1, returns 0", func(t *testing.T) {
 		series := mockTimeSeries("0", "10")
-		stdDev := StandardDeviationIndicator{
-			Indicator: NewClosePriceIndicator(series),
-		}
+		stdDev := NewStandardDeviationIndicator(NewClosePriceIndicator(series))
 
 		assert.EqualValues(t, "0", stdDev.Calculate(0).String())
 	})
@@ -26,9 +24,7 @@ func TestStandardDeviationIndicator(t *testing.T) {
 			23,
 			21)
 
-		stdDev := StandardDeviationIndicator{
-			Indicator: NewClosePriceIndicator(series),
-		}
+		stdDev := NewStandardDeviationIndicator(NewClosePriceIndicator(series))
 
 		assert.EqualValues(t, "4.00", stdDev.Calculate(1).FormattedString(2))
 		assert.EqualValues(t, "15.43", stdDev.Calculate(2).FormattedString(2))
