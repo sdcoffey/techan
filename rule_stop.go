@@ -29,7 +29,7 @@ func (slr stopLossRule) IsSatisfied(index int, record *TradingRecord) bool {
 	}
 	openPrice := record.CurrentPosition().EntranceOrder().Price
 	loss := slr.Indicator.Calculate(index).Div(openPrice).Sub(big.ONE)
-	if record.currentPosition.IsShort() {
+	if record.CurrentPosition().IsShort() {
 		loss = loss.Neg()
 	}
 	return loss.LTE(slr.tolerance)
@@ -50,7 +50,7 @@ func (sgr stopGainRule) IsSatisfied(index int, record *TradingRecord) bool {
 	}
 	openPrice := record.CurrentPosition().EntranceOrder().Price
 	gain := sgr.Indicator.Calculate(index).Div(openPrice).Sub(big.ONE)
-	if record.currentPosition.IsShort() {
+	if record.CurrentPosition().IsShort() {
 		gain = gain.Neg()
 	}
 	return gain.GTE(sgr.tolerance)
