@@ -2,7 +2,7 @@ files := $(shell find . -name "*.go" | grep -v vendor)
 
 bootstrap:
 	go get golang.org/x/lint/golint
-	go get github.com/go-tools/cmd/staticcheck
+	go get honnef.co/go/tools/...
 
 clean:
 	goimports -w $(files)
