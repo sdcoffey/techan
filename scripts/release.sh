@@ -24,7 +24,7 @@ if [[ $added_count -gt 0 ]]; then
   git commit -m"Release version $newversion"
 fi
 
-git tag "$newversion" -m "$newversion"
+git tag "v$newversion" -m "v$newversion"
 
 git push origin master
 git push --tags
