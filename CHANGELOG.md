@@ -1,5 +1,9 @@
 # Techan Release notes
 
+## 0.7.0
+* Add Trendline indicator
+* Update big to v0.4.1
+
 ## 0.6.1
 * Merge #10, which fixes a bug in TotalProfitAnalysis not taking short positions into effect
 
