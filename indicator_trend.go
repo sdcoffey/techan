@@ -17,13 +17,15 @@ func NewTrendlineIndicator(indicator Indicator, window int) Indicator {
 }
 
 func (tli trendLineIndicator) Calculate(index int) big.Decimal {
-	values := make([]big.Decimal, tli.window)
+	window := Min(index+1, tli.window)
 
-	for i := 0; i < tli.window; i++ {
-		values[i] = tli.indicator.Calculate(index - (tli.window - 1) + i)
+	values := make([]big.Decimal, window)
+
+	for i := 0; i < window; i++ {
+		values[i] = tli.indicator.Calculate(index - (window - 1) + i)
 	}
 
-	n := big.ONE.Mul(big.NewDecimal(float64(tli.window)))
+	n := big.ONE.Mul(big.NewDecimal(float64(window)))
 	ab := sumXy(values).Mul(n).Sub(sumX(values).Mul(sumY(values)))
 	cd := sumX2(values).Mul(n).Sub(sumX(values).Pow(2))
 

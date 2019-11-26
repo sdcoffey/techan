@@ -39,4 +39,10 @@ func TestTrendIndicator(t *testing.T) {
 		indicator := NewTrendlineIndicator(NewClosePriceIndicator(series), 4)
 		assert.EqualValues(t, "1", indicator.Calculate(5).String())
 	})
+
+	t.Run("does not allow an index out of bounds on the low end", func(t *testing.T) {
+		series := mockTimeSeriesFl(0, 1)
+		indicator := NewTrendlineIndicator(NewClosePriceIndicator(series), 4)
+		assert.EqualValues(t, "1", indicator.Calculate(1).String())
+	})
 }
