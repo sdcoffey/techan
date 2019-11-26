@@ -1,5 +1,8 @@
 # Techan Release notes
 
+## 0.7.1
+* Fix bug in trendline indicator to prevent low-end index-OOB errors
+
 ## 0.7.0
 * Add Trendline indicator
 * Update big to v0.4.1
