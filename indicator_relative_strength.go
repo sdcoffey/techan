@@ -1,6 +1,8 @@
 package techan
 
 import (
+	"math"
+	
 	"github.com/sdcoffey/big"
 )
 
@@ -46,6 +48,10 @@ func NewRelativeStrengthIndicator(indicator Indicator, timeframe int) Indicator 
 func (rs relativeStrengthIndicator) Calculate(index int) big.Decimal {
 	avgGain := rs.avgGain.Calculate(index)
 	avgLoss := rs.avgLoss.Calculate(index)
+
+	if avgLoss.EQ(big.ZERO) {
+		return big.NewDecimal(math.MaxFloat64)
+	}
 
 	return avgGain.Div(avgLoss)
 }
