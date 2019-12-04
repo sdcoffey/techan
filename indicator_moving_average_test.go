@@ -64,6 +64,20 @@ func TestExponentialMovingAverage(t *testing.T) {
 	})
 }
 
+func TestNewMMAIndicator(t *testing.T) {
+	series := mockTimeSeriesFl(
+		64.75, 63.79, 63.73,
+		63.73, 63.55, 63.19,
+		63.91, 63.85, 62.95,
+		63.37, 61.33, 61.51)
+
+	mma := NewMMAIndicator(NewClosePriceIndicator(series), 10)
+
+	decimalEquals(t, 63.9983, mma.Calculate(9))
+	decimalEquals(t, 63.7315, mma.Calculate(10))
+	decimalEquals(t, 63.5094, mma.Calculate(11))
+}
+
 func TestNewMACDIndicator(t *testing.T) {
 	series := randomTimeSeries(100)
 

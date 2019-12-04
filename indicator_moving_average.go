@@ -64,6 +64,18 @@ func (ema *emaIndicator) cacheResult(index int, val big.Decimal) {
 	}
 }
 
+// NewMMAIndicator returns a derivative indciator which returns the modified moving average of the underlying
+// indictator. An in-depth explanation can be found here:
+// https://en.wikipedia.org/wiki/Moving_average#Modified_moving_average
+func NewMMAIndicator(indicator Indicator, window int) Indicator {
+	return &emaIndicator{
+		Indicator:   indicator,
+		window:      window,
+		alpha:       big.NewDecimal(1.0 / float64(window)),
+		resultCache: make([]*big.Decimal, 10000),
+	}
+}
+
 // NewMACDIndicator returns a derivative Indicator which returns the difference between two EMAIndicators with long and
 // short windows. It's useful for gauging the strength of price movements. A more in-depth explanation can be found here:
 // http://www.investopedia.com/terms/m/macd.asp
