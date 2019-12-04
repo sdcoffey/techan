@@ -26,6 +26,7 @@ func (sma smaIndicator) Calculate(index int) big.Decimal {
 type emaIndicator struct {
 	Indicator
 	window      int
+	alpha       big.Decimal
 	resultCache []*big.Decimal
 }
 
@@ -36,25 +37,20 @@ func NewEMAIndicator(indicator Indicator, window int) Indicator {
 	return &emaIndicator{
 		Indicator:   indicator,
 		window:      window,
+		alpha:       big.NewDecimal(2.0 / float64(window+1)),
 		resultCache: make([]*big.Decimal, 10000),
 	}
 }
 
 func (ema *emaIndicator) Calculate(index int) big.Decimal {
 	if index == 0 {
-		result := ema.Indicator.Calculate(index)
-		return result
-	} else if index+1 < ema.window {
-		result := smaIndicator{ema.Indicator, ema.window}.Calculate(index)
-		ema.cacheResult(index, result)
-		return result
+		return ema.Indicator.Calculate(index)
 	} else if len(ema.resultCache) > index && ema.resultCache[index] != nil {
 		return *ema.resultCache[index]
 	}
 
 	emaPrev := ema.Calculate(index - 1)
-	mult := big.NewDecimal(2.0 / float64(ema.window+1))
-	result := ema.Indicator.Calculate(index).Sub(emaPrev).Mul(mult).Add(emaPrev)
+	result := ema.Indicator.Calculate(index).Sub(emaPrev).Mul(ema.alpha).Add(emaPrev)
 	ema.cacheResult(index, result)
 
 	return result

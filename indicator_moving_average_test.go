@@ -49,9 +49,9 @@ func TestExponentialMovingAverage(t *testing.T) {
 
 		ema := NewEMAIndicator(NewClosePriceIndicator(ts), 10)
 
-		decimalEquals(t, 63.6536, ema.Calculate(9))
-		decimalEquals(t, 63.2312, ema.Calculate(10))
-		decimalEquals(t, 62.9182, ema.Calculate(11))
+		decimalEquals(t, 63.6948, ema.Calculate(9))
+		decimalEquals(t, 63.2649, ema.Calculate(10))
+		decimalEquals(t, 62.9458, ema.Calculate(11))
 	})
 
 	t.Run("expands result cache when > 10000 candles added", func(t *testing.T) {
