@@ -1,5 +1,11 @@
 # Techan Release notes
 
+## 0.8.0
+* Add [MMAIndicator](https://en.wikipedia.org/wiki/Moving_average#Modified_moving_average)
+* Add GainIndicator
+* Add LossIndicator
+* Fix bug in RSI calculation (fixes #13)
+
 ## 0.7.1
 * Fix bug in trendline indicator to prevent low-end index-OOB errors
 
