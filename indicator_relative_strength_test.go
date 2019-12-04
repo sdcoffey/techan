@@ -1,7 +1,11 @@
 package techan
 
 import (
+	"math"
 	"testing"
+
+	"github.com/sdcoffey/big"
+	"github.com/stretchr/testify/assert"
 )
 
 var timeseries = mockTimeSeriesFl(
@@ -51,4 +55,10 @@ func TestRelativeStrengthIndicator(t *testing.T) {
 	decimalEquals(t, 3.2153, indicator.Calculate(23))
 	decimalEquals(t, 3.5436, indicator.Calculate(24))
 	decimalEquals(t, 2.0759, indicator.Calculate(25))
+}
+
+func TestRelativeStrengthIndicatorNoPriceChange(t *testing.T) {
+	close := NewClosePriceIndicator(mockTimeSeries("42.0", "42.0"))
+	rsInd := NewRelativeStrengthIndicator(close, 2)
+	assert.Equal(t, big.NewDecimal(math.MaxFloat64).FormattedString(2), rsInd.Calculate(1).FormattedString(2))
 }
