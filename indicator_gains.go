@@ -2,6 +2,42 @@ package techan
 
 import "github.com/sdcoffey/big"
 
+type gainLossIndicator struct {
+	Indicator
+	coefficient big.Decimal
+}
+
+// New GainIndicator returns a derivative indicator that returns the gains in the underlying indicator in the last bar,
+// if any. If the delta is negative, zero is returned
+func NewGainIndicator(indicator Indicator) Indicator {
+	return gainLossIndicator{
+		Indicator:   indicator,
+		coefficient: big.ONE,
+	}
+}
+
+// NewLossIndicator returns a derivative indicator that returns the losses in the underlying indicator in the last bar,
+// if any. If the delta is positive, zero is returned
+func NewLossIndicator(indicator Indicator) Indicator {
+	return gainLossIndicator{
+		Indicator:   indicator,
+		coefficient: big.ONE.Neg(),
+	}
+}
+
+func (gli gainLossIndicator) Calculate(index int) big.Decimal {
+	if index == 0 {
+		return big.ZERO
+	}
+
+	delta := gli.Indicator.Calculate(index).Sub(gli.Indicator.Calculate(index - 1)).Mul(gli.coefficient)
+	if delta.GT(big.ZERO) {
+		return delta
+	}
+
+	return big.ZERO
+}
+
 type cumulativeIndicator struct {
 	Indicator
 	window int

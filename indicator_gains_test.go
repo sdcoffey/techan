@@ -4,6 +4,32 @@ import (
 	"testing"
 )
 
+func TestGainIndicator(t *testing.T) {
+	ts := mockTimeSeriesFl(1, 2, 3, 3, 2, 1)
+
+	gains := NewGainIndicator(NewClosePriceIndicator(ts))
+
+	decimalEquals(t, 0, gains.Calculate(0))
+	decimalEquals(t, 1, gains.Calculate(1))
+	decimalEquals(t, 1, gains.Calculate(2))
+	decimalEquals(t, 0, gains.Calculate(3))
+	decimalEquals(t, 0, gains.Calculate(4))
+	decimalEquals(t, 0, gains.Calculate(5))
+}
+
+func TestLossIndicator(t *testing.T) {
+	ts := mockTimeSeriesFl(1, 2, 3, 3, 2, 0)
+
+	gains := NewLossIndicator(NewClosePriceIndicator(ts))
+
+	decimalEquals(t, 0, gains.Calculate(0))
+	decimalEquals(t, 0, gains.Calculate(1))
+	decimalEquals(t, 0, gains.Calculate(2))
+	decimalEquals(t, 0, gains.Calculate(3))
+	decimalEquals(t, 1, gains.Calculate(4))
+	decimalEquals(t, 2, gains.Calculate(5))
+}
+
 func TestCumulativeGainsIndicator(t *testing.T) {
 	t.Run("Basic", func(t *testing.T) {
 		ts := mockTimeSeriesFl(1, 2, 3, 5, 8, 13)
