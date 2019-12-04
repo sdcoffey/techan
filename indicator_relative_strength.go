@@ -38,8 +38,8 @@ type relativeStrengthIndicator struct {
 // average loss of down period during the same time frame
 func NewRelativeStrengthIndicator(indicator Indicator, timeframe int) Indicator {
 	return relativeStrengthIndicator{
-		avgGain: NewAverageGainsIndicator(indicator, timeframe),
-		avgLoss: NewAverageLossesIndicator(indicator, timeframe),
+		avgGain: NewMMAIndicator(NewGainIndicator(indicator), timeframe),
+		avgLoss: NewMMAIndicator(NewLossIndicator(indicator), timeframe),
 	}
 }
 
