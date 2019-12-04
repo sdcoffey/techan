@@ -7,7 +7,7 @@ type gainLossIndicator struct {
 	coefficient big.Decimal
 }
 
-// New GainIndicator returns a derivative indicator that returns the gains in the underlying indicator in the last bar,
+// NewGainIndicator returns a derivative indicator that returns the gains in the underlying indicator in the last bar,
 // if any. If the delta is negative, zero is returned
 func NewGainIndicator(indicator Indicator) Indicator {
 	return gainLossIndicator{
