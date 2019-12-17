@@ -2,6 +2,7 @@ package techan
 
 import (
 	"fmt"
+	"regexp"
 	"time"
 )
 
@@ -15,15 +16,68 @@ type TimePeriod struct {
 const (
 	SimpleDateTimeFormat = "01/02/2006T15:04:05"
 	SimpleDateFormat     = "01/02/2006"
+
+	SimpleTimeFormat   = "15:04:05"
+	SimpleDateFormatV2 = "2006-01-02"
 )
+
+// Constants representing regexes for parsing datetimes
+var (
+	SimpleTimeFomatRegex    = regexp.MustCompile(`T\d{2}:\d{2}:\d{2}`)
+	SimpleDateFormatV2Regex = regexp.MustCompile(`\d{4}-\d{2}-\d{2}`)
+)
+
+// ParseTimePeriod parses two datetimes as one string and returns it as a TimePeriod.
+//
+// Note that if you were previously using Parse, the date format has changed to something more rfc3339-like (yyyy-mm-dd)
+// Will accept any combination of date and time for either side. Omitting the right hand side will result in a time
+// period ending in time.Now()
+func ParseTimePeriod(period string) (TimePeriod, error) {
+	dateMatches := SimpleDateFormatV2Regex.FindAllStringIndex(period, -1)
+	timeMatches := SimpleTimeFomatRegex.FindAllStringIndex(period, -1)
+
+	formats := make([]string, len(dateMatches))
+	timeStrings := make([]string, len(dateMatches))
+
+	for i, j := 0, 0; i < len(dateMatches); i++ {
+		date := period[dateMatches[i][0]:dateMatches[i][1]]
+		if j < len(timeMatches) && timeMatches[j][0] == dateMatches[i][1] {
+			t := period[timeMatches[j][0]:timeMatches[j][1]]
+			j++
+
+			timeStrings[i] = fmt.Sprint(date, t)
+			formats[i] = fmt.Sprint(SimpleDateFormatV2, "T", SimpleTimeFormat)
+		} else {
+			timeStrings[i] = date
+			formats[i] = SimpleDateFormatV2
+		}
+	}
+
+	times := [2]time.Time{}
+	for i, timeString := range timeStrings {
+		var err error
+		times[i], err = time.Parse(formats[i], timeString)
+		if err != nil {
+			return TimePeriod{}, err
+		}
+	}
+
+	timePeriod := TimePeriod{
+		Start: times[0],
+	}
+
+	if !times[1].IsZero() {
+		timePeriod.End = times[1]
+	} else {
+		timePeriod.End = time.Now()
+	}
+
+	return timePeriod, nil
+}
 
 // Parse takes a string in one of the following formats and returns a new TimePeriod, and optionally, an error
 //
-// Supported Formats:
-// SimpleDateTimeFormat:SimpleDateTimeFormat
-// SimpleDateTimeFormat: (to now)
-// SimpleDateFormat:
-// SimpleDateFormat:SimpleDateFormat
+// Deprecated: Please use ParseTimePeriod instead
 func Parse(timerange string) (tr TimePeriod, err error) {
 	var start, end, layout string
 	switch len(timerange) {
@@ -90,7 +144,8 @@ func (tp TimePeriod) Advance(iterations int) TimePeriod {
 }
 
 func (tp TimePeriod) String() string {
-	return tp.Format(SimpleDateTimeFormat)
+	layout := fmt.Sprint(SimpleDateFormatV2, "T", SimpleTimeFormat)
+	return tp.Format(layout)
 }
 
 // NewTimePeriod returns a TimePeriod starting at the given time and ending at the given time plus the given duration

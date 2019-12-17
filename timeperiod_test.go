@@ -1,11 +1,102 @@
 package techan
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func ExampleParseTimePeriod() {
+	// Any separator between two times is valid
+	parseable := "2009-01-20T12:00:00 -- 2017-01-20T12:00:00"
+	timePeriod, err := ParseTimePeriod(parseable)
+	if err != nil {
+		return
+	}
+
+	fmt.Println(timePeriod.Start.Year(), timePeriod.End.Year())
+	// Output: 2009 2017
+}
+
+func TestParseTimePeriod(t *testing.T) {
+	t.Run("SimpleDT:SimpleDT", func(t *testing.T) {
+		parseable := "2009-01-20T12:00:00 2017-01-20T12:00:00"
+		timePeriod, err := ParseTimePeriod(parseable)
+		assert.NoError(t, err)
+
+		assert.EqualValues(t, 2009, timePeriod.Start.Year())
+		assert.EqualValues(t, 01, timePeriod.Start.Month())
+		assert.EqualValues(t, 20, timePeriod.Start.Day())
+		assert.EqualValues(t, 12, timePeriod.Start.Hour())
+		assert.EqualValues(t, 0, timePeriod.Start.Minute())
+		assert.EqualValues(t, 0, timePeriod.Start.Second())
+
+		assert.EqualValues(t, 2017, timePeriod.End.Year())
+		assert.EqualValues(t, 01, timePeriod.End.Month())
+		assert.EqualValues(t, 20, timePeriod.End.Day())
+		assert.EqualValues(t, 12, timePeriod.End.Hour())
+		assert.EqualValues(t, 0, timePeriod.End.Minute())
+		assert.EqualValues(t, 0, timePeriod.End.Second())
+	})
+
+	t.Run("SimpleDT:", func(t *testing.T) {
+		parseable := "2009-01-20T12:00:00"
+		timePeriod, err := ParseTimePeriod(parseable)
+		now := time.Now()
+		assert.NoError(t, err)
+
+		assert.EqualValues(t, 2009, timePeriod.Start.Year())
+		assert.EqualValues(t, 01, timePeriod.Start.Month())
+		assert.EqualValues(t, 20, timePeriod.Start.Day())
+		assert.EqualValues(t, 12, timePeriod.Start.Hour())
+		assert.EqualValues(t, 0, timePeriod.Start.Minute())
+		assert.EqualValues(t, 0, timePeriod.Start.Second())
+
+		assert.True(t, now.Sub(timePeriod.End) < time.Second)
+	})
+
+	t.Run("SimpleDT:SimpleD", func(t *testing.T) {
+		parseable := "2009-01-20T12:00:00 2017-01-20"
+		timePeriod, err := ParseTimePeriod(parseable)
+		assert.NoError(t, err)
+
+		assert.EqualValues(t, 2009, timePeriod.Start.Year())
+		assert.EqualValues(t, 01, timePeriod.Start.Month())
+		assert.EqualValues(t, 20, timePeriod.Start.Day())
+		assert.EqualValues(t, 12, timePeriod.Start.Hour())
+		assert.EqualValues(t, 0, timePeriod.Start.Minute())
+		assert.EqualValues(t, 0, timePeriod.Start.Second())
+
+		assert.EqualValues(t, 2017, timePeriod.End.Year())
+		assert.EqualValues(t, 01, timePeriod.End.Month())
+		assert.EqualValues(t, 20, timePeriod.End.Day())
+		assert.EqualValues(t, 0, timePeriod.End.Hour())
+		assert.EqualValues(t, 0, timePeriod.End.Minute())
+		assert.EqualValues(t, 0, timePeriod.End.Second())
+	})
+
+	t.Run("SimpleD:SimpleDT", func(t *testing.T) {
+		parseable := "2009-01-20:2017-01-20T12:00:00"
+		timePeriod, err := ParseTimePeriod(parseable)
+		assert.NoError(t, err)
+
+		assert.EqualValues(t, 2009, timePeriod.Start.Year())
+		assert.EqualValues(t, 01, timePeriod.Start.Month())
+		assert.EqualValues(t, 20, timePeriod.Start.Day())
+		assert.EqualValues(t, 0, timePeriod.Start.Hour())
+		assert.EqualValues(t, 0, timePeriod.Start.Minute())
+		assert.EqualValues(t, 0, timePeriod.Start.Second())
+
+		assert.EqualValues(t, 2017, timePeriod.End.Year())
+		assert.EqualValues(t, 01, timePeriod.End.Month())
+		assert.EqualValues(t, 20, timePeriod.End.Day())
+		assert.EqualValues(t, 12, timePeriod.End.Hour())
+		assert.EqualValues(t, 0, timePeriod.End.Minute())
+		assert.EqualValues(t, 0, timePeriod.End.Second())
+	})
+}
 
 func TestParse(t *testing.T) {
 	t.Run("SimpleDT:SimpleDT", func(t *testing.T) {
@@ -28,8 +119,6 @@ func TestParse(t *testing.T) {
 		assert.EqualValues(t, 0, timePeriod.End.Second())
 	})
 
-	// this has the potential to be flaky, on account of the slight difference in time between
-	// now and the now created in Parse
 	t.Run("SimpleDT:", func(t *testing.T) {
 		parseable := "08/15/1991T20:30:00:"
 		timePeriod, err := Parse(parseable)
@@ -43,12 +132,7 @@ func TestParse(t *testing.T) {
 		assert.EqualValues(t, 30, timePeriod.Start.Minute())
 		assert.EqualValues(t, 0, timePeriod.Start.Second())
 
-		assert.EqualValues(t, now.Year(), timePeriod.End.Year())
-		assert.EqualValues(t, now.Month(), timePeriod.End.Month())
-		assert.EqualValues(t, now.Day(), timePeriod.End.Day())
-		assert.EqualValues(t, now.Hour(), timePeriod.End.Hour())
-		assert.EqualValues(t, now.Minute(), timePeriod.End.Minute())
-		assert.EqualValues(t, now.Second(), timePeriod.End.Second())
+		assert.True(t, now.Sub(timePeriod.End) < time.Second)
 	})
 
 	t.Run("SimpleDate:SimpleDate", func(t *testing.T) {
