@@ -115,6 +115,19 @@ func Parse(timerange string) (tr TimePeriod, err error) {
 	return
 }
 
+// In returns a copy of TimePeriod tp with both start and end times' location set to the specified location
+func (tp TimePeriod) In(location *time.Location) TimePeriod {
+	return TimePeriod{
+		Start: tp.Start.In(location),
+		End:   tp.End.In(location),
+	}
+}
+
+// UTC returns a copy of TimePeriod tp with both start and end times' location set to UTC
+func (tp TimePeriod) UTC() TimePeriod {
+	return tp.In(time.UTC)
+}
+
 // Length returns the length of the period as a time.Duration value
 func (tp TimePeriod) Length() time.Duration {
 	return tp.End.Sub(tp.Start)

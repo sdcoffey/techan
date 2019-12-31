@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -246,4 +248,37 @@ func TestTimePeriod_Advance(t *testing.T) {
 		assert.EqualValues(t, now.Add(time.Minute).UnixNano(), tp.Start.UnixNano())
 		assert.EqualValues(t, now.Add(time.Minute*2).UnixNano(), tp.End.UnixNano())
 	})
+}
+
+func TestTimePeriod_In(t *testing.T) {
+	now := time.Now().Truncate(time.Minute).UTC()
+
+	tp := TimePeriod{
+		Start: now,
+		End:   now.Add(time.Minute),
+	}
+
+	location, err := time.LoadLocation("America/Los_Angeles")
+	require.NoError(t, err)
+	tp = tp.In(location)
+
+	assert.EqualValues(t, tp.Start.Location().String(), "America/Los_Angeles")
+	assert.EqualValues(t, tp.End.Location().String(), "America/Los_Angeles")
+}
+
+func TestTimePeriod_UTC(t *testing.T) {
+	location, err := time.LoadLocation("America/Los_Angeles")
+	require.NoError(t, err)
+
+	now := time.Now().Truncate(time.Minute).In(location)
+
+	tp := TimePeriod{
+		Start: now,
+		End:   now.Add(time.Minute),
+	}
+
+	tp = tp.UTC()
+
+	assert.EqualValues(t, tp.Start.Location().String(), "UTC")
+	assert.EqualValues(t, tp.End.Location().String(), "UTC")
 }
