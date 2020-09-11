@@ -2,40 +2,14 @@ package techan
 
 import "github.com/sdcoffey/big"
 
-type windowedStandardDeviationIndicator struct {
-	Indicator
-	movingAverage Indicator
-	window        int
-}
-
-func NewWindowedStandardDeviationIndicator(ind Indicator, window int) Indicator {
-	return windowedStandardDeviationIndicator{
-		Indicator:     ind,
-		movingAverage: NewSimpleMovingAverage(ind, window),
-		window:        window,
-	}
-}
-
-// Calculate returns the windowed standard deviation of a base indicator
-func (sdi windowedStandardDeviationIndicator) Calculate(index int) big.Decimal {
-	avg := sdi.movingAverage.Calculate(index)
-	variance := big.ZERO
-	for i := Max(0, index-sdi.window+1); i <= index; i++ {
-		pow := sdi.Indicator.Calculate(i).Sub(avg).Pow(2)
-		variance = variance.Add(pow)
-	}
-	realwindow := Min(sdi.window, index+1)
-
-	return variance.Div(big.NewDecimal(float64(realwindow))).Sqrt()
-}
-
 type bbandIndicator struct {
 	ma     Indicator
 	stdev  Indicator
 	muladd big.Decimal
 }
 
-// Usually window=20, sigma=2
+// NewBollingerUpperBandIndicator a a derivative indicator which returns the upper bound of a bollinger band
+// on the underlying indicator
 func NewBollingerUpperBandIndicator(indicator Indicator, window int, sigma float64) Indicator {
 	return bbandIndicator{
 		ma:     NewSimpleMovingAverage(indicator, window),
@@ -44,6 +18,8 @@ func NewBollingerUpperBandIndicator(indicator Indicator, window int, sigma float
 	}
 }
 
+// NewBollingerLowerBandIndicator returns a a derivative indicator which returns the lower bound of a bollinger band
+// on the underlying indicator
 func NewBollingerLowerBandIndicator(indicator Indicator, window int, sigma float64) Indicator {
 	return bbandIndicator{
 		ma:     NewSimpleMovingAverage(indicator, window),
