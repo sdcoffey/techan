@@ -1,5 +1,8 @@
 # Techan Release notes
 
+## 0.11.0
+* Add BollingerUpperBandIndicator and BollingerLowerBandIndicator (thanks @shkim!)
+
 ## 0.10.0
 * Add TimePeriod#In to modify timezone information
 * Add TimePeriod#UTC to set location to UTC
