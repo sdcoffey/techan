@@ -1,5 +1,7 @@
 package techan
 
+//lint:file-ignore S1038 prefer Fprintln
+
 import (
 	"fmt"
 	"io"

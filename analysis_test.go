@@ -268,7 +268,7 @@ func TestLogTradesAnalysis(t *testing.T) {
 		case 1:
 			expected = fmt.Sprintf("%s - exit with sell EXM (1 @ $1)", dates[1].Format(time.RFC822))
 		case 2:
-			expected = fmt.Sprintf("Profit: $-1")
+			expected = "Profit: $-1"
 		case 3:
 			expected = fmt.Sprintf("%s - enter with buy EXM (1 @ $1)", dates[2].Format(time.RFC822))
 		case 4:
