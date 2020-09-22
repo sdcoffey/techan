@@ -1,7 +1,7 @@
 language: go
 
 go:
-  - "1.12"
+  - "1.15"
 
 install:
   - go get
