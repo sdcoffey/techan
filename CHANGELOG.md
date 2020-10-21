@@ -1,5 +1,9 @@
 # Techan Release notes
 
+## 0.12.0
+* Add MaximumValue and MinimumValue Indicators
+* Add [MaximumDrawdownIndicator](https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp).
+
 ## 0.11.0
 * Add BollingerUpperBandIndicator and BollingerLowerBandIndicator (thanks @shkim!)
 
