@@ -38,14 +38,14 @@ func NewEMAIndicator(indicator Indicator, window int) Indicator {
 		Indicator:   indicator,
 		window:      window,
 		alpha:       big.NewDecimal(2.0 / float64(window+1)),
-		resultCache: make([]*big.Decimal, 10000),
+		resultCache: make([]*big.Decimal, 1, 10000),
 	}
 }
 
 func (ema *emaIndicator) Calculate(index int) big.Decimal {
 	if index == 0 {
 		return ema.Indicator.Calculate(index)
-	} else if len(ema.resultCache) > index && ema.resultCache[index] != nil {
+	} else if index < len(ema.resultCache)-1 {
 		return *ema.resultCache[index]
 	}
 
@@ -57,6 +57,9 @@ func (ema *emaIndicator) Calculate(index int) big.Decimal {
 }
 
 func (ema *emaIndicator) cacheResult(index int, val big.Decimal) {
+	if index == len(ema.resultCache)-1 {
+		return
+	}
 	if index < len(ema.resultCache) {
 		ema.resultCache[index] = &val
 	} else {
@@ -72,7 +75,7 @@ func NewMMAIndicator(indicator Indicator, window int) Indicator {
 		Indicator:   indicator,
 		window:      window,
 		alpha:       big.NewDecimal(1.0 / float64(window)),
-		resultCache: make([]*big.Decimal, 10000),
+		resultCache: make([]*big.Decimal, 1, 10000),
 	}
 }
 
