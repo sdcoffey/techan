@@ -60,11 +60,7 @@ func (ema *emaIndicator) cacheResult(index int, val big.Decimal) {
 	if index == len(ema.resultCache)-1 {
 		return
 	}
-	if index < len(ema.resultCache) {
-		ema.resultCache[index] = &val
-	} else {
-		ema.resultCache = append(ema.resultCache, &val)
-	}
+	ema.resultCache = append(ema.resultCache, &val)
 }
 
 // NewMMAIndicator returns a derivative indciator which returns the modified moving average of the underlying
