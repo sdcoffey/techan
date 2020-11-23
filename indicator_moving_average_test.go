@@ -3,6 +3,7 @@ package techan
 import (
 	"testing"
 
+	"github.com/sdcoffey/big"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -52,6 +53,23 @@ func TestExponentialMovingAverage(t *testing.T) {
 		decimalEquals(t, 63.6948, ema.Calculate(9))
 		decimalEquals(t, 63.2649, ema.Calculate(10))
 		decimalEquals(t, 62.9458, ema.Calculate(11))
+	})
+
+	t.Run("if index < len(ema.resultCache)-1, returns cached result", func(t *testing.T) {
+		ts := mockTimeSeriesFl(
+			64.75, 63.79, 63.73,
+			63.73, 63.55, 63.19,
+			63.91, 63.85, 62.95,
+			63.37, 61.33, 61.51)
+
+		ema := NewEMAIndicator(NewClosePriceIndicator(ts), 10)
+
+		decimalEquals(t, 62.9458, ema.Calculate(11))
+		decimalEquals(t, 63.2649, ema.Calculate(10))
+		decimalEquals(t, 63.6948, ema.Calculate(9))
+
+		ts.LastCandle().ClosePrice = big.NewDecimal(61.01)
+		decimalEquals(t, 62.8549, ema.Calculate(11))
 	})
 
 	t.Run("expands result cache when > 10000 candles added", func(t *testing.T) {
