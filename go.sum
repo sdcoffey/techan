@@ -17,6 +17,8 @@ github.com/sdcoffey/big v0.0.0-20180413224939-438f3d83db4c h1:avDKoFuBXMQAcu0sxd
 github.com/sdcoffey/big v0.0.0-20180413224939-438f3d83db4c/go.mod h1:WzOYJJhNOp7m1u1MrNQaYSHmgqHGkZThC+VgDqdFl0I=
 github.com/sdcoffey/big v0.4.1 h1:DyK4tHRbbAfdIZV/VbxrEz/ZpcVv5GWNNw+G6AOhfpM=
 github.com/sdcoffey/big v0.4.1/go.mod h1:spXh3ZRHdlXkg4SzauLC8ahWmHpxWL5/6drgufL73es=
+github.com/sdcoffey/big v0.6.0 h1:0C+nB/91mHQGAxlgvDy/hFO3MMv3dTnCuNA3qfhEYYQ=
+github.com/sdcoffey/big v0.6.0/go.mod h1:spXh3ZRHdlXkg4SzauLC8ahWmHpxWL5/6drgufL73es=
 github.com/stretchr/testify v1.1.4/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/stretchr/testify v1.2.1 h1:52QO5WkIUcHGIR7EnGagH88x1bUzqGXTC5/1bDTUQ7U=
 github.com/stretchr/testify v1.2.1/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
