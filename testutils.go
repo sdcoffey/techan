@@ -34,14 +34,14 @@ func randomTimeSeries(size int) *TimeSeries {
 	return mockTimeSeries(vals...)
 }
 
-func mockTimeSeriesOCHL(values ...[]string) *TimeSeries {
+func mockTimeSeriesOCHL(values ...[]float64) *TimeSeries {
 	ts := NewTimeSeries()
 	for i, ochl := range values {
 		candle := NewCandle(NewTimePeriod(time.Unix(int64(i), 0), time.Second))
-		candle.OpenPrice = big.NewFromString(ochl[0])
-		candle.ClosePrice = big.NewFromString(ochl[1])
-		candle.MaxPrice = big.NewFromString(ochl[2])
-		candle.MinPrice = big.NewFromString(ochl[3])
+		candle.OpenPrice = big.NewDecimal(ochl[0])
+		candle.ClosePrice = big.NewDecimal(ochl[1])
+		candle.MaxPrice = big.NewDecimal(ochl[2])
+		candle.MinPrice = big.NewDecimal(ochl[3])
 		candle.Volume = big.NewDecimal(float64(i))
 
 		ts.AddCandle(candle)

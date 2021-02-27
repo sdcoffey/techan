@@ -37,14 +37,14 @@ func NewEMAIndicator(indicator Indicator, window int) Indicator {
 	return &emaIndicator{
 		Indicator:   indicator,
 		window:      window,
-		alpha:       big.NewDecimal(2.0 / float64(window+1)),
+		alpha:       big.NewDecimal(2.0).Div(big.NewFromInt(window +1)),
 		resultCache: make([]*big.Decimal, 10000),
 	}
 }
 
 func (ema *emaIndicator) Calculate(index int) big.Decimal {
-	if index == 0 {
-		return ema.Indicator.Calculate(index)
+	if index < ema.window {
+		return big.ZERO
 	} else if len(ema.resultCache) > index && ema.resultCache[index] != nil {
 		return *ema.resultCache[index]
 	}

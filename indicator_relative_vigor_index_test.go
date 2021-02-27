@@ -8,10 +8,10 @@ import (
 
 func TestRelativeVigorIndexIndicator_Calculate(t *testing.T) {
 	series := mockTimeSeriesOCHL(
-		[]string{"10", "12", "12", "8"},
-		[]string{"11", "14", "14", "9"},
-		[]string{"8", "19", "20", "8"},
-		[]string{"9", "10", "11", "8"},
+		[]float64{10, 12, 12, 8},
+		[]float64{11, 14, 14, 9},
+		[]float64{8, 19, 20, 8},
+		[]float64{9, 10, 11, 8},
 	)
 
 	rvii := NewRelativeVigorIndexIndicator(series)
@@ -29,14 +29,14 @@ func TestRelativeVigorIndexIndicator_Calculate(t *testing.T) {
 
 func TestRelativeVigorIndexSignalLine_Calculate(t *testing.T) {
 	series := mockTimeSeriesOCHL(
-		[]string{"10", "12", "12", "8"},
-		[]string{"11", "14", "14", "9"},
-		[]string{"8", "19", "20", "8"},
-		[]string{"9", "10", "11", "8"},
-		[]string{"11", "14", "14", "9"},
-		[]string{"9", "10", "11", "8"},
-		[]string{"10", "12", "12", "8"},
-		[]string{"9", "10", "11", "8"},
+		[]float64{10, 12, 12, 8},
+		[]float64{11, 14, 14, 9},
+		[]float64{8, 19, 20, 8},
+		[]float64{9, 10, 11, 8},
+		[]float64{11, 14, 14, 9},
+		[]float64{9, 10, 11, 8},
+		[]float64{10, 12, 12, 8},
+		[]float64{9, 10, 11, 8},
 	)
 
 	signalLine := NewRelativeVigorSignalLine(series)

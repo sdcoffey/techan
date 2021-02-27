@@ -1,30 +1,23 @@
 package techan
 
 import (
+	"math"
 	"testing"
+	"math/big"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSimpleMovingAverage(t *testing.T) {
-	ts := mockTimeSeriesFl(1, 2, 3, 4, 3, 4, 5, 4, 3, 3, 4, 3, 2)
+	//ts := mockTimeSeriesFl(15, 16, 17, 18, 17, 18, 16)
+	//
+	//sma := NewSimpleMovingAverage(NewClosePriceIndicator(ts), 3)
 
-	sma := NewSimpleMovingAverage(NewClosePriceIndicator(ts), 3)
+	nan := math.NaN()
+	println(nan)
 
-	decimalEquals(t, 1, sma.Calculate(0))
-	decimalEquals(t, 1.5, sma.Calculate(1))
-
-	decimalEquals(t, 2, sma.Calculate(2))
-	decimalEquals(t, 3, sma.Calculate(3))
-	decimalEquals(t, 10.0/3.0, sma.Calculate(4))
-	decimalEquals(t, 11.0/3.0, sma.Calculate(5))
-	decimalEquals(t, 4, sma.Calculate(6))
-	decimalEquals(t, 13.0/3.0, sma.Calculate(7))
-	decimalEquals(t, 4, sma.Calculate(8))
-	decimalEquals(t, 10.0/3.0, sma.Calculate(9))
-	decimalEquals(t, 10.0/3.0, sma.Calculate(10))
-	decimalEquals(t, 10.0/3.0, sma.Calculate(11))
-	decimalEquals(t, 3, sma.Calculate(12))
+	bnan := big.NewFloat(nan)
+	print(bnan.String())
 }
 
 func TestExponentialMovingAverage(t *testing.T) {
@@ -61,6 +54,19 @@ func TestExponentialMovingAverage(t *testing.T) {
 		ema.Calculate(10000)
 
 		assert.EqualValues(t, 10001, len(ema.(*emaIndicator).resultCache))
+	})
+
+	t.Run("Very simple", func(t *testing.T) {
+		ts := mockTimeSeriesFl(15, 16, 17, 18, 19, 20, 21)
+
+		ema := NewEMAIndicator(NewClosePriceIndicator(ts), 3)
+
+		decimalEquals(t, 16, ema.Calculate(5))
+		decimalEquals(t, 15, ema.Calculate(4))
+		decimalEquals(t, 14, ema.Calculate(3))
+		decimalEquals(t, 13, ema.Calculate(2))
+		decimalEquals(t, 0, ema.Calculate(1))
+		decimalEquals(t, 0, ema.Calculate(0))
 	})
 }
 

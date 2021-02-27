@@ -16,6 +16,10 @@ func NewTrueRangeIndicator(series *TimeSeries) Indicator {
 }
 
 func (tri trueRangeIndicator) Calculate(index int) big.Decimal {
+	if index-1 < 0 {
+		return big.ZERO
+	}
+
 	candle := tri.series.Candles[index]
 	previousClose := tri.series.Candles[index-1].ClosePrice
 
