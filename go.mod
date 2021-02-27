@@ -4,5 +4,5 @@ go 1.12
 
 require (
 	github.com/sdcoffey/big v0.7.0
-	github.com/stretchr/testify v1.2.1
+	github.com/stretchr/testify v1.7.0
 )
