@@ -2,6 +2,7 @@ package techan
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"testing"
 	"time"
@@ -13,6 +14,11 @@ import (
 )
 
 var candleIndex int
+var mockedTimeSeries = mockTimeSeriesFl(
+	64.75, 63.79, 63.73,
+	63.73, 63.55, 63.19,
+	63.91, 63.85, 62.95,
+	63.37, 61.33, 61.51)
 
 func randomTimeSeries(size int) *TimeSeries {
 	vals := make([]string, size)
@@ -80,4 +86,16 @@ func mockTimeSeriesFl(values ...float64) *TimeSeries {
 
 func decimalEquals(t *testing.T, expected float64, actual big.Decimal) {
 	assert.Equal(t, fmt.Sprintf("%.4f", expected), fmt.Sprintf("%.4f", actual.Float()))
+}
+
+func indicatorEquals(t *testing.T, expected []float64, indicator Indicator) {
+	precision := 4.0
+	m := math.Pow(10, precision)
+
+	actualValues := make([]float64, len(expected))
+	for index := range expected {
+		actualValues[index] = math.Round(indicator.Calculate(index).Float()*m) / m
+	}
+
+	assert.EqualValues(t, expected, actualValues)
 }
