@@ -1,8 +1,9 @@
 files := $(shell find . -name "*.go" | grep -v vendor)
 
 bootstrap:
-	go get golang.org/x/lint/golint
-	go get honnef.co/go/tools/...
+	go install -v golang.org/x/lint/golint@latest
+	go install -v golang.org/x/tools/...@latest
+	go install -v honnef.co/go/tools/cmd/staticcheck@latest
 
 clean:
 	goimports -w $(files)
