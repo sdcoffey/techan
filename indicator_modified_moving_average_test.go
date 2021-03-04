@@ -19,6 +19,7 @@ func TestModifiedMovingAverage(t *testing.T) {
 		63.4898,
 		63.4498,
 		62.7432,
+		62.3321,
 	}
 
 	indicatorEquals(t, expected, indicator)

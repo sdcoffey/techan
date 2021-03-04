@@ -92,10 +92,17 @@ func indicatorEquals(t *testing.T, expected []float64, indicator Indicator) {
 	precision := 4.0
 	m := math.Pow(10, precision)
 
-	actualValues := make([]float64, len(expected))
-	for index := range expected {
-		actualValues[index] = math.Round(indicator.Calculate(index).Float()*m) / m
-	}
+	actualValues := make([]float64, 0)
 
-	assert.EqualValues(t, expected, actualValues)
+	defer func() {
+		recover()
+
+		assert.EqualValues(t, expected, actualValues)
+	}()
+
+	var index int
+	for {
+		actualValues = append(actualValues, math.Round(indicator.Calculate(index).Float()*m)/m)
+		index++
+	}
 }
