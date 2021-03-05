@@ -1,26 +1,49 @@
 package techan
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestKeltnerChannel(t *testing.T) {
 	t.Run("Upper", func(t *testing.T) {
-		ts := mockTimeSeriesOCHL(
-			[]float64{10, 15, 20, 10},
-			[]float64{11, 16, 21, 11},
-			[]float64{12, 17, 22, 12},
-			[]float64{13, 18, 23, 13},
-			[]float64{14, 19, 24, 14},
-			[]float64{15, 20, 25, 15},
-			[]float64{16, 20, 26, 16},
-		)
+		upper := NewKeltnerChannelUpperIndicator(mockedTimeSeries, 3)
 
-		upper := NewKeltnerChannelUpperIndicator(ts, 3)
+		expectedValues := []float64{
+			0,
+			0,
+			0,
+			67.91,
+			67.73,
+			67.46,
+			67.685,
+			67.7675,
+			67.3588,
+			67.3644,
+			67.0405,
+			66.6219,
+		}
 
-		decimalEquals(t, 40, upper.Calculate(5))
-		decimalEquals(t, 39, upper.Calculate(4))
-		decimalEquals(t, 38, upper.Calculate(3))
-		decimalEquals(t, 37, upper.Calculate(2))
-		decimalEquals(t, 0, upper.Calculate(1))
-		decimalEquals(t, 0, upper.Calculate(0))
+		indicatorEquals(t, expectedValues, upper)
+	})
+
+	t.Run("Lower", func(t *testing.T) {
+		lower := NewKeltnerChannelLowerIndicator(mockedTimeSeries, 3)
+
+		expectedValues := []float64{
+			0,
+			0,
+			0,
+			59.91,
+			59.73,
+			59.46,
+			59.685,
+			59.7675,
+			59.3588,
+			59.3644,
+			57.6539,
+			57.2353,
+		}
+
+		indicatorEquals(t, expectedValues, lower)
 	})
 }

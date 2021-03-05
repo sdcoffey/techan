@@ -7,7 +7,7 @@ type averageTrueRangeIndicator struct {
 	window int
 }
 
-// NewAverageTrueRangeIndicator returns a base indicator that caculates the average true range of the
+// NewAverageTrueRangeIndicator returns a base indicator that calculates the average true range of the
 // underlying over a window
 // https://www.investopedia.com/terms/a/atr.asp
 func NewAverageTrueRangeIndicator(series *TimeSeries, window int) Indicator {
@@ -24,7 +24,7 @@ func (atr averageTrueRangeIndicator) Calculate(index int) big.Decimal {
 
 	sum := big.ZERO
 
-	for i := index - atr.window + 1; i <= index; i++ {
+	for i := index; i > index-atr.window; i-- {
 		sum = sum.Add(NewTrueRangeIndicator(atr.series).Calculate(i))
 	}
 

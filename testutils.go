@@ -62,8 +62,8 @@ func mockTimeSeries(values ...string) *TimeSeries {
 		candle := NewCandle(NewTimePeriod(time.Unix(int64(candleIndex), 0), time.Second))
 		candle.OpenPrice = big.NewFromString(val)
 		candle.ClosePrice = big.NewFromString(val)
-		candle.MaxPrice = big.NewFromString(val)
-		candle.MinPrice = big.NewFromString(val)
+		candle.MaxPrice = big.NewFromString(val).Add(big.ONE)
+		candle.MinPrice = big.NewFromString(val).Sub(big.ONE)
 		candle.Volume = big.NewFromString(val)
 
 		ts.AddCandle(candle)
@@ -88,21 +88,24 @@ func decimalEquals(t *testing.T, expected float64, actual big.Decimal) {
 	assert.Equal(t, fmt.Sprintf("%.4f", expected), fmt.Sprintf("%.4f", actual.Float()))
 }
 
-func indicatorEquals(t *testing.T, expected []float64, indicator Indicator) {
+func dump(indicator Indicator) (values []float64) {
 	precision := 4.0
 	m := math.Pow(10, precision)
 
-	actualValues := make([]float64, 0)
-
 	defer func() {
 		recover()
-
-		assert.EqualValues(t, expected, actualValues)
 	}()
 
 	var index int
 	for {
-		actualValues = append(actualValues, math.Round(indicator.Calculate(index).Float()*m)/m)
+		values = append(values, math.Round(indicator.Calculate(index).Float()*m)/m)
 		index++
 	}
+
+	return
+}
+
+func indicatorEquals(t *testing.T, expected []float64, indicator Indicator) {
+	actualValues := dump(indicator)
+	assert.EqualValues(t, expected, actualValues)
 }

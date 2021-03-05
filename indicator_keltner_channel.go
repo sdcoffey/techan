@@ -1,6 +1,8 @@
 package techan
 
-import "github.com/sdcoffey/big"
+import (
+	"github.com/sdcoffey/big"
+)
 
 type keltnerChannelIndicator struct {
 	ema    Indicator
@@ -20,14 +22,15 @@ func NewKeltnerChannelUpperIndicator(series *TimeSeries, window int) Indicator {
 
 func NewKeltnerChannelLowerIndicator(series *TimeSeries, window int) Indicator {
 	return keltnerChannelIndicator{
-		atr: NewAverageTrueRangeIndicator(series, window),
-		ema: NewEMAIndicator(NewClosePriceIndicator(series), window),
-		mul: big.ONE,
+		atr:    NewAverageTrueRangeIndicator(series, window),
+		ema:    NewEMAIndicator(NewClosePriceIndicator(series), window),
+		mul:    big.ONE.Neg(),
+		window: window,
 	}
 }
 
 func (kci keltnerChannelIndicator) Calculate(index int) big.Decimal {
-	if index < kci.window {
+	if index <= kci.window-1 {
 		return big.ZERO
 	}
 
