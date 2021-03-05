@@ -13,7 +13,22 @@ func TestSimpleMovingAverage(t *testing.T) {
 
 	decimalEquals(t, 1, sma.Calculate(0))
 	decimalEquals(t, 1.5, sma.Calculate(1))
+	decimalEquals(t, 2, sma.Calculate(2))
+	decimalEquals(t, 3, sma.Calculate(3))
+	decimalEquals(t, 10.0/3.0, sma.Calculate(4))
+	decimalEquals(t, 11.0/3.0, sma.Calculate(5))
+	decimalEquals(t, 4, sma.Calculate(6))
+	decimalEquals(t, 13.0/3.0, sma.Calculate(7))
+	decimalEquals(t, 4, sma.Calculate(8))
+	decimalEquals(t, 10.0/3.0, sma.Calculate(9))
+	decimalEquals(t, 10.0/3.0, sma.Calculate(10))
+	decimalEquals(t, 10.0/3.0, sma.Calculate(11))
+	decimalEquals(t, 3, sma.Calculate(12))
 
+	sma.RemoveCachedEntry(6)
+
+	decimalEquals(t, 1, sma.Calculate(0))
+	decimalEquals(t, 1.5, sma.Calculate(1))
 	decimalEquals(t, 2, sma.Calculate(2))
 	decimalEquals(t, 3, sma.Calculate(3))
 	decimalEquals(t, 10.0/3.0, sma.Calculate(4))

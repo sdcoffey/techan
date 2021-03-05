@@ -31,6 +31,10 @@ func TestTrendIndicator(t *testing.T) {
 			indicator := NewTrendlineIndicator(NewClosePriceIndicator(series), 4)
 
 			assert.EqualValues(t, test.expectedResult, indicator.Calculate(3).String())
+
+			indicator.RemoveCachedEntry(3)
+
+			assert.EqualValues(t, test.expectedResult, indicator.Calculate(3).String())
 		}
 	})
 

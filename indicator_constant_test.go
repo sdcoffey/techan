@@ -11,4 +11,8 @@ func TestConstantIndicator_Calculate(t *testing.T) {
 	decimalEquals(t, 4.56, ci.Calculate(0))
 	decimalEquals(t, 4.56, ci.Calculate(-math.MaxInt64))
 	decimalEquals(t, 4.56, ci.Calculate(math.MaxInt64))
+
+	ci.RemoveCachedEntry(0)
+
+	decimalEquals(t, 4.56, ci.Calculate(0))
 }

@@ -29,3 +29,7 @@ func (sdi windowedStandardDeviationIndicator) Calculate(index int) big.Decimal {
 
 	return variance.Div(big.NewDecimal(float64(realwindow))).Sqrt()
 }
+
+func (sdi windowedStandardDeviationIndicator) RemoveCachedEntry(index int) {
+	sdi.movingAverage.RemoveCachedEntry(index)
+}

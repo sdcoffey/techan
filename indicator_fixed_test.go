@@ -13,4 +13,12 @@ func TestFixedIndicator_Calculate(t *testing.T) {
 	decimalEquals(t, 2, fi.Calculate(2))
 	decimalEquals(t, -100, fi.Calculate(3))
 	decimalEquals(t, math.MaxInt64, fi.Calculate(4))
+
+	fi.RemoveCachedEntry(2)
+
+	decimalEquals(t, 0, fi.Calculate(0))
+	decimalEquals(t, 1, fi.Calculate(1))
+	decimalEquals(t, 2, fi.Calculate(2))
+	decimalEquals(t, -100, fi.Calculate(3))
+	decimalEquals(t, math.MaxInt64, fi.Calculate(4))
 }

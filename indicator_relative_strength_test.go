@@ -61,4 +61,8 @@ func TestRelativeStrengthIndicatorNoPriceChange(t *testing.T) {
 	close := NewClosePriceIndicator(mockTimeSeries("42.0", "42.0"))
 	rsInd := NewRelativeStrengthIndicator(close, 2)
 	assert.Equal(t, big.NewDecimal(math.MaxFloat64).FormattedString(2), rsInd.Calculate(1).FormattedString(2))
+
+	rsInd.RemoveCachedEntry(1)
+
+	assert.Equal(t, big.NewDecimal(math.MaxFloat64).FormattedString(2), rsInd.Calculate(1).FormattedString(2))
 }

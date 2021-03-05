@@ -10,4 +10,10 @@ func TestDifferenceIndicator_Calculate(t *testing.T) {
 	decimalEquals(t, 2, di.Calculate(0))
 	decimalEquals(t, 0, di.Calculate(1))
 	decimalEquals(t, -2, di.Calculate(2))
+
+	di.RemoveCachedEntry(1)
+
+	decimalEquals(t, 2, di.Calculate(0))
+	decimalEquals(t, 0, di.Calculate(1))
+	decimalEquals(t, -2, di.Calculate(2))
 }
