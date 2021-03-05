@@ -26,6 +26,10 @@ func (ai *aroonIndicator) Calculate(index int) big.Decimal {
 	return windowAsDecimal.Sub(pSince).Div(windowAsDecimal).Mul(oneHundred)
 }
 
+func (ai *aroonIndicator) RemoveCachedEntry(index int) {
+	ai.indicator.RemoveCachedEntry(index)
+}
+
 func (ai aroonIndicator) findLowIndex(index int) int {
 	if ai.lowIndex < 1 || ai.lowIndex < index-ai.window {
 		lv := big.NewDecimal(math.MaxFloat64)

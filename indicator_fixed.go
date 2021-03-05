@@ -12,3 +12,7 @@ func NewFixedIndicator(vals ...float64) Indicator {
 func (fi fixedIndicator) Calculate(index int) big.Decimal {
 	return big.NewDecimal(fi[index])
 }
+
+func (fi fixedIndicator) RemoveCachedEntry(index int) {
+	//No-Op
+}

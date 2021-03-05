@@ -62,6 +62,26 @@ func TestExponentialMovingAverage(t *testing.T) {
 
 		assert.EqualValues(t, 10001, len(ema.(*emaIndicator).resultCache))
 	})
+
+	t.Run("works after calling RemoveCacheEntry ", func(t *testing.T) {
+		ts := mockTimeSeriesFl(
+			64.75, 63.79, 63.73,
+			63.73, 63.55, 63.19,
+			63.91, 63.85, 62.95,
+			63.37, 61.33, 61.51)
+
+		ema := NewEMAIndicator(NewClosePriceIndicator(ts), 10)
+
+		decimalEquals(t, 63.6948, ema.Calculate(9))
+		decimalEquals(t, 63.2649, ema.Calculate(10))
+		decimalEquals(t, 62.9458, ema.Calculate(11))
+
+		ema.RemoveCachedEntry(10)
+
+		decimalEquals(t, 63.6948, ema.Calculate(9))
+		decimalEquals(t, 63.2649, ema.Calculate(10))
+		decimalEquals(t, 62.9458, ema.Calculate(11))
+	})
 }
 
 func TestNewMMAIndicator(t *testing.T) {
@@ -72,6 +92,12 @@ func TestNewMMAIndicator(t *testing.T) {
 		63.37, 61.33, 61.51)
 
 	mma := NewMMAIndicator(NewClosePriceIndicator(series), 10)
+
+	decimalEquals(t, 63.9983, mma.Calculate(9))
+	decimalEquals(t, 63.7315, mma.Calculate(10))
+	decimalEquals(t, 63.5094, mma.Calculate(11))
+
+	mma.RemoveCachedEntry(10)
 
 	decimalEquals(t, 63.9983, mma.Calculate(9))
 	decimalEquals(t, 63.7315, mma.Calculate(10))
@@ -95,7 +121,7 @@ func TestNewMACDHistogramIndicator(t *testing.T) {
 	assert.NotNil(t, macdHistogram)
 }
 
-func BenchmarkExponetialMovingAverage(b *testing.B) {
+func BenchmarkExponentialMovingAverage(b *testing.B) {
 	size := 10000
 	ts := randomTimeSeries(size)
 

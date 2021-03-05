@@ -7,4 +7,5 @@ import "github.com/sdcoffey/big"
 // returns the current moving average of the prices in that series.
 type Indicator interface {
 	Calculate(int) big.Decimal
+	RemoveCachedEntry(int)
 }
