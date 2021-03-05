@@ -31,3 +31,8 @@ func NewBollingerLowerBandIndicator(indicator Indicator, window int, sigma float
 func (bbi bbandIndicator) Calculate(index int) big.Decimal {
 	return bbi.ma.Calculate(index).Add(bbi.stdev.Calculate(index).Mul(bbi.muladd))
 }
+
+func (bbi bbandIndicator) RemoveCachedEntry(index int) {
+	bbi.ma.RemoveCachedEntry(index)
+	bbi.stdev.RemoveCachedEntry(index)
+}

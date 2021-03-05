@@ -23,6 +23,10 @@ func (sma smaIndicator) Calculate(index int) big.Decimal {
 	return sum.Div(big.NewDecimal(float64(realwindow)))
 }
 
+func (sma smaIndicator) RemoveCachedEntry(index int) {
+	sma.indicator.RemoveCachedEntry(index)
+}
+
 type emaIndicator struct {
 	Indicator
 	window      int
@@ -51,16 +55,20 @@ func (ema *emaIndicator) Calculate(index int) big.Decimal {
 
 	emaPrev := ema.Calculate(index - 1)
 	result := ema.Indicator.Calculate(index).Sub(emaPrev).Mul(ema.alpha).Add(emaPrev)
-	ema.cacheResult(index, result)
+	ema.cacheResult(index, &result)
 
 	return result
 }
 
-func (ema *emaIndicator) cacheResult(index int, val big.Decimal) {
+func (ema *emaIndicator) RemoveCachedEntry(index int) {
+	ema.cacheResult(index, nil)
+}
+
+func (ema *emaIndicator) cacheResult(index int, val *big.Decimal) {
 	if index < len(ema.resultCache) {
-		ema.resultCache[index] = &val
+		ema.resultCache[index] = val
 	} else {
-		ema.resultCache = append(ema.resultCache, &val)
+		ema.resultCache = append(ema.resultCache, val)
 	}
 }
 

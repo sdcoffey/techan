@@ -118,4 +118,19 @@ func TestBollingerBandIndicator(t *testing.T) {
 		decimalAlmostEquals(t, big.NewFromString(BBLOs[j]), bbLO.Calculate(i), 0.01)
 		decimalAlmostEquals(t, big.NewFromString(BBWs[j]), bbUP.Calculate(i).Sub(bbLO.Calculate((i))), 0.01)
 	}
+
+	src.RemoveCachedEntry(0)
+	sma.RemoveCachedEntry(0)
+	wstd.RemoveCachedEntry(0)
+	bbUP.RemoveCachedEntry(0)
+	bbLO.RemoveCachedEntry(0)
+
+	for i := window - 1; i < len(ts.Candles); i++ {
+		j := i - (window - 1)
+		decimalAlmostEquals(t, big.NewFromString(SMAs[j]), sma.Calculate(i), 0.01)
+		decimalAlmostEquals(t, big.NewFromString(STDEVs[j]), wstd.Calculate(i), 0.01)
+		decimalAlmostEquals(t, big.NewFromString(BBUPs[j]), bbUP.Calculate(i), 0.01)
+		decimalAlmostEquals(t, big.NewFromString(BBLOs[j]), bbLO.Calculate(i), 0.01)
+		decimalAlmostEquals(t, big.NewFromString(BBWs[j]), bbUP.Calculate(i).Sub(bbLO.Calculate((i))), 0.01)
+	}
 }

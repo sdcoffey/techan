@@ -26,3 +26,7 @@ func (mdi maximumDrawdownIndicator) Calculate(index int) big.Decimal {
 
 	return (minVal.Sub(maxVal)).Div(maxVal)
 }
+
+func (mdi maximumDrawdownIndicator) RemoveCachedEntry(index int) {
+	mdi.indicator.RemoveCachedEntry(index)
+}

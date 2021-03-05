@@ -15,19 +15,37 @@ func TestGainIndicator(t *testing.T) {
 	decimalEquals(t, 0, gains.Calculate(3))
 	decimalEquals(t, 0, gains.Calculate(4))
 	decimalEquals(t, 0, gains.Calculate(5))
+
+	gains.RemoveCachedEntry(2)
+
+	decimalEquals(t, 0, gains.Calculate(0))
+	decimalEquals(t, 1, gains.Calculate(1))
+	decimalEquals(t, 1, gains.Calculate(2))
+	decimalEquals(t, 0, gains.Calculate(3))
+	decimalEquals(t, 0, gains.Calculate(4))
+	decimalEquals(t, 0, gains.Calculate(5))
 }
 
 func TestLossIndicator(t *testing.T) {
 	ts := mockTimeSeriesFl(1, 2, 3, 3, 2, 0)
 
-	gains := NewLossIndicator(NewClosePriceIndicator(ts))
+	losses := NewLossIndicator(NewClosePriceIndicator(ts))
 
-	decimalEquals(t, 0, gains.Calculate(0))
-	decimalEquals(t, 0, gains.Calculate(1))
-	decimalEquals(t, 0, gains.Calculate(2))
-	decimalEquals(t, 0, gains.Calculate(3))
-	decimalEquals(t, 1, gains.Calculate(4))
-	decimalEquals(t, 2, gains.Calculate(5))
+	decimalEquals(t, 0, losses.Calculate(0))
+	decimalEquals(t, 0, losses.Calculate(1))
+	decimalEquals(t, 0, losses.Calculate(2))
+	decimalEquals(t, 0, losses.Calculate(3))
+	decimalEquals(t, 1, losses.Calculate(4))
+	decimalEquals(t, 2, losses.Calculate(5))
+
+	losses.RemoveCachedEntry(2)
+
+	decimalEquals(t, 0, losses.Calculate(0))
+	decimalEquals(t, 0, losses.Calculate(1))
+	decimalEquals(t, 0, losses.Calculate(2))
+	decimalEquals(t, 0, losses.Calculate(3))
+	decimalEquals(t, 1, losses.Calculate(4))
+	decimalEquals(t, 2, losses.Calculate(5))
 }
 
 func TestCumulativeGainsIndicator(t *testing.T) {
@@ -35,6 +53,15 @@ func TestCumulativeGainsIndicator(t *testing.T) {
 		ts := mockTimeSeriesFl(1, 2, 3, 5, 8, 13)
 
 		cumGains := NewCumulativeGainsIndicator(NewClosePriceIndicator(ts), 6)
+
+		decimalEquals(t, 0, cumGains.Calculate(0))
+		decimalEquals(t, 1, cumGains.Calculate(1))
+		decimalEquals(t, 2, cumGains.Calculate(2))
+		decimalEquals(t, 4, cumGains.Calculate(3))
+		decimalEquals(t, 7, cumGains.Calculate(4))
+		decimalEquals(t, 12, cumGains.Calculate(5))
+
+		cumGains.RemoveCachedEntry(2)
 
 		decimalEquals(t, 0, cumGains.Calculate(0))
 		decimalEquals(t, 1, cumGains.Calculate(1))
@@ -76,6 +103,15 @@ func TestCumulativeLossesIndicator(t *testing.T) {
 		ts := mockTimeSeriesFl(13, 8, 5, 3, 2, 1)
 
 		cumLosses := NewCumulativeLossesIndicator(NewClosePriceIndicator(ts), 6)
+
+		decimalEquals(t, 0, cumLosses.Calculate(0))
+		decimalEquals(t, 5, cumLosses.Calculate(1))
+		decimalEquals(t, 8, cumLosses.Calculate(2))
+		decimalEquals(t, 10, cumLosses.Calculate(3))
+		decimalEquals(t, 11, cumLosses.Calculate(4))
+		decimalEquals(t, 12, cumLosses.Calculate(5))
+
+		cumLosses.RemoveCachedEntry(2)
 
 		decimalEquals(t, 0, cumLosses.Calculate(0))
 		decimalEquals(t, 5, cumLosses.Calculate(1))
@@ -132,6 +168,24 @@ func TestPercentGainIndicator(t *testing.T) {
 		decimalEquals(t, 0, pgi.Calculate(0))
 		decimalEquals(t, -.5, pgi.Calculate(1))
 		decimalEquals(t, -.5, pgi.Calculate(2))
+		decimalEquals(t, 0, pgi.Calculate(3))
+	})
+
+	t.Run("Works after RemoveCachedEntry", func(t *testing.T) {
+		ts := mockTimeSeriesFl(1, 1.5, 2.25, 2.25)
+
+		pgi := NewPercentChangeIndicator(NewClosePriceIndicator(ts))
+
+		decimalEquals(t, 0, pgi.Calculate(0))
+		decimalEquals(t, .5, pgi.Calculate(1))
+		decimalEquals(t, .5, pgi.Calculate(2))
+		decimalEquals(t, 0, pgi.Calculate(3))
+
+		pgi.RemoveCachedEntry(2)
+
+		decimalEquals(t, 0, pgi.Calculate(0))
+		decimalEquals(t, .5, pgi.Calculate(1))
+		decimalEquals(t, .5, pgi.Calculate(2))
 		decimalEquals(t, 0, pgi.Calculate(3))
 	})
 }

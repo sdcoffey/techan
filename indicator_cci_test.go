@@ -26,4 +26,10 @@ func TestCommidityChannelIndexIndicator_Calculate(t *testing.T) {
 	for i, result := range results {
 		assert.EqualValues(t, result, cci.Calculate(i+19).FormattedString(4))
 	}
+
+	cci.RemoveCachedEntry(19)
+
+	for i, result := range results {
+		assert.EqualValues(t, result, cci.Calculate(i+19).FormattedString(4))
+	}
 }

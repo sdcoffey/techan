@@ -15,6 +15,10 @@ func (vi volumeIndicator) Calculate(index int) big.Decimal {
 	return vi.Candles[index].Volume
 }
 
+func (vi volumeIndicator) RemoveCachedEntry(index int) {
+	//No-Op
+}
+
 type closePriceIndicator struct {
 	*TimeSeries
 }
@@ -26,6 +30,10 @@ func NewClosePriceIndicator(series *TimeSeries) Indicator {
 
 func (cpi closePriceIndicator) Calculate(index int) big.Decimal {
 	return cpi.Candles[index].ClosePrice
+}
+
+func (cpi closePriceIndicator) RemoveCachedEntry(index int) {
+	//No-Op
 }
 
 type highPriceIndicator struct {
@@ -43,6 +51,10 @@ func (hpi highPriceIndicator) Calculate(index int) big.Decimal {
 	return hpi.Candles[index].MaxPrice
 }
 
+func (hpi highPriceIndicator) RemoveCachedEntry(index int) {
+	//No-Op
+}
+
 type lowPriceIndicator struct {
 	*TimeSeries
 }
@@ -56,6 +68,10 @@ func NewLowPriceIndicator(series *TimeSeries) Indicator {
 
 func (lpi lowPriceIndicator) Calculate(index int) big.Decimal {
 	return lpi.Candles[index].MinPrice
+}
+
+func (lpi lowPriceIndicator) RemoveCachedEntry(index int) {
+	//No-Op
 }
 
 type openPriceIndicator struct {
@@ -73,6 +89,10 @@ func (opi openPriceIndicator) Calculate(index int) big.Decimal {
 	return opi.Candles[index].OpenPrice
 }
 
+func (opi openPriceIndicator) RemoveCachedEntry(index int) {
+	//No-Op
+}
+
 type typicalPriceIndicator struct {
 	*TimeSeries
 }
@@ -86,4 +106,8 @@ func NewTypicalPriceIndicator(series *TimeSeries) Indicator {
 func (tpi typicalPriceIndicator) Calculate(index int) big.Decimal {
 	numerator := tpi.Candles[index].MaxPrice.Add(tpi.Candles[index].MinPrice).Add(tpi.Candles[index].ClosePrice)
 	return numerator.Div(big.NewFromString("3"))
+}
+
+func (tpi typicalPriceIndicator) RemoveCachedEntry(index int) {
+	//No-Op
 }

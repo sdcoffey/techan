@@ -25,6 +25,10 @@ func TestVolumeIndicator_Calculate(t *testing.T) {
 
 	indicator := NewVolumeIndicator(series)
 	assert.EqualValues(t, "1.208", indicator.Calculate(0).FormattedString(3))
+
+	indicator.RemoveCachedEntry(0)
+
+	assert.EqualValues(t, "1.208", indicator.Calculate(0).FormattedString(3))
 }
 
 func TestTypicalPriceIndicator_Calculate(t *testing.T) {
@@ -40,7 +44,10 @@ func TestTypicalPriceIndicator_Calculate(t *testing.T) {
 
 	series.AddCandle(candle)
 
-	typicalPrice := NewTypicalPriceIndicator(series).Calculate(0)
+	indicator := NewTypicalPriceIndicator(series)
+	assert.EqualValues(t, "1.2143", indicator.Calculate(0).FormattedString(4))
 
-	assert.EqualValues(t, "1.2143", typicalPrice.FormattedString(4))
+	indicator.RemoveCachedEntry(0)
+
+	assert.EqualValues(t, "1.2143", indicator.Calculate(0).FormattedString(4))
 }

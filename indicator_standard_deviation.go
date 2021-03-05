@@ -20,3 +20,7 @@ type standardDeviationIndicator struct {
 func (sdi standardDeviationIndicator) Calculate(index int) big.Decimal {
 	return sdi.indicator.Calculate(index).Sqrt()
 }
+
+func (sdi standardDeviationIndicator) RemoveCachedEntry(index int) {
+	sdi.indicator.RemoveCachedEntry(index)
+}

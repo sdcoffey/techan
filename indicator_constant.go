@@ -13,3 +13,7 @@ func NewConstantIndicator(constant float64) Indicator {
 func (ci constantIndicator) Calculate(index int) big.Decimal {
 	return big.NewDecimal(float64(ci))
 }
+
+func (ci constantIndicator) RemoveCachedEntry(index int) {
+	//No-Op
+}

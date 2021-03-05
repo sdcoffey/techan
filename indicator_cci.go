@@ -23,3 +23,7 @@ func (ccii commidityChannelIndexIndicator) Calculate(index int) big.Decimal {
 
 	return typicalPrice.Calculate(index).Sub(typicalPriceSma.Calculate(index)).Div(meanDeviation.Calculate(index).Mul(big.NewFromString("0.015")))
 }
+
+func (ccii commidityChannelIndexIndicator) RemoveCachedEntry(index int) {
+	//No-Op - since indicators are created directly within the Calculate function
+}

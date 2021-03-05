@@ -25,6 +25,11 @@ func TestRelativeVigorIndexIndicator_Calculate(t *testing.T) {
 	t.Run("Calculates rvii", func(t *testing.T) {
 		assert.EqualValues(t, "0.756", rvii.Calculate(3).FormattedString(3))
 	})
+
+	t.Run("Works after RemoveCachedEntry", func(t *testing.T) {
+		rvii.RemoveCachedEntry(3)
+		assert.EqualValues(t, "0.756", rvii.Calculate(3).FormattedString(3))
+	})
 }
 
 func TestRelativeVigorIndexSignalLine_Calculate(t *testing.T) {
@@ -48,6 +53,11 @@ func TestRelativeVigorIndexSignalLine_Calculate(t *testing.T) {
 	})
 
 	t.Run("Calculates rvii signal line", func(t *testing.T) {
+		assert.EqualValues(t, "0.5752", signalLine.Calculate(7).FormattedString(4))
+	})
+
+	t.Run("Works after RemoveCachedEntry", func(t *testing.T) {
+		signalLine.RemoveCachedEntry(7)
 		assert.EqualValues(t, "0.5752", signalLine.Calculate(7).FormattedString(4))
 	})
 }

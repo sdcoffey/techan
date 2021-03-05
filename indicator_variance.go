@@ -6,12 +6,12 @@ import "github.com/sdcoffey/big"
 // deviations from the mean at any given index in the time series.
 func NewVarianceIndicator(ind Indicator) Indicator {
 	return varianceIndicator{
-		Indicator: ind,
+		indicator: ind,
 	}
 }
 
 type varianceIndicator struct {
-	Indicator Indicator
+	indicator Indicator
 }
 
 // Calculate returns the Variance for this indicator at the given index
@@ -20,14 +20,18 @@ func (vi varianceIndicator) Calculate(index int) big.Decimal {
 		return big.ZERO
 	}
 
-	avgIndicator := NewSimpleMovingAverage(vi.Indicator, index+1)
+	avgIndicator := NewSimpleMovingAverage(vi.indicator, index+1)
 	avg := avgIndicator.Calculate(index)
 	variance := big.ZERO
 
 	for i := 0; i <= index; i++ {
-		pow := vi.Indicator.Calculate(i).Sub(avg).Pow(2)
+		pow := vi.indicator.Calculate(i).Sub(avg).Pow(2)
 		variance = variance.Add(pow)
 	}
 
 	return variance.Div(big.NewDecimal(float64(index + 1)))
+}
+
+func (vi varianceIndicator) RemoveCachedEntry(index int) {
+	vi.indicator.RemoveCachedEntry(index)
 }
