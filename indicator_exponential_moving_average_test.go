@@ -1,25 +1,42 @@
 package techan
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestExponentialMovingAverage(t *testing.T) {
-	expectedValues := []float64{
-		0,
-		0,
-		64.09,
-		63.91,
-		63.73,
-		63.46,
-		63.685,
-		63.7675,
-		63.3588,
-		63.3644,
-		62.3472,
-		61.9286,
-	}
+	t.Run("Default Case", func(t *testing.T) {
+		expectedValues := []float64{
+			0,
+			0,
+			64.09,
+			63.91,
+			63.73,
+			63.46,
+			63.685,
+			63.7675,
+			63.3588,
+			63.3644,
+			62.3472,
+			61.9286,
+		}
 
-	closePriceIndicator := NewClosePriceIndicator(mockedTimeSeries)
-	indicatorEquals(t, expectedValues, NewEMAIndicator(closePriceIndicator, 3))
+		closePriceIndicator := NewClosePriceIndicator(mockedTimeSeries)
+		indicatorEquals(t, expectedValues, NewEMAIndicator(closePriceIndicator, 3))
+	})
+
+	t.Run("Expands Result Cache", func(t *testing.T) {
+		closeIndicator := NewClosePriceIndicator(randomTimeSeries(1001))
+		ema := NewEMAIndicator(closeIndicator, 20)
+
+		ema.Calculate(1000)
+
+		emaStruct, ok := ema.(cachedIndicator)
+		assert.True(t, ok)
+		assert.EqualValues(t, 1001, len(emaStruct.cache()))
+	})
 }
 
 func BenchmarkExponetialMovingAverage(b *testing.B) {
