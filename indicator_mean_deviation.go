@@ -19,6 +19,10 @@ func NewMeanDeviationIndicator(indicator Indicator, window int) Indicator {
 }
 
 func (mdi meanDeviationIndicator) Calculate(index int) big.Decimal {
+	if index < mdi.window-1 {
+		return big.ZERO
+	}
+
 	average := mdi.movingAverage.Calculate(index)
 	start := Max(0, index-mdi.window+1)
 	absoluteDeviations := big.NewDecimal(0)

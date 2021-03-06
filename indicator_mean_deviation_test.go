@@ -9,13 +9,19 @@ func TestMeanDeviationIndicator(t *testing.T) {
 
 	meanDeviation := NewMeanDeviationIndicator(NewClosePriceIndicator(ts), 5)
 
-	decimalEquals(t, 2.4444, meanDeviation.Calculate(2))
-	decimalEquals(t, 2.5, meanDeviation.Calculate(3))
-	decimalEquals(t, 2.16, meanDeviation.Calculate(4))
-	decimalEquals(t, 1.68, meanDeviation.Calculate(5))
-	decimalEquals(t, 1.2, meanDeviation.Calculate(6))
-	decimalEquals(t, 2.16, meanDeviation.Calculate(7))
-	decimalEquals(t, 2.32, meanDeviation.Calculate(8))
-	decimalEquals(t, 2.72, meanDeviation.Calculate(9))
-	decimalEquals(t, 3.52, meanDeviation.Calculate(10))
+	expected := []float64{
+		0,
+		0,
+		0,
+		0,
+		2.16,
+		1.68,
+		1.2,
+		2.16,
+		2.32,
+		2.72,
+		3.52,
+	}
+
+	indicatorEquals(t, expected, meanDeviation)
 }

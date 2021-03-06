@@ -2,6 +2,7 @@ package techan
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"testing"
 	"time"
@@ -13,6 +14,11 @@ import (
 )
 
 var candleIndex int
+var mockedTimeSeries = mockTimeSeriesFl(
+	64.75, 63.79, 63.73,
+	63.73, 63.55, 63.19,
+	63.91, 63.85, 62.95,
+	63.37, 61.33, 61.51)
 
 func randomTimeSeries(size int) *TimeSeries {
 	vals := make([]string, size)
@@ -34,14 +40,14 @@ func randomTimeSeries(size int) *TimeSeries {
 	return mockTimeSeries(vals...)
 }
 
-func mockTimeSeriesOCHL(values ...[]string) *TimeSeries {
+func mockTimeSeriesOCHL(values ...[]float64) *TimeSeries {
 	ts := NewTimeSeries()
 	for i, ochl := range values {
 		candle := NewCandle(NewTimePeriod(time.Unix(int64(i), 0), time.Second))
-		candle.OpenPrice = big.NewFromString(ochl[0])
-		candle.ClosePrice = big.NewFromString(ochl[1])
-		candle.MaxPrice = big.NewFromString(ochl[2])
-		candle.MinPrice = big.NewFromString(ochl[3])
+		candle.OpenPrice = big.NewDecimal(ochl[0])
+		candle.ClosePrice = big.NewDecimal(ochl[1])
+		candle.MaxPrice = big.NewDecimal(ochl[2])
+		candle.MinPrice = big.NewDecimal(ochl[3])
 		candle.Volume = big.NewDecimal(float64(i))
 
 		ts.AddCandle(candle)
@@ -56,8 +62,8 @@ func mockTimeSeries(values ...string) *TimeSeries {
 		candle := NewCandle(NewTimePeriod(time.Unix(int64(candleIndex), 0), time.Second))
 		candle.OpenPrice = big.NewFromString(val)
 		candle.ClosePrice = big.NewFromString(val)
-		candle.MaxPrice = big.NewFromString(val)
-		candle.MinPrice = big.NewFromString(val)
+		candle.MaxPrice = big.NewFromString(val).Add(big.ONE)
+		candle.MinPrice = big.NewFromString(val).Sub(big.ONE)
 		candle.Volume = big.NewFromString(val)
 
 		ts.AddCandle(candle)
@@ -80,4 +86,26 @@ func mockTimeSeriesFl(values ...float64) *TimeSeries {
 
 func decimalEquals(t *testing.T, expected float64, actual big.Decimal) {
 	assert.Equal(t, fmt.Sprintf("%.4f", expected), fmt.Sprintf("%.4f", actual.Float()))
+}
+
+func dump(indicator Indicator) (values []float64) {
+	precision := 4.0
+	m := math.Pow(10, precision)
+
+	defer func() {
+		recover()
+	}()
+
+	var index int
+	for {
+		values = append(values, math.Round(indicator.Calculate(index).Float()*m)/m)
+		index++
+	}
+
+	return
+}
+
+func indicatorEquals(t *testing.T, expected []float64, indicator Indicator) {
+	actualValues := dump(indicator)
+	assert.EqualValues(t, expected, actualValues)
 }
