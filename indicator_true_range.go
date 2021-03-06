@@ -7,7 +7,7 @@ type trueRangeIndicator struct {
 }
 
 // NewTrueRangeIndicator returns a base indicator
-// which calculates the true rangat the current point in time for a series
+// which calculates the true range at the current point in time for a series
 // https://www.investopedia.com/terms/a/atr.asp
 func NewTrueRangeIndicator(series *TimeSeries) Indicator {
 	return trueRangeIndicator{
