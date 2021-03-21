@@ -29,7 +29,7 @@ func (ema *emaIndicator) Calculate(index int) big.Decimal {
 	}
 
 	todayVal := ema.indicator.Calculate(index).Mul(ema.alpha)
-	result := todayVal.Add(ema.Calculate(index - 1).Mul(ema.alpha))
+	result := todayVal.Add(ema.Calculate(index - 1).Mul(big.ONE.Sub(ema.alpha)))
 
 	cacheResult(ema, index, result)
 

@@ -27,6 +27,26 @@ func TestExponentialMovingAverage(t *testing.T) {
 		indicatorEquals(t, expectedValues, NewEMAIndicator(closePriceIndicator, 3))
 	})
 
+	t.Run("Window Size 5", func(t *testing.T) {
+		expectedValues := []float64{
+			0,
+			0,
+			0,
+			0,
+			63.91,
+			63.67,
+			63.75,
+			63.7833,
+			63.5056,
+			63.4604,
+			62.7502,
+			62.3368,
+		}
+
+		closePriceIndicator := NewClosePriceIndicator(mockedTimeSeries)
+		indicatorEquals(t, expectedValues, NewEMAIndicator(closePriceIndicator, 5))
+	})
+
 	t.Run("Expands Result Cache", func(t *testing.T) {
 		closeIndicator := NewClosePriceIndicator(randomTimeSeries(1001))
 		ema := NewEMAIndicator(closeIndicator, 20)
