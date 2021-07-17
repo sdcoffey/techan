@@ -26,5 +26,5 @@ fi
 
 git tag "v$newversion" -m "v$newversion"
 
-git push origin master
+git push origin main
 git push --tags
