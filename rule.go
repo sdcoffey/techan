@@ -8,31 +8,39 @@ type Rule interface {
 }
 
 // And returns a new rule whereby BOTH of the passed-in rules must be satisfied for the rule to be satisfied
-func And(r1, r2 Rule) Rule {
-	return andRule{r1, r2}
+func And(r ...Rule) Rule {
+	return andRule{r}
 }
 
 // Or returns a new rule whereby ONE OF the passed-in rules must be satisfied for the rule to be satisfied
-func Or(r1, r2 Rule) Rule {
-	return orRule{r1, r2}
+func Or(r ...Rule) Rule {
+	return orRule{r}
 }
 
 type andRule struct {
-	r1 Rule
-	r2 Rule
+	r []Rule
 }
 
 func (ar andRule) IsSatisfied(index int, record *TradingRecord) bool {
-	return ar.r1.IsSatisfied(index, record) && ar.r2.IsSatisfied(index, record)
+	for _, r := range ar.r {
+		if !r.IsSatisfied(index, record) {
+			return false
+		}
+	}
+	return true
 }
 
 type orRule struct {
-	r1 Rule
-	r2 Rule
+	r []Rule
 }
 
 func (or orRule) IsSatisfied(index int, record *TradingRecord) bool {
-	return or.r1.IsSatisfied(index, record) || or.r2.IsSatisfied(index, record)
+	for _, r := range or.r {
+		if r.IsSatisfied(index, record) {
+			return true
+		}
+	}
+	return false
 }
 
 // OverIndicatorRule is a rule where the First Indicator must be greater than the Second Indicator to be Satisfied
