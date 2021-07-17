@@ -15,6 +15,17 @@ const (
 	SELL
 )
 
+func (os OrderSide) String() string {
+	switch os {
+	case BUY:
+		return "BUY"
+	case SELL:
+		return "SELL"
+	default:
+		return "UNKNOWN"
+	}
+}
+
 // Order represents a trade execution (buy or sell) with associated metadata.
 type Order struct {
 	Side          OrderSide
