@@ -11,20 +11,20 @@ func TestExponentialMovingAverage(t *testing.T) {
 		expectedValues := []float64{
 			0,
 			0,
-			64.09,
-			63.91,
-			63.73,
-			63.46,
-			63.685,
-			63.7675,
-			63.3588,
-			63.3644,
-			62.3472,
-			61.9286,
+			0,
+			64,
+			63.82,
+			63.568,
+			63.7048,
+			63.7629,
+			63.4377,
+			63.4106,
+			62.5784,
+			62.151,
 		}
 
 		closePriceIndicator := NewClosePriceIndicator(mockedTimeSeries)
-		indicatorEquals(t, expectedValues, NewEMAIndicator(closePriceIndicator, 3))
+		indicatorEquals(t, expectedValues, NewEMAIndicator(closePriceIndicator, 4))
 	})
 
 	t.Run("Expands Result Cache", func(t *testing.T) {
