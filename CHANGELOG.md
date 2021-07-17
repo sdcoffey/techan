@@ -1,5 +1,8 @@
 # Techan Release notes
 
+## 0.12.1
+* Fixes EMA window calculation (thanks @danhenke and @joelnordell!)
+
 ## 0.12.0
 * Add MaximumValue and MinimumValue Indicators
 * Add [MaximumDrawdownIndicator](https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp).
