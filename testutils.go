@@ -4,21 +4,22 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"strconv"
 	"testing"
 	"time"
-
-	"strconv"
 
 	"github.com/sdcoffey/big"
 	"github.com/stretchr/testify/assert"
 )
 
-var candleIndex int
-var mockedTimeSeries = mockTimeSeriesFl(
-	64.75, 63.79, 63.73,
-	63.73, 63.55, 63.19,
-	63.91, 63.85, 62.95,
-	63.37, 61.33, 61.51)
+var (
+	candleIndex      int
+	mockedTimeSeries = mockTimeSeriesFl(
+		64.75, 63.79, 63.73,
+		63.73, 63.55, 63.19,
+		63.91, 63.85, 62.95,
+		63.37, 61.33, 61.51)
+)
 
 func randomTimeSeries(size int) *TimeSeries {
 	vals := make([]string, size)
@@ -49,6 +50,22 @@ func mockTimeSeriesOCHL(values ...[]float64) *TimeSeries {
 		candle.MaxPrice = big.NewDecimal(ochl[2])
 		candle.MinPrice = big.NewDecimal(ochl[3])
 		candle.Volume = big.NewDecimal(float64(i))
+
+		ts.AddCandle(candle)
+	}
+
+	return ts
+}
+
+func mockTimeSeriesOCHLV(values ...[]float64) *TimeSeries {
+	ts := NewTimeSeries()
+	for i, ochlv := range values {
+		candle := NewCandle(NewTimePeriod(time.Unix(int64(i), 0), time.Second))
+		candle.OpenPrice = big.NewDecimal(ochlv[0])
+		candle.ClosePrice = big.NewDecimal(ochlv[1])
+		candle.MaxPrice = big.NewDecimal(ochlv[2])
+		candle.MinPrice = big.NewDecimal(ochlv[3])
+		candle.Volume = big.NewDecimal(ochlv[4])
 
 		ts.AddCandle(candle)
 	}
