@@ -73,6 +73,13 @@ strategy := techan.RuleStrategy{
 strategy.ShouldEnter(0, record) // returns false
 ```
 
+### Enjoying this project?
+Are you using techan in production? You can sponsor its development by buying me a coffee! ☕
+
+**BTC:** `1DipyghRPG8iFQzLPKMNEVA4gnJ8q8qQfH`
+
+**ETH:** `0x4b86389f57da7ece64882b1c1f2e4ba698f5659a`
+
 ### Credits
 Techan is heavily influenced by the great [ta4j](https://github.com/ta4j/ta4j). Many of the ideas and frameworks in this library owe their genesis to the great work done over there.
 
