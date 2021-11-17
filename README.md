@@ -78,7 +78,7 @@ Are you using techan in production? You can sponsor its development by buying me
 
 **BTC:** `1DipyghRPG8iFQzLPKMNEVA4gnJ8q8qQfH`
 
-**ETH:** `0x4b86389f57da7ece64882b1c1f2e4ba698f5659a`
+**ETH:** `0x2D9d3A1c16F118A3a59d0e446d574e1F01F62949`
 
 ### Credits
 Techan is heavily influenced by the great [ta4j](https://github.com/ta4j/ta4j). Many of the ideas and frameworks in this library owe their genesis to the great work done over there.
