@@ -76,8 +76,6 @@ strategy.ShouldEnter(0, record) // returns false
 ### Enjoying this project?
 Are you using techan in production? You can sponsor its development by buying me a coffee! ☕
 
-**BTC:** `1DipyghRPG8iFQzLPKMNEVA4gnJ8q8qQfH`
-
 **ETH:** `0x2D9d3A1c16F118A3a59d0e446d574e1F01F62949`
 
 ### Credits
