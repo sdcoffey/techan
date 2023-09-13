@@ -10,6 +10,6 @@ func NewMACDIndicator(baseIndicator Indicator, shortwindow, longwindow int) Indi
 // NewMACDHistogramIndicator returns a derivative Indicator based on the MACDIndicator, the result of which is
 // the macd indicator minus it's signalLinewindow EMA. A more in-depth explanation can be found here:
 // http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:macd-histogram
-func NewMACDHistogramIndicator(macdIdicator Indicator, signalLinewindow int) Indicator {
-	return NewDifferenceIndicator(macdIdicator, NewEMAIndicator(macdIdicator, signalLinewindow))
+func NewMACDHistogramIndicator(macdIdicator Indicator, signalLinewindow int, macdLongWindow int) Indicator {
+	return NewDifferenceIndicator(macdIdicator, NewEMAIndicatorWithOffset(macdIdicator, signalLinewindow, macdLongWindow))
 }
