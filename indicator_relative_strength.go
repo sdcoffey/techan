@@ -24,6 +24,13 @@ func NewRelativeStrengthIndexIndicator(indicator Indicator, timeframe int) Indic
 func (rsi relativeStrengthIndexIndicator) Calculate(index int) big.Decimal {
 	relativeStrength := rsi.rsIndicator.Calculate(index)
 
+	// RSI = 100 - (100 / (1 + RS))
+	// onePlusRS := helper.IncrementBy(relativeStrength, big.ONE)
+	// inverse := helper.Pow(onePlusRS, -1)
+	// scaled := helper.MultiplyBy(inverse, 100)
+	// negated := helper.MultiplyBy(scaled, -1)
+	// rsiValue := helper.IncrementBy(negated, 100)
+
 	return rsi.oneHundred.Sub(rsi.oneHundred.Div(big.ONE.Add(relativeStrength)))
 }
 

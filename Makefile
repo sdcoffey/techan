@@ -14,8 +14,8 @@ test: clean
 lint:
 	golint -set_exit_status
 	golint -set_exit_status example
-	staticcheck github.com/sdcoffey/techan
-	staticcheck github.com/sdcoffey/techan/example
+	staticcheck github.com/iamshivamnanda/techan
+	staticcheck github.com/iamshivamnanda/techan/example
 
 bench: clean
 	go test -bench .
@@ -27,7 +27,7 @@ release: clean test lint
 	./scripts/release.sh
 
 test-with-coverage:
-	go test -race -cover -covermode=atomic -coverprofile=coverage.txt github.com/sdcoffey/techan
+	go test -race -cover -covermode=atomic -coverprofile=coverage.txt github.com/iamshivamnanda/techan
 
 view-coverage: test-with-coverage
 	go tool cover -html coverage.txt

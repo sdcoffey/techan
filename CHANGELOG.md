@@ -16,7 +16,7 @@
 
 ## 0.9.0
 * Add [AroonIndicator](https://www.investopedia.com/terms/a/aroon.asp)
-* Deprecate [Parse](https://godoc.org/github.com/sdcoffey/techan#Parse) for time periods, introduce `ParseTimePeriod`
+* Deprecate [Parse](https://godoc.org/github.com/iamshivamnanda/techan#Parse) for time periods, introduce `ParseTimePeriod`
 
 ## 0.8.0
 * Add [MMAIndicator](https://en.wikipedia.org/wiki/Moving_average#Modified_moving_average)
