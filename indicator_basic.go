@@ -87,3 +87,28 @@ func (tpi typicalPriceIndicator) Calculate(index int) big.Decimal {
 	numerator := tpi.Candles[index].MaxPrice.Add(tpi.Candles[index].MinPrice).Add(tpi.Candles[index].ClosePrice)
 	return numerator.Div(big.NewFromString("3"))
 }
+
+type sumIndicator struct {
+	indicator Indicator
+	window    int
+}
+
+// NewSumIndicator returns an Indicator which returns the sum of the underlying indicator's values over the given window.
+func NewSumIndicator(indicator Indicator, window int) Indicator {
+	return sumIndicator{indicator, window}
+}
+
+func (si sumIndicator) Calculate(index int) big.Decimal {
+	if si.window <= 0 {
+		return big.ZERO
+	}
+	start := index - si.window + 1
+	if start < 0 {
+		start = 0
+	}
+	sum := big.ZERO
+	for i := start; i <= index; i++ {
+		sum = sum.Add(si.indicator.Calculate(i))
+	}
+	return sum
+}
