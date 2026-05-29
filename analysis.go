@@ -46,7 +46,12 @@ type PercentGainAnalysis struct{}
 // Analyze analyzes the trading record for the percentage profit gained relative to start
 func (pga PercentGainAnalysis) Analyze(record *TradingRecord) float64 {
 	if len(record.Trades) > 0 && record.Trades[0].IsClosed() {
-		return (record.Trades[len(record.Trades)-1].ExitValue().Div(record.Trades[0].CostBasis())).Sub(big.NewDecimal(1)).Float()
+		costBasis := record.Trades[0].CostBasis()
+		if costBasis.EQ(big.ZERO) {
+			return 0
+		}
+
+		return (record.Trades[len(record.Trades)-1].ExitValue().Div(costBasis)).Sub(big.NewDecimal(1)).Float()
 	}
 
 	return 0
@@ -92,10 +97,18 @@ type PeriodProfitAnalysis struct {
 
 // Analyze returns the average profit for the trading record based on the given duration
 func (ppa PeriodProfitAnalysis) Analyze(record *TradingRecord) float64 {
+	if len(record.Trades) == 0 || ppa.Period <= 0 {
+		return 0
+	}
+
 	var tp TotalProfitAnalysis
 	totalProfit := tp.Analyze(record)
 
 	periods := record.Trades[len(record.Trades)-1].ExitOrder().ExecutionTime.Sub(record.Trades[0].EntranceOrder().ExecutionTime) / ppa.Period
+	if periods == 0 {
+		return 0
+	}
+
 	return totalProfit / float64(periods)
 }
 
@@ -106,10 +119,16 @@ type ProfitableTradesAnalysis struct{}
 func (pta ProfitableTradesAnalysis) Analyze(record *TradingRecord) float64 {
 	var profitableTrades int
 	for _, trade := range record.Trades {
+		if !trade.IsClosed() {
+			continue
+		}
+
 		costBasis := trade.EntranceOrder().Amount.Mul(trade.EntranceOrder().Price)
 		sellPrice := trade.ExitOrder().Amount.Mul(trade.ExitOrder().Price)
 
-		if sellPrice.GT(costBasis) {
+		if trade.IsLong() && sellPrice.GT(costBasis) {
+			profitableTrades++
+		} else if trade.IsShort() && sellPrice.LT(costBasis) {
 			profitableTrades++
 		}
 	}
@@ -123,6 +142,10 @@ type AverageProfitAnalysis struct{}
 
 // Analyze returns the average profit of the trading record
 func (apa AverageProfitAnalysis) Analyze(record *TradingRecord) float64 {
+	if len(record.Trades) == 0 {
+		return 0
+	}
+
 	var tp TotalProfitAnalysis
 	totalProft := tp.Analyze(record)
 
@@ -139,14 +162,19 @@ type BuyAndHoldAnalysis struct {
 
 // Analyze returns the profit based on a simple buy and hold strategy
 func (baha BuyAndHoldAnalysis) Analyze(record *TradingRecord) float64 {
-	if len(record.Trades) == 0 {
+	if len(record.Trades) == 0 || baha.TimeSeries == nil || len(baha.TimeSeries.Candles) == 0 {
+		return 0
+	}
+
+	firstClose := baha.TimeSeries.Candles[0].ClosePrice
+	if firstClose.EQ(big.ZERO) {
 		return 0
 	}
 
 	openOrder := Order{
 		Side:   BUY,
-		Amount: big.NewDecimal(baha.StartingMoney).Div(baha.TimeSeries.Candles[0].ClosePrice),
-		Price:  baha.TimeSeries.Candles[0].ClosePrice,
+		Amount: big.NewDecimal(baha.StartingMoney).Div(firstClose),
+		Price:  firstClose,
 	}
 
 	closeOrder := Order{

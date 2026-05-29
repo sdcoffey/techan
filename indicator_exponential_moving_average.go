@@ -10,8 +10,8 @@ type emaIndicator struct {
 }
 
 // NewEMAIndicator returns a derivative indicator which returns the average of the current and preceding values in
-// the given windowSize, with values closer to current index given more weight. A more in-depth explanation can be found here:
-// http://www.investopedia.com/terms/e/ema.asp
+// the given windowSize, with values closer to current index given more weight. It returns zero for indices before
+// the first complete window. A more in-depth explanation can be found here: http://www.investopedia.com/terms/e/ema.asp
 func NewEMAIndicator(indicator Indicator, window int) Indicator {
 	return &emaIndicator{
 		indicator:   indicator,
@@ -43,3 +43,8 @@ func (ema *emaIndicator) setCache(newCache resultCache) {
 }
 
 func (ema emaIndicator) windowSize() int { return ema.window }
+
+// ResetCacheFrom invalidates cached EMA values from index onward.
+func (ema *emaIndicator) ResetCacheFrom(index int) {
+	resetResultCache(ema, index)
+}
