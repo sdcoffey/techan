@@ -1,5 +1,15 @@
 # Techan Release notes
 
+## 0.13.0
+* **BREAKING**: Raise the minimum supported Go version from 1.12 to 1.21.
+* Replace Travis CI with GitHub Actions and test Go 1.21 through 1.26.
+* Fix stop-loss percentage calculations for multi-unit orders and short positions (fixes #8).
+* Fix trendline divide-by-zero behavior for sparse windows.
+* Add cache invalidation support for built-in cached indicators.
+* Document SMA and EMA warm-up behavior.
+* Harden analysis helpers for empty records, invalid periods, zero cost basis, and short trades.
+* Update Go module dependencies, including `github.com/sdcoffey/big` to v0.8.0 and `github.com/stretchr/testify` to v1.11.1.
+
 ## 0.12.1
 * Fixes EMA window calculation (thanks @danhenke and @joelnordell!)
 
