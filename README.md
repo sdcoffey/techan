@@ -41,8 +41,12 @@ for _, datum := range dataset {
 closePrices := techan.NewClosePriceIndicator(series)
 movingAverage := techan.NewEMAIndicator(closePrices, 10) // Create an exponential moving average with a window of 10
 
-fmt.Println(movingAverage.Calculate(0).FormattedString(2))
+if series.LastIndex() >= 9 {
+	fmt.Println(movingAverage.Calculate(series.LastIndex()).FormattedString(2))
+}
 ```
+
+Windowed indicators such as SMA and EMA return `0` until enough data exists to fill their first window. For example, a 10-period EMA starts producing calculated values at index `9`.
 
 ### Creating trading strategies
 ```go

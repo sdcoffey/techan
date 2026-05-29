@@ -88,24 +88,14 @@ func decimalEquals(t *testing.T, expected float64, actual big.Decimal) {
 	assert.Equal(t, fmt.Sprintf("%.4f", expected), fmt.Sprintf("%.4f", actual.Float()))
 }
 
-func dump(indicator Indicator) (values []float64) {
+func indicatorEquals(t *testing.T, expected []float64, indicator Indicator) {
 	precision := 4.0
 	m := math.Pow(10, precision)
 
-	defer func() {
-		recover()
-	}()
-
-	var index int
-	for {
-		values = append(values, math.Round(indicator.Calculate(index).Float()*m)/m)
-		index++
+	actualValues := make([]float64, len(expected))
+	for i := range expected {
+		actualValues[i] = math.Round(indicator.Calculate(i).Float()*m) / m
 	}
 
-	return
-}
-
-func indicatorEquals(t *testing.T, expected []float64, indicator Indicator) {
-	actualValues := dump(indicator)
 	assert.EqualValues(t, expected, actualValues)
 }
