@@ -11,6 +11,24 @@ type cachedIndicator interface {
 	windowSize() int
 }
 
+// CacheResetter describes indicators whose cached values can be invalidated after
+// their underlying data changes.
+type CacheResetter interface {
+	ResetCacheFrom(index int)
+}
+
+// ResetCacheFrom invalidates cached values from index onward when the indicator
+// supports cache resets. It returns true when a cache was reset.
+func ResetCacheFrom(indicator Indicator, index int) bool {
+	resetter, ok := indicator.(CacheResetter)
+	if !ok {
+		return false
+	}
+
+	resetter.ResetCacheFrom(index)
+	return true
+}
+
 func cacheResult(indicator cachedIndicator, index int, val big.Decimal) {
 	if index < len(indicator.cache()) {
 		indicator.cache()[index] = &val
@@ -27,6 +45,16 @@ func expandResultCache(indicator cachedIndicator, newSize int) {
 
 	expansion := make([]*big.Decimal, sizeDiff)
 	indicator.setCache(append(indicator.cache(), expansion...))
+}
+
+func resetResultCache(indicator cachedIndicator, index int) {
+	if index < 0 {
+		index = 0
+	}
+
+	for i := index; i < len(indicator.cache()); i++ {
+		indicator.cache()[i] = nil
+	}
 }
 
 func returnIfCached(indicator cachedIndicator, index int, firstValueFallback func(int) big.Decimal) *big.Decimal {

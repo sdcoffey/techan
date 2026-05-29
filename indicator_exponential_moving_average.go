@@ -43,3 +43,8 @@ func (ema *emaIndicator) setCache(newCache resultCache) {
 }
 
 func (ema emaIndicator) windowSize() int { return ema.window }
+
+// ResetCacheFrom invalidates cached EMA values from index onward.
+func (ema *emaIndicator) ResetCacheFrom(index int) {
+	resetResultCache(ema, index)
+}

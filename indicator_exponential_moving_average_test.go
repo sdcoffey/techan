@@ -3,6 +3,7 @@ package techan
 import (
 	"testing"
 
+	"github.com/sdcoffey/big"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -36,6 +37,26 @@ func TestExponentialMovingAverage(t *testing.T) {
 		emaStruct, ok := ema.(cachedIndicator)
 		assert.True(t, ok)
 		assert.EqualValues(t, 1001, len(emaStruct.cache()))
+	})
+
+	t.Run("Can reset cached values after the underlying series changes", func(t *testing.T) {
+		series := mockTimeSeriesFl(10, 10, 10, 10)
+		ema := NewEMAIndicator(NewClosePriceIndicator(series), 3)
+
+		decimalEquals(t, 10, ema.Calculate(3))
+
+		series.Candles[3].ClosePrice = big.NewFromString("20")
+		decimalEquals(t, 10, ema.Calculate(3))
+
+		assert.True(t, ResetCacheFrom(ema, 3))
+		decimalEquals(t, 15, ema.Calculate(3))
+	})
+
+	t.Run("Reports when an indicator does not support cache resets", func(t *testing.T) {
+		series := mockTimeSeriesFl(10, 20, 30)
+		sma := NewSimpleMovingAverage(NewClosePriceIndicator(series), 3)
+
+		assert.False(t, ResetCacheFrom(sma, 0))
 	})
 }
 
