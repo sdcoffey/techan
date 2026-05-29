@@ -52,6 +52,13 @@ func TestExponentialMovingAverage(t *testing.T) {
 		decimalEquals(t, 15, ema.Calculate(3))
 	})
 
+	t.Run("Returns zero before large windows have enough values", func(t *testing.T) {
+		series := mockTimeSeriesFl(10)
+		ema := NewEMAIndicator(NewClosePriceIndicator(series), 2000)
+
+		assert.EqualValues(t, "0", ema.Calculate(1500).String())
+	})
+
 	t.Run("Reports when an indicator does not support cache resets", func(t *testing.T) {
 		series := mockTimeSeriesFl(10, 20, 30)
 		sma := NewSimpleMovingAverage(NewClosePriceIndicator(series), 3)
