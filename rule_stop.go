@@ -1,6 +1,10 @@
 package techan
 
-import "github.com/sdcoffey/big"
+import (
+	"strconv"
+
+	"github.com/sdcoffey/big"
+)
 
 type stopLossRule struct {
 	Indicator
@@ -12,7 +16,7 @@ type stopLossRule struct {
 func NewStopLossRule(series *TimeSeries, lossTolerance float64) Rule {
 	return stopLossRule{
 		Indicator: NewClosePriceIndicator(series),
-		tolerance: big.NewDecimal(lossTolerance),
+		tolerance: big.NewFromString(strconv.FormatFloat(lossTolerance, 'f', -1, 64)),
 	}
 }
 
@@ -25,9 +29,9 @@ func (slr stopLossRule) IsSatisfied(index int, record *TradingRecord) bool {
 	currentPrice := slr.Indicator.Calculate(index)
 	entryPrice := entryOrder.Price
 
-	loss := currentPrice.Div(entryPrice).Sub(big.ONE)
+	loss := currentPrice.Sub(entryPrice).Div(entryPrice)
 	if entryOrder.Side == SELL {
-		loss = big.ONE.Sub(currentPrice.Div(entryPrice))
+		loss = entryPrice.Sub(currentPrice).Div(entryPrice)
 	}
 
 	return loss.LTE(slr.tolerance)
