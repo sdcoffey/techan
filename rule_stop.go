@@ -21,7 +21,14 @@ func (slr stopLossRule) IsSatisfied(index int, record *TradingRecord) bool {
 		return false
 	}
 
-	openPrice := record.CurrentPosition().CostBasis()
-	loss := slr.Indicator.Calculate(index).Div(openPrice).Sub(big.ONE)
+	entryOrder := record.CurrentPosition().EntranceOrder()
+	currentPrice := slr.Indicator.Calculate(index)
+	entryPrice := entryOrder.Price
+
+	loss := currentPrice.Div(entryPrice).Sub(big.ONE)
+	if entryOrder.Side == SELL {
+		loss = entryPrice.Div(currentPrice).Sub(big.ONE)
+	}
+
 	return loss.LTE(slr.tolerance)
 }

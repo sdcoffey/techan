@@ -23,12 +23,27 @@ func TestStopLossRule(t *testing.T) {
 		record.Operate(Order{
 			Side:   BUY,
 			Amount: big.NewFromString("10"),
-			Price:  big.ONE,
+			Price:  big.NewFromString("10"),
 		})
 
 		series := mockTimeSeriesFl(10, 9) // Lose 10%
 
 		slr := NewStopLossRule(series, -0.05)
+
+		assert.True(t, slr.IsSatisfied(1, record))
+	})
+
+	t.Run("Uses entry price instead of total cost basis", func(t *testing.T) {
+		record := NewTradingRecord()
+		record.Operate(Order{
+			Side:   BUY,
+			Amount: big.NewFromString("100"),
+			Price:  big.NewFromString("3000"),
+		})
+
+		series := mockTimeSeriesFl(3000, 2500) // Lose 16.67%
+
+		slr := NewStopLossRule(series, -0.1)
 
 		assert.True(t, slr.IsSatisfied(1, record))
 	})
@@ -39,7 +54,7 @@ func TestStopLossRule(t *testing.T) {
 		record.Operate(Order{
 			Side:   BUY,
 			Amount: big.NewFromString("10"),
-			Price:  big.ONE,
+			Price:  big.NewFromString("10"),
 		})
 
 		series := mockTimeSeriesFl(10, 10.1) // Gain 1%
@@ -47,5 +62,20 @@ func TestStopLossRule(t *testing.T) {
 		slr := NewStopLossRule(series, -0.05)
 
 		assert.False(t, slr.IsSatisfied(1, record))
+	})
+
+	t.Run("Returns true for short positions when price rises past tolerance", func(t *testing.T) {
+		record := NewTradingRecord()
+		record.Operate(Order{
+			Side:   SELL,
+			Amount: big.NewFromString("10"),
+			Price:  big.NewFromString("100"),
+		})
+
+		series := mockTimeSeriesFl(100, 110) // Lose 9.09% on a short
+
+		slr := NewStopLossRule(series, -0.05)
+
+		assert.True(t, slr.IsSatisfied(1, record))
 	})
 }
