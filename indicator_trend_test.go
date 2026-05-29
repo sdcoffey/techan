@@ -45,4 +45,14 @@ func TestTrendIndicator(t *testing.T) {
 		indicator := NewTrendlineIndicator(NewClosePriceIndicator(series), 4)
 		assert.EqualValues(t, "1", indicator.Calculate(1).String())
 	})
+
+	t.Run("returns zero when there are not enough points for a slope", func(t *testing.T) {
+		series := mockTimeSeriesFl(10, 11)
+
+		indicator := NewTrendlineIndicator(NewClosePriceIndicator(series), 4)
+		assert.EqualValues(t, "0", indicator.Calculate(0).String())
+
+		indicator = NewTrendlineIndicator(NewClosePriceIndicator(series), 1)
+		assert.EqualValues(t, "0", indicator.Calculate(1).String())
+	})
 }

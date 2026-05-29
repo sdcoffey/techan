@@ -190,6 +190,28 @@ func TestPercentGainAnalysis(t *testing.T) {
 		gain := pga.Analyze(record)
 		assert.EqualValues(t, -.375, gain)
 	})
+
+	t.Run("Zero cost basis", func(t *testing.T) {
+		record := NewTradingRecord()
+
+		record.Operate(Order{
+			Side:          BUY,
+			Amount:        big.NewDecimal(1),
+			Price:         big.ZERO,
+			Security:      example,
+			ExecutionTime: time.Now(),
+		})
+		record.Operate(Order{
+			Side:          SELL,
+			Amount:        big.NewDecimal(1),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: time.Now(),
+		})
+
+		pga := PercentGainAnalysis{}
+		assert.EqualValues(t, 0, pga.Analyze(record))
+	})
 }
 
 func TestNumTradesAnalysis(t *testing.T) {
@@ -283,6 +305,59 @@ func TestLogTradesAnalysis(t *testing.T) {
 }
 
 func TestPeriodProfitAnalysis(t *testing.T) {
+	t.Run("Zero when there are no trades", func(t *testing.T) {
+		ppa := PeriodProfitAnalysis{
+			Period: time.Minute,
+		}
+
+		assert.EqualValues(t, 0, ppa.Analyze(NewTradingRecord()))
+	})
+
+	t.Run("Zero when period is invalid", func(t *testing.T) {
+		record := NewTradingRecord()
+		record.Operate(Order{
+			Side:          BUY,
+			Amount:        big.NewDecimal(1),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: time.Now(),
+		})
+		record.Operate(Order{
+			Side:          SELL,
+			Amount:        big.NewDecimal(2),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: time.Now(),
+		})
+
+		assert.EqualValues(t, 0, PeriodProfitAnalysis{}.Analyze(record))
+	})
+
+	t.Run("Zero when no full periods have elapsed", func(t *testing.T) {
+		record := NewTradingRecord()
+		now := time.Now()
+		record.Operate(Order{
+			Side:          BUY,
+			Amount:        big.NewDecimal(1),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: now,
+		})
+		record.Operate(Order{
+			Side:          SELL,
+			Amount:        big.NewDecimal(2),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: now.Add(time.Minute),
+		})
+
+		ppa := PeriodProfitAnalysis{
+			Period: time.Hour,
+		}
+
+		assert.EqualValues(t, 0, ppa.Analyze(record))
+	})
+
 	record := NewTradingRecord()
 
 	now := time.Now().Add(-time.Minute * 5)
@@ -370,9 +445,56 @@ func TestProfitableTradesAnalysis(t *testing.T) {
 	pta := ProfitableTradesAnalysis{}
 
 	assert.EqualValues(t, 1, pta.Analyze(record))
+
+	t.Run("Counts profitable short trades", func(t *testing.T) {
+		record := NewTradingRecord()
+
+		orders := []Order{
+			{
+				Side:          SELL,
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(10),
+				Security:      example,
+				ExecutionTime: time.Now(),
+			},
+			{
+				Side:          BUY,
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(8),
+				Security:      example,
+				ExecutionTime: time.Now(),
+			},
+			{
+				Side:          SELL,
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(10),
+				Security:      example,
+				ExecutionTime: time.Now(),
+			},
+			{
+				Side:          BUY,
+				Amount:        big.NewDecimal(1),
+				Price:         big.NewDecimal(12),
+				Security:      example,
+				ExecutionTime: time.Now(),
+			},
+		}
+
+		for _, order := range orders {
+			record.Operate(order)
+		}
+
+		assert.EqualValues(t, 1, pta.Analyze(record))
+	})
 }
 
 func TestAverageProfitAnalysis(t *testing.T) {
+	t.Run("Zero when there are no trades", func(t *testing.T) {
+		pta := AverageProfitAnalysis{}
+
+		assert.EqualValues(t, 0, pta.Analyze(NewTradingRecord()))
+	})
+
 	record := NewTradingRecord()
 
 	orders := []Order{
@@ -470,5 +592,30 @@ func TestBuyAndHoldAnalysis(t *testing.T) {
 		}
 
 		assert.EqualValues(t, 5, buyAndHoldAnalysis.Analyze(record))
+	})
+
+	t.Run("== 0 candles returns zero", func(t *testing.T) {
+		record := NewTradingRecord()
+		record.Operate(Order{
+			Side:          BUY,
+			Amount:        big.NewDecimal(1),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: time.Now(),
+		})
+		record.Operate(Order{
+			Side:          SELL,
+			Amount:        big.NewDecimal(2),
+			Price:         big.NewDecimal(1),
+			Security:      example,
+			ExecutionTime: time.Now(),
+		})
+
+		buyAndHoldAnalysis := BuyAndHoldAnalysis{
+			TimeSeries:    NewTimeSeries(),
+			StartingMoney: 1,
+		}
+
+		assert.EqualValues(t, 0, buyAndHoldAnalysis.Analyze(record))
 	})
 }
