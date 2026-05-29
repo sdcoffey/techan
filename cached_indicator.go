@@ -18,15 +18,20 @@ type CacheResetter interface {
 }
 
 // ResetCacheFrom invalidates cached values from index onward when the indicator
-// supports cache resets. It returns true when a cache was reset.
+// supports cache resets or uses the built-in result cache. It returns true when
+// a cache was reset.
 func ResetCacheFrom(indicator Indicator, index int) bool {
-	resetter, ok := indicator.(CacheResetter)
-	if !ok {
-		return false
+	if resetter, ok := indicator.(CacheResetter); ok {
+		resetter.ResetCacheFrom(index)
+		return true
 	}
 
-	resetter.ResetCacheFrom(index)
-	return true
+	if cached, ok := indicator.(cachedIndicator); ok {
+		resetResultCache(cached, index)
+		return true
+	}
+
+	return false
 }
 
 func cacheResult(indicator cachedIndicator, index int, val big.Decimal) {
