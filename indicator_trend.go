@@ -18,6 +18,9 @@ func NewTrendlineIndicator(indicator Indicator, window int) Indicator {
 
 func (tli trendLineIndicator) Calculate(index int) big.Decimal {
 	window := Min(index+1, tli.window)
+	if window < 2 {
+		return big.ZERO
+	}
 
 	values := make([]big.Decimal, window)
 
@@ -28,6 +31,9 @@ func (tli trendLineIndicator) Calculate(index int) big.Decimal {
 	n := big.ONE.Mul(big.NewDecimal(float64(window)))
 	ab := sumXy(values).Mul(n).Sub(sumX(values).Mul(sumY(values)))
 	cd := sumX2(values).Mul(n).Sub(sumX(values).Pow(2))
+	if cd.EQ(big.ZERO) {
+		return big.ZERO
+	}
 
 	return ab.Div(cd)
 }

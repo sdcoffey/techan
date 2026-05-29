@@ -2,6 +2,9 @@ package techan
 
 import (
 	"testing"
+
+	"github.com/sdcoffey/big"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestModifiedMovingAverage(t *testing.T) {
@@ -23,4 +26,17 @@ func TestModifiedMovingAverage(t *testing.T) {
 	}
 
 	indicatorEquals(t, expected, indicator)
+}
+
+func TestModifiedMovingAverage_ResetCacheFrom(t *testing.T) {
+	series := mockTimeSeriesFl(10, 10, 10, 10)
+	mma := NewMMAIndicator(NewClosePriceIndicator(series), 3)
+
+	decimalEquals(t, 10, mma.Calculate(3))
+
+	series.Candles[3].ClosePrice = big.NewFromString("20")
+	decimalEquals(t, 10, mma.Calculate(3))
+
+	assert.True(t, ResetCacheFrom(mma, 3))
+	decimalEquals(t, 13.3333, mma.Calculate(3))
 }

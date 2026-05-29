@@ -8,7 +8,7 @@ type smaIndicator struct {
 }
 
 // NewSimpleMovingAverage returns a derivative Indicator which returns the average of the current value and preceding
-// values in the given windowSize.
+// values in the given windowSize. It returns zero for indices before the first complete window.
 func NewSimpleMovingAverage(indicator Indicator, window int) Indicator {
 	return smaIndicator{indicator, window}
 }
