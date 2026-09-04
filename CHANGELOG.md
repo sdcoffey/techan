@@ -1,15 +1,15 @@
 # Techan Release notes
 
-## Unreleased
+## 0.14.0
 * Keep the minimum supported Go version at 1.21; add Go 1.27 to CI.
 * Bound EMA/MMA cached precision to 256 bits and calculate histories iteratively.
 * Propagate cache invalidation through built-in composite indicators.
-* Add first-valid-index metadata and seed composed averages only from usable values.
+* Add first-valid-index metadata and seed composed averages only from usable values; offset average gain/loss divisors by input warm-up.
 * Correct crossover event semantics, chronological maximum drawdown, CCI deviation inputs, Aroon evaluation order, and Bollinger warm-up.
 * Use Wilder RSI initialization from actual price changes; return zero for flat windows.
 * Correct directional profit reporting, fractional period rates, and buy-and-hold comparison horizons.
 * Allow strategies to operate at the unstable-period boundary.
-* Reject malformed and reversed time periods without panicking.
+* Reject malformed and reversed time periods, including dangling range separators, without panicking.
 * Move test helpers out of production builds; use deterministic fixtures, executable examples, and pinned developer tools.
 * These correctness fixes can change existing indicator values, signals, and analysis results. See the README for calculation and precision conventions.
 
