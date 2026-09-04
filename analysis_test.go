@@ -333,7 +333,7 @@ func TestPeriodProfitAnalysis(t *testing.T) {
 		assert.EqualValues(t, 0, PeriodProfitAnalysis{}.Analyze(record))
 	})
 
-	t.Run("Zero when no full periods have elapsed", func(t *testing.T) {
+	t.Run("Normalizes fractional periods", func(t *testing.T) {
 		record := NewTradingRecord()
 		now := time.Now()
 		record.Operate(Order{
@@ -355,7 +355,7 @@ func TestPeriodProfitAnalysis(t *testing.T) {
 			Period: time.Hour,
 		}
 
-		assert.EqualValues(t, 0, ppa.Analyze(record))
+		assert.EqualValues(t, 60, ppa.Analyze(record))
 	})
 
 	record := NewTradingRecord()
@@ -401,7 +401,7 @@ func TestPeriodProfitAnalysis(t *testing.T) {
 		Period: time.Minute * 2,
 	}
 
-	assert.EqualValues(t, 2, ppa.Analyze(record))
+	assert.InDelta(t, 4.0/3, ppa.Analyze(record), 1e-12)
 }
 
 func TestProfitableTradesAnalysis(t *testing.T) {

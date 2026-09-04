@@ -1,8 +1,6 @@
 package techan
 
 import (
-	"math"
-
 	"github.com/sdcoffey/big"
 )
 
@@ -10,45 +8,26 @@ type aroonIndicator struct {
 	indicator Indicator
 	window    int
 	direction big.Decimal
-	lowIndex  int
 }
 
 func (ai *aroonIndicator) Calculate(index int) big.Decimal {
-	if index < ai.window-1 {
+	if index < ai.FirstValidIndex() {
 		return big.ZERO
 	}
-
-	oneHundred := big.TEN.Mul(big.TEN)
-	ai.lowIndex = ai.findLowIndex(index)
-	pSince := big.NewDecimal(float64(index - ai.lowIndex))
-	windowAsDecimal := big.NewDecimal(float64(ai.window))
-
-	return windowAsDecimal.Sub(pSince).Div(windowAsDecimal).Mul(oneHundred)
-}
-
-func (ai aroonIndicator) findLowIndex(index int) int {
-	if ai.lowIndex < 1 || ai.lowIndex < index-ai.window {
-		lv := big.NewDecimal(math.MaxFloat64)
-		lowIndex := -1
-		for i := (index + 1) - ai.window; i <= index; i++ {
-			value := ai.indicator.Calculate(i).Mul(ai.direction)
-			if value.LT(lv) {
-				lv = value
-				lowIndex = i
-			}
+	start := index - ai.window + 1
+	extremeIndex := start
+	extreme := ai.indicator.Calculate(start).Mul(ai.direction)
+	for i := start; i <= index; i++ {
+		value := ai.indicator.Calculate(i).Mul(ai.direction)
+		if value.NaN() {
+			return big.NaN
 		}
-
-		return lowIndex
+		// The latest occurrence of an equal extreme determines periods since it.
+		if value.LTE(extreme) {
+			extreme, extremeIndex = value, i
+		}
 	}
-
-	v1 := ai.indicator.Calculate(index).Mul(ai.direction)
-	v2 := ai.indicator.Calculate(ai.lowIndex).Mul(ai.direction)
-
-	if v1.LT(v2) {
-		return index
-	}
-
-	return ai.lowIndex
+	return big.NewFromInt(ai.window - (index - extremeIndex)).Div(big.NewFromInt(ai.window)).Mul(big.NewFromInt(100))
 }
 
 // NewAroonUpIndicator returns a derivative indicator that will return a value based on
@@ -57,11 +36,11 @@ func (ai aroonIndicator) findLowIndex(index int) int {
 //
 // Note: this indicator should be constructed with a either a HighPriceIndicator or a derivative thereof
 func NewAroonUpIndicator(indicator Indicator, window int) Indicator {
+	requirePositiveWindow(window)
 	return &aroonIndicator{
 		indicator: indicator,
 		window:    window,
 		direction: big.ONE.Neg(),
-		lowIndex:  -1,
 	}
 }
 
@@ -71,10 +50,10 @@ func NewAroonUpIndicator(indicator Indicator, window int) Indicator {
 //
 // Note: this indicator should be constructed with a either a LowPriceIndicator or a derivative thereof
 func NewAroonDownIndicator(indicator Indicator, window int) Indicator {
+	requirePositiveWindow(window)
 	return &aroonIndicator{
 		indicator: indicator,
 		window:    window,
 		direction: big.ONE,
-		lowIndex:  -1,
 	}
 }

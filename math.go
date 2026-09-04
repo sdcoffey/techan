@@ -2,18 +2,12 @@ package techan
 
 // Min returns the smaller integer of the two integers passed in
 func Min(i, j int) int {
-	if i < j {
-		return i
-	}
-	return j
+	return min(i, j)
 }
 
 // Max returns the larger of the two integers passed in
 func Max(i, j int) int {
-	if i > j {
-		return i
-	}
-	return j
+	return max(i, j)
 }
 
 // Pow returns the first integer to the power of the second integer

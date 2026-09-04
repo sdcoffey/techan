@@ -20,12 +20,14 @@ func TestAbs(t *testing.T) {
 	})
 }
 
+var mathBenchmarkResult int
+
 func BenchmarkPower(b *testing.B) {
 	var x int
 	for i := 0; i < b.N; i++ {
 		x = Pow(4, 5)
 	}
-	x++
+	mathBenchmarkResult = x
 }
 
 func BenchmarkAbs(b *testing.B) {
@@ -33,5 +35,5 @@ func BenchmarkAbs(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		x = Abs(-5)
 	}
-	x++
+	mathBenchmarkResult = x
 }

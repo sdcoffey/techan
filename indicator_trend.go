@@ -17,7 +17,7 @@ func NewTrendlineIndicator(indicator Indicator, window int) Indicator {
 }
 
 func (tli trendLineIndicator) Calculate(index int) big.Decimal {
-	window := Min(index+1, tli.window)
+	window := min(index-FirstValidIndex(tli.indicator)+1, tli.window)
 	if window < 2 {
 		return big.ZERO
 	}

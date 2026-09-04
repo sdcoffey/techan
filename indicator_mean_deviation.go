@@ -19,7 +19,7 @@ func NewMeanDeviationIndicator(indicator Indicator, window int) Indicator {
 }
 
 func (mdi meanDeviationIndicator) Calculate(index int) big.Decimal {
-	if index < mdi.window-1 {
+	if index < mdi.FirstValidIndex() {
 		return big.ZERO
 	}
 

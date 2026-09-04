@@ -7,6 +7,7 @@ import "github.com/sdcoffey/big"
 // maximum observed loss from peak of an underlying indicator in a given timeframe.
 // Maximum drawdown is given as a percentage of the peak. Use a window value of -1 to include
 // all values present in the underlying indicator.
+// Only declines after positive peaks are measured; if none exist, it returns zero.
 // See: https://www.investopedia.com/terms/m/maximum-drawdown-mdd.asp
 func NewMaximumDrawdownIndicator(ind Indicator, window int) Indicator {
 	return maximumDrawdownIndicator{
@@ -21,8 +22,30 @@ type maximumDrawdownIndicator struct {
 }
 
 func (mdi maximumDrawdownIndicator) Calculate(index int) big.Decimal {
-	minVal := NewMinimumValueIndicator(mdi.indicator, mdi.window).Calculate(index)
-	maxVal := NewMaximumValueIndicator(mdi.indicator, mdi.window).Calculate(index)
-
-	return (minVal.Sub(maxVal)).Div(maxVal)
+	start := mdi.FirstValidIndex()
+	if mdi.window > 0 {
+		start = max(start, index-mdi.window+1)
+	}
+	if index < start {
+		return big.ZERO
+	}
+	peak := mdi.indicator.Calculate(start)
+	drawdown := big.ZERO
+	for i := start; i <= index; i++ {
+		value := mdi.indicator.Calculate(i)
+		if value.NaN() {
+			return big.NaN
+		}
+		if value.GT(peak) {
+			peak = value
+		}
+		// A percentage drawdown needs a positive reference price.
+		if peak.GT(big.ZERO) {
+			loss := value.Sub(peak).Div(peak)
+			if loss.LT(drawdown) {
+				drawdown = loss
+			}
+		}
+	}
+	return drawdown
 }

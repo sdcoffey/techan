@@ -26,11 +26,14 @@ func NewLossIndicator(indicator Indicator) Indicator {
 }
 
 func (gli gainLossIndicator) Calculate(index int) big.Decimal {
-	if index == 0 {
+	if index < gli.FirstValidIndex() {
 		return big.ZERO
 	}
 
 	delta := gli.Indicator.Calculate(index).Sub(gli.Indicator.Calculate(index - 1)).Mul(gli.coefficient)
+	if delta.NaN() {
+		return delta
+	}
 	if delta.GT(big.ZERO) {
 		return delta
 	}
@@ -67,7 +70,7 @@ func NewCumulativeLossesIndicator(indicator Indicator, window int) Indicator {
 func (ci cumulativeIndicator) Calculate(index int) big.Decimal {
 	total := big.NewDecimal(0.0)
 
-	for i := Max(1, index-(ci.window-1)); i <= index; i++ {
+	for i := max(ci.FirstValidIndex(), index-(ci.window-1)); i <= index; i++ {
 		diff := ci.Indicator.Calculate(i).Sub(ci.Indicator.Calculate(i - 1))
 		if diff.Mul(ci.mult).GT(big.ZERO) {
 			total = total.Add(diff.Abs())
@@ -88,7 +91,7 @@ func NewPercentChangeIndicator(indicator Indicator) Indicator {
 }
 
 func (pgi percentChangeIndicator) Calculate(index int) big.Decimal {
-	if index == 0 {
+	if index < pgi.FirstValidIndex() {
 		return big.ZERO
 	}
 

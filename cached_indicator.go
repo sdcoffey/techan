@@ -8,7 +8,10 @@ type cachedIndicator interface {
 	Indicator
 	cache() resultCache
 	setCache(cache resultCache)
-	windowSize() int
+}
+
+type indicatorDependencies interface {
+	dependencies() []Indicator
 }
 
 // CacheResetter describes indicators whose cached values can be invalidated after
@@ -18,20 +21,26 @@ type CacheResetter interface {
 }
 
 // ResetCacheFrom invalidates cached values from index onward when the indicator
-// supports cache resets or uses the built-in result cache. It returns true when
-// a cache was reset.
+// supports cache resets or uses the built-in result cache, including inputs of
+// built-in composites. It returns true if any cache was reset. Reset each root
+// used by the caller; parents outside that root's input graph are not visited.
 func ResetCacheFrom(indicator Indicator, index int) bool {
 	if resetter, ok := indicator.(CacheResetter); ok {
 		resetter.ResetCacheFrom(index)
 		return true
 	}
 
+	reset := false
 	if cached, ok := indicator.(cachedIndicator); ok {
 		resetResultCache(cached, index)
-		return true
+		reset = true
 	}
-
-	return false
+	if composite, ok := indicator.(indicatorDependencies); ok {
+		for _, input := range composite.dependencies() {
+			reset = ResetCacheFrom(input, index) || reset
+		}
+	}
+	return reset
 }
 
 func cacheResult(indicator cachedIndicator, index int, val big.Decimal) {
@@ -53,31 +62,6 @@ func expandResultCache(indicator cachedIndicator, newSize int) {
 }
 
 func resetResultCache(indicator cachedIndicator, index int) {
-	if index < 0 {
-		index = 0
-	}
-
-	for i := index; i < len(indicator.cache()); i++ {
-		indicator.cache()[i] = nil
-	}
-}
-
-func returnIfCached(indicator cachedIndicator, index int, firstValueFallback func(int) big.Decimal) *big.Decimal {
-	if index < indicator.windowSize()-1 {
-		return &big.ZERO
-	}
-
-	if index >= len(indicator.cache()) {
-		expandResultCache(indicator, index+1)
-	}
-
-	if val := indicator.cache()[index]; val != nil {
-		return val
-	} else if index == indicator.windowSize()-1 {
-		value := firstValueFallback(index)
-		cacheResult(indicator, index, value)
-		return &value
-	}
-
-	return nil
+	cache := indicator.cache()
+	clear(cache[min(max(index, 0), len(cache)):])
 }

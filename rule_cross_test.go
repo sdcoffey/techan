@@ -19,7 +19,7 @@ func TestCrossUpIndicatorRule(t *testing.T) {
 	t.Run("Returns true when lower indicator crosses upper indicator", func(t *testing.T) {
 		assert.False(t, rule.IsSatisfied(1, nil))
 		assert.True(t, rule.IsSatisfied(2, nil))
-		assert.True(t, rule.IsSatisfied(3, nil))
+		assert.False(t, rule.IsSatisfied(3, nil))
 	})
 }
 
@@ -36,6 +36,6 @@ func TestCrossDownIndicatorRule(t *testing.T) {
 	t.Run("returns true when upper indicator crosses below lower indicator", func(t *testing.T) {
 		assert.False(t, rule.IsSatisfied(1, nil))
 		assert.True(t, rule.IsSatisfied(2, nil))
-		assert.True(t, rule.IsSatisfied(3, nil))
+		assert.False(t, rule.IsSatisfied(3, nil))
 	})
 }
