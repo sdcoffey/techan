@@ -9,7 +9,8 @@ type windowedStandardDeviationIndicator struct {
 }
 
 // NewWindowedStandardDeviationIndicator returns a indicator which calculates the standard deviation of the underlying
-// indicator over a window
+// indicator over a window. It returns zero before a complete window of usable
+// input observations exists.
 func NewWindowedStandardDeviationIndicator(ind Indicator, window int) Indicator {
 	return windowedStandardDeviationIndicator{
 		Indicator:     ind,
@@ -19,6 +20,9 @@ func NewWindowedStandardDeviationIndicator(ind Indicator, window int) Indicator 
 }
 
 func (sdi windowedStandardDeviationIndicator) Calculate(index int) big.Decimal {
+	if index < sdi.FirstValidIndex() {
+		return big.ZERO
+	}
 	avg := sdi.movingAverage.Calculate(index)
 	variance := big.ZERO
 	for i := Max(0, index-sdi.window+1); i <= index; i++ {

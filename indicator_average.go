@@ -8,7 +8,8 @@ type averageIndicator struct {
 }
 
 // NewAverageGainsIndicator Returns a new average gains indicator, which returns the average gains
-// in the given window based on the given indicator.
+// in the given window based on the given indicator. The divisor is the number
+// of usable source observations so far, capped at window.
 func NewAverageGainsIndicator(indicator Indicator, window int) Indicator {
 	return averageIndicator{
 		NewCumulativeGainsIndicator(indicator, window),
@@ -17,7 +18,8 @@ func NewAverageGainsIndicator(indicator Indicator, window int) Indicator {
 }
 
 // NewAverageLossesIndicator Returns a new average losses indicator, which returns the average losses
-// in the given window based on the given indicator.
+// in the given window based on the given indicator. The divisor is the number
+// of usable source observations so far, capped at window.
 func NewAverageLossesIndicator(indicator Indicator, window int) Indicator {
 	return averageIndicator{
 		NewCumulativeLossesIndicator(indicator, window),
@@ -26,5 +28,11 @@ func NewAverageLossesIndicator(indicator Indicator, window int) Indicator {
 }
 
 func (ai averageIndicator) Calculate(index int) big.Decimal {
-	return ai.Indicator.Calculate(index).Div(big.NewDecimal(float64(Min(index+1, ai.window))))
+	first := ai.FirstValidIndex()
+	if index < first {
+		return big.ZERO
+	}
+	// The first cumulative change requires two usable source observations.
+	observations := min(index-first+2, ai.window)
+	return ai.Indicator.Calculate(index).Div(big.NewFromInt(observations))
 }

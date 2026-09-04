@@ -20,9 +20,12 @@ type maximumValueIndicator struct {
 func (mvi maximumValueIndicator) Calculate(index int) big.Decimal {
 	maxValue := big.NewFromString("-Inf")
 
-	start := 0
+	start := mvi.FirstValidIndex()
+	if index < start {
+		return big.ZERO
+	}
 	if mvi.window > 0 {
-		start = Max(index-mvi.window+1, 0)
+		start = max(index-mvi.window+1, start)
 	}
 
 	for i := start; i <= index; i++ {

@@ -71,6 +71,7 @@ func BenchmarkExponetialMovingAverage(b *testing.B) {
 	size := 10000
 	ts := randomTimeSeries(size)
 
+	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		ema := NewEMAIndicator(NewClosePriceIndicator(ts), 10)
@@ -83,6 +84,8 @@ func BenchmarkExponentialMovingAverage_Cached(b *testing.B) {
 	ts := randomTimeSeries(size)
 	ema := NewEMAIndicator(NewClosePriceIndicator(ts), 10)
 
+	ema.Calculate(size - 1)
+	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		ema.Calculate(size - 1)

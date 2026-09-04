@@ -19,7 +19,7 @@ func NewRelativeVigorIndexIndicator(series *TimeSeries) Indicator {
 }
 
 func (rvii relativeVigorIndexIndicator) Calculate(index int) big.Decimal {
-	if index < 3 {
+	if index < rvii.FirstValidIndex() {
 		return big.ZERO
 	}
 
@@ -55,7 +55,7 @@ func NewRelativeVigorSignalLine(series *TimeSeries) Indicator {
 }
 
 func (rvsn relativeVigorIndexSignalLine) Calculate(index int) big.Decimal {
-	if index < 3 {
+	if index < rvsn.FirstValidIndex() {
 		return big.ZERO
 	}
 

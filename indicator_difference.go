@@ -17,5 +17,16 @@ func NewDifferenceIndicator(minuend, subtrahend Indicator) Indicator {
 }
 
 func (di differenceIndicator) Calculate(index int) big.Decimal {
+	if index < di.FirstValidIndex() {
+		return big.ZERO
+	}
 	return di.minuend.Calculate(index).Sub(di.subtrahend.Calculate(index))
+}
+
+func (di differenceIndicator) FirstValidIndex() int {
+	return max(FirstValidIndex(di.minuend), FirstValidIndex(di.subtrahend))
+}
+
+func (di differenceIndicator) dependencies() []Indicator {
+	return []Indicator{di.minuend, di.subtrahend}
 }

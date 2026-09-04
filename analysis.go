@@ -1,7 +1,5 @@
 package techan
 
-//lint:file-ignore S1038 prefer Fprintln
-
 import (
 	"fmt"
 	"io"
@@ -10,181 +8,199 @@ import (
 	"github.com/sdcoffey/big"
 )
 
-// Analysis is an interface that describes a methodology for taking a TradingRecord as input,
-// and giving back some float value that describes it's performance with respect to that methodology.
+// Analysis measures the performance of a trading record.
 type Analysis interface {
 	Analyze(*TradingRecord) float64
 }
 
-// TotalProfitAnalysis analyzes the trading record for total profit.
+func positionProfit(trade *Position) big.Decimal {
+	if trade == nil || !trade.IsClosed() {
+		return big.ZERO
+	}
+	if trade.IsLong() {
+		return trade.ExitValue().Sub(trade.CostBasis())
+	}
+	if trade.IsShort() {
+		return trade.CostBasis().Sub(trade.ExitValue())
+	}
+	return big.ZERO
+}
+
+func totalProfit(record *TradingRecord) big.Decimal {
+	total := big.ZERO
+	if record != nil {
+		for _, trade := range record.Trades {
+			total = total.Add(positionProfit(trade))
+		}
+	}
+	return total
+}
+
+func tradeBounds(record *TradingRecord) (first, last *Position) {
+	if record == nil {
+		return
+	}
+	for _, trade := range record.Trades {
+		if trade == nil || !trade.IsClosed() {
+			continue
+		}
+		if first == nil || trade.EntranceOrder().ExecutionTime.Before(first.EntranceOrder().ExecutionTime) {
+			first = trade
+		}
+		if last == nil || trade.ExitOrder().ExecutionTime.After(last.ExitOrder().ExecutionTime) {
+			last = trade
+		}
+	}
+	return
+}
+
+// TotalProfitAnalysis measures realized profit, accounting for order direction.
 type TotalProfitAnalysis struct{}
 
-// Analyze analyzes the trading record for total profit.
-func (tps TotalProfitAnalysis) Analyze(record *TradingRecord) float64 {
-	totalProfit := big.NewDecimal(0)
-	for _, trade := range record.Trades {
-		if trade.IsClosed() {
+// Analyze returns total realized profit across closed positions.
+func (TotalProfitAnalysis) Analyze(record *TradingRecord) float64 { return totalProfit(record).Float() }
 
-			costBasis := trade.CostBasis()
-			exitValue := trade.ExitValue()
-
-			if trade.IsLong() {
-				totalProfit = totalProfit.Add(exitValue.Sub(costBasis))
-			} else if trade.IsShort() {
-				totalProfit = totalProfit.Sub(exitValue.Sub(costBasis))
-			}
-
-		}
-	}
-
-	return totalProfit.Float()
-}
-
-// PercentGainAnalysis analyzes the trading record for the percentage profit gained relative to start
+// PercentGainAnalysis normalizes total realized profit by the first closed
+// position's entry cost. Returns are fractions (0.1 means 10%). It assumes that
+// this cost represents starting capital; deposits, withdrawals, and fees are not
+// modeled. Both long and short positions contribute their directional profit.
 type PercentGainAnalysis struct{}
 
-// Analyze analyzes the trading record for the percentage profit gained relative to start
-func (pga PercentGainAnalysis) Analyze(record *TradingRecord) float64 {
-	if len(record.Trades) > 0 && record.Trades[0].IsClosed() {
-		costBasis := record.Trades[0].CostBasis()
-		if costBasis.EQ(big.ZERO) {
-			return 0
-		}
-
-		return (record.Trades[len(record.Trades)-1].ExitValue().Div(costBasis)).Sub(big.NewDecimal(1)).Float()
+// Analyze returns profit relative to starting capital, or zero for no closed
+// positions or a zero initial cost basis.
+func (PercentGainAnalysis) Analyze(record *TradingRecord) float64 {
+	first, _ := tradeBounds(record)
+	if first == nil || first.CostBasis().IsZero() {
+		return 0
 	}
-
-	return 0
+	return totalProfit(record).Div(first.CostBasis()).Float()
 }
 
-// NumTradesAnalysis analyzes the trading record for the number of trades executed
+// NumTradesAnalysis counts the trades in a record.
 type NumTradesAnalysis string
 
-// Analyze analyzes the trading record for the number of trades executed
-func (nta NumTradesAnalysis) Analyze(record *TradingRecord) float64 {
+// Analyze returns the number of recorded trades.
+func (NumTradesAnalysis) Analyze(record *TradingRecord) float64 {
+	if record == nil {
+		return 0
+	}
 	return float64(len(record.Trades))
 }
 
-// LogTradesAnalysis is a wrapper around an io.Writer, which logs every trade executed to that writer
+// LogTradesAnalysis writes closed positions and their realized profits.
 type LogTradesAnalysis struct {
 	io.Writer
 }
 
-// Analyze logs trades to provided io.Writer
+// Analyze writes each closed position using its actual order sides.
 func (lta LogTradesAnalysis) Analyze(record *TradingRecord) float64 {
-	logOrder := func(trade *Position) {
-		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - enter with buy %s (%s @ $%s)", trade.EntranceOrder().ExecutionTime.UTC().Format(time.RFC822), trade.EntranceOrder().Security, trade.EntranceOrder().Amount, trade.EntranceOrder().Price))
-		fmt.Fprintln(lta.Writer, fmt.Sprintf("%s - exit with sell %s (%s @ $%s)", trade.ExitOrder().ExecutionTime.UTC().Format(time.RFC822), trade.ExitOrder().Security, trade.ExitOrder().Amount, trade.ExitOrder().Price))
-
-		profit := trade.ExitValue().Sub(trade.CostBasis())
-		fmt.Fprintln(lta.Writer, fmt.Sprintf("Profit: $%s", profit))
+	if record == nil {
+		return 0
 	}
-
-	for _, trade := range record.Trades {
-		if trade.IsClosed() {
-			logOrder(trade)
+	sideName := func(side OrderSide) string {
+		switch side {
+		case BUY:
+			return "buy"
+		case SELL:
+			return "sell"
+		default:
+			return "unknown"
 		}
 	}
-	return 0.0
+	for _, trade := range record.Trades {
+		if trade == nil || !trade.IsClosed() {
+			continue
+		}
+		entry, exit := trade.EntranceOrder(), trade.ExitOrder()
+		fmt.Fprintf(lta.Writer, "%s - enter with %s %s (%s @ $%s)\n", entry.ExecutionTime.UTC().Format(time.RFC822), sideName(entry.Side), entry.Security, entry.Amount, entry.Price)
+		fmt.Fprintf(lta.Writer, "%s - exit with %s %s (%s @ $%s)\n", exit.ExecutionTime.UTC().Format(time.RFC822), sideName(exit.Side), exit.Security, exit.Amount, exit.Price)
+		fmt.Fprintf(lta.Writer, "Profit: $%s\n", positionProfit(trade))
+	}
+	return 0
 }
 
-// PeriodProfitAnalysis analyzes the trading record for the average profit based on the time period provided.
-// i.e., if the trading record spans a year of trading, and PeriodProfitAnalysis wraps one month, Analyze will return
-// the total profit for the whole time period divided by 12.
+// PeriodProfitAnalysis normalizes realized profit to a duration, including
+// fractional periods. For example, profit of 15 over 90 minutes is 10 per hour.
 type PeriodProfitAnalysis struct {
 	Period time.Duration
 }
 
-// Analyze returns the average profit for the trading record based on the given duration
+// Analyze returns zero if there are no closed trades or the durations are invalid.
 func (ppa PeriodProfitAnalysis) Analyze(record *TradingRecord) float64 {
-	if len(record.Trades) == 0 || ppa.Period <= 0 {
+	first, last := tradeBounds(record)
+	if first == nil || ppa.Period <= 0 {
 		return 0
 	}
-
-	var tp TotalProfitAnalysis
-	totalProfit := tp.Analyze(record)
-
-	periods := record.Trades[len(record.Trades)-1].ExitOrder().ExecutionTime.Sub(record.Trades[0].EntranceOrder().ExecutionTime) / ppa.Period
-	if periods == 0 {
+	elapsed := last.ExitOrder().ExecutionTime.Sub(first.EntranceOrder().ExecutionTime)
+	if elapsed <= 0 {
 		return 0
 	}
-
-	return totalProfit / float64(periods)
+	periods := float64(elapsed) / float64(ppa.Period)
+	return totalProfit(record).Float() / periods
 }
 
-// ProfitableTradesAnalysis analyzes the trading record for the number of profitable trades
+// ProfitableTradesAnalysis counts profitable closed positions.
 type ProfitableTradesAnalysis struct{}
 
-// Analyze returns the number of profitable trades in a trading record
-func (pta ProfitableTradesAnalysis) Analyze(record *TradingRecord) float64 {
-	var profitableTrades int
-	for _, trade := range record.Trades {
-		if !trade.IsClosed() {
-			continue
-		}
-
-		costBasis := trade.EntranceOrder().Amount.Mul(trade.EntranceOrder().Price)
-		sellPrice := trade.ExitOrder().Amount.Mul(trade.ExitOrder().Price)
-
-		if trade.IsLong() && sellPrice.GT(costBasis) {
-			profitableTrades++
-		} else if trade.IsShort() && sellPrice.LT(costBasis) {
-			profitableTrades++
-		}
-	}
-
-	return float64(profitableTrades)
-}
-
-// AverageProfitAnalysis returns the average profit for the trading record. Average profit is represented as the total
-// profit divided by the number of trades executed.
-type AverageProfitAnalysis struct{}
-
-// Analyze returns the average profit of the trading record
-func (apa AverageProfitAnalysis) Analyze(record *TradingRecord) float64 {
-	if len(record.Trades) == 0 {
+// Analyze counts profitable long and short positions.
+func (ProfitableTradesAnalysis) Analyze(record *TradingRecord) float64 {
+	if record == nil {
 		return 0
 	}
-
-	var tp TotalProfitAnalysis
-	totalProft := tp.Analyze(record)
-
-	return totalProft / float64(len(record.Trades))
+	count := 0
+	for _, trade := range record.Trades {
+		if positionProfit(trade).GT(big.ZERO) {
+			count++
+		}
+	}
+	return float64(count)
 }
 
-// BuyAndHoldAnalysis returns the profit based on a hypothetical where a purchase order was made on the first period available
-// and held until the date on the last trade of the trading record. It's useful for comparing the performance of your strategy
-// against a simple long position.
+// AverageProfitAnalysis measures average realized profit per closed position.
+type AverageProfitAnalysis struct{}
+
+// Analyze returns average realized profit, or zero if no positions are closed.
+func (AverageProfitAnalysis) Analyze(record *TradingRecord) float64 {
+	if record == nil {
+		return 0
+	}
+	count := 0
+	for _, trade := range record.Trades {
+		if trade != nil && trade.IsClosed() {
+			count++
+		}
+	}
+	if count == 0 {
+		return 0
+	}
+	return totalProfit(record).Div(big.NewFromInt(count)).Float()
+}
+
+// BuyAndHoldAnalysis compares buying at the first available candle close with
+// holding until the last closed trade's exit time. Only candles ending at or
+// before that time are eligible, so future or unfinished bars cannot affect it.
 type BuyAndHoldAnalysis struct {
 	TimeSeries    *TimeSeries
 	StartingMoney float64
 }
 
-// Analyze returns the profit based on a simple buy and hold strategy
+// Analyze returns the hypothetical profit, or zero if no comparison is possible.
 func (baha BuyAndHoldAnalysis) Analyze(record *TradingRecord) float64 {
-	if len(record.Trades) == 0 || baha.TimeSeries == nil || len(baha.TimeSeries.Candles) == 0 {
+	_, last := tradeBounds(record)
+	if last == nil || baha.TimeSeries == nil || len(baha.TimeSeries.Candles) == 0 {
 		return 0
 	}
-
 	firstClose := baha.TimeSeries.Candles[0].ClosePrice
-	if firstClose.EQ(big.ZERO) {
+	if firstClose.IsZero() {
 		return 0
 	}
-
-	openOrder := Order{
-		Side:   BUY,
-		Amount: big.NewDecimal(baha.StartingMoney).Div(firstClose),
-		Price:  firstClose,
+	end := last.ExitOrder().ExecutionTime
+	for i := len(baha.TimeSeries.Candles) - 1; i >= 0; i-- {
+		candle := baha.TimeSeries.Candles[i]
+		if !candle.Period.End.After(end) {
+			amount := big.NewDecimal(baha.StartingMoney).Div(firstClose)
+			return candle.ClosePrice.Sub(firstClose).Mul(amount).Float()
+		}
 	}
-
-	closeOrder := Order{
-		Side:   SELL,
-		Amount: openOrder.Amount,
-		Price:  baha.TimeSeries.Candles[len(baha.TimeSeries.Candles)-1].ClosePrice,
-	}
-
-	pos := NewPosition(openOrder)
-	pos.Exit(closeOrder)
-
-	return pos.ExitValue().Sub(pos.CostBasis()).Float()
+	return 0
 }

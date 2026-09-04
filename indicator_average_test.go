@@ -1,8 +1,42 @@
 package techan
 
 import (
+	"fmt"
 	"testing"
 )
+
+func TestAverageGainLossInputWarmup(t *testing.T) {
+	for _, tc := range []struct {
+		name   string
+		make   func(Indicator, int) Indicator
+		prices []float64
+	}{
+		{"gains", NewAverageGainsIndicator, []float64{10, 12, 14, 18, 14, 24, 8}},
+		{"losses", NewAverageLossesIndicator, []float64{30, 28, 26, 22, 26, 16, 32}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			// The EMA first becomes usable at index 2. The selected changes
+			// thereafter are 3, 0, 4.75, 0 for both gains and mirrored losses.
+			for _, window := range []struct {
+				size int
+				want []float64
+			}{
+				{1, []float64{0, 0, 0, 3, 0, 4.75, 0}},
+				{3, []float64{0, 0, 0, 1.5, 1, 31.0 / 12, 19.0 / 12}},
+				{6, []float64{0, 0, 0, 1.5, 1, 31.0 / 16, 31.0 / 20}},
+			} {
+				t.Run(fmt.Sprint(window.size), func(t *testing.T) {
+					average := tc.make(NewEMAIndicator(NewFixedIndicator(tc.prices...), 3), window.size)
+					for index, want := range window.want {
+						t.Run(fmt.Sprint(index), func(t *testing.T) {
+							decimalEquals(t, want, average.Calculate(index))
+						})
+					}
+				})
+			}
+		})
+	}
+}
 
 func TestAverageGainsIndicator(t *testing.T) {
 	t.Run("Basic", func(t *testing.T) {

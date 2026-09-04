@@ -1,33 +1,38 @@
-files := $(shell find . -name "*.go" | grep -v vendor)
+GO ?= go
+GOIMPORTS_VERSION := v0.49.0
+STATICCHECK_VERSION := v0.8.1
+GOIMPORTS = $(GO) run golang.org/x/tools/cmd/goimports@$(GOIMPORTS_VERSION)
+STATICCHECK = $(GO) run honnef.co/go/tools/cmd/staticcheck@$(STATICCHECK_VERSION)
+
+.PHONY: bootstrap format clean test lint bench commit release test-with-coverage view-coverage
 
 bootstrap:
-	go install -v golang.org/x/lint/golint@latest
-	go install -v golang.org/x/tools/...@latest
-	go install -v honnef.co/go/tools/cmd/staticcheck@latest
+	$(GO) install golang.org/x/tools/cmd/goimports@$(GOIMPORTS_VERSION)
+	$(GO) install honnef.co/go/tools/cmd/staticcheck@$(STATICCHECK_VERSION)
 
-clean:
-	goimports -w $(files)
+format:
+	$(GOIMPORTS) -w .
 
-test: clean
-	go test
+clean: format
+
+test:
+	$(GO) test ./...
 
 lint:
-	golint -set_exit_status
-	golint -set_exit_status example
-	staticcheck github.com/sdcoffey/techan
-	staticcheck github.com/sdcoffey/techan/example
+	$(GO) vet ./...
+	$(STATICCHECK) ./...
 
-bench: clean
-	go test -bench .
+bench:
+	$(GO) test -run '^$$' -bench . -benchmem ./...
 
 commit: test
 	git commit
 
-release: clean test lint
+release: format test lint
 	./scripts/release.sh
 
 test-with-coverage:
-	go test -race -cover -covermode=atomic -coverprofile=coverage.txt github.com/sdcoffey/techan
+	$(GO) test -race -covermode=atomic -coverprofile=coverage.txt ./...
 
 view-coverage: test-with-coverage
-	go tool cover -html coverage.txt
+	$(GO) tool cover -html coverage.txt

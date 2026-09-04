@@ -14,26 +14,28 @@ type RuleStrategy struct {
 	UnstablePeriod int
 }
 
-// ShouldEnter will return true when the index is less than the unstable period and the entry rule is satisfied
+// ShouldEnter returns true at or after UnstablePeriod when the position is new
+// and the entry rule is satisfied.
 func (rs RuleStrategy) ShouldEnter(index int, record *TradingRecord) bool {
 	if rs.EntryRule == nil {
 		panic("entry rule cannot be nil")
 	}
 
-	if index > rs.UnstablePeriod && record.CurrentPosition().IsNew() {
+	if index >= max(0, rs.UnstablePeriod) && record.CurrentPosition().IsNew() {
 		return rs.EntryRule.IsSatisfied(index, record)
 	}
 
 	return false
 }
 
-// ShouldExit will return true when the index is less than the unstable period and the exit rule is satisfied
+// ShouldExit returns true at or after UnstablePeriod when the position is open
+// and the exit rule is satisfied.
 func (rs RuleStrategy) ShouldExit(index int, record *TradingRecord) bool {
 	if rs.ExitRule == nil {
 		panic("exit rule cannot be nil")
 	}
 
-	if index > rs.UnstablePeriod && record.CurrentPosition().IsOpen() {
+	if index >= max(0, rs.UnstablePeriod) && record.CurrentPosition().IsOpen() {
 		return rs.ExitRule.IsSatisfied(index, record)
 	}
 

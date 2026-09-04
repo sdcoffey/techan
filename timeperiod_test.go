@@ -100,6 +100,28 @@ func TestParseTimePeriod(t *testing.T) {
 	})
 }
 
+func TestParseTimePeriodSeparators(t *testing.T) {
+	for _, start := range []string{"2020-01-01", "2020-01-01T12:00:00"} {
+		t.Run(start, func(t *testing.T) {
+			// A bare endpoint, with optional surrounding whitespace, remains
+			// valid and uses the current time as its end.
+			_, err := ParseTimePeriod(" \t" + start + "\n ")
+			require.NoError(t, err)
+			for _, separator := range []string{" -> ", ",", ":", ";", " -- ", "/", "."} {
+				t.Run(separator, func(t *testing.T) {
+					_, err := ParseTimePeriod(start + separator)
+					require.Error(t, err, "range separator needs an endpoint")
+					_, err = ParseTimePeriod(start + " -> 2020-01-02" + separator)
+					require.Error(t, err, "completed range must not have a dangling separator")
+					period, err := ParseTimePeriod(start + separator + "2020-01-02\n ")
+					require.NoError(t, err)
+					assert.Equal(t, time.Date(2020, 1, 2, 0, 0, 0, 0, time.UTC), period.End)
+				})
+			}
+		})
+	}
+}
+
 func TestParse(t *testing.T) {
 	t.Run("SimpleDT:SimpleDT", func(t *testing.T) {
 		parseable := "01/20/2009T12:00:00:01/20/2017T12:00:00"

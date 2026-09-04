@@ -16,18 +16,19 @@ type varianceIndicator struct {
 
 // Calculate returns the Variance for this indicator at the given index
 func (vi varianceIndicator) Calculate(index int) big.Decimal {
-	if index < 1 {
+	start := FirstValidIndex(vi.Indicator)
+	if index <= start {
 		return big.ZERO
 	}
 
-	avgIndicator := NewSimpleMovingAverage(vi.Indicator, index+1)
+	avgIndicator := NewSimpleMovingAverage(vi.Indicator, index-start+1)
 	avg := avgIndicator.Calculate(index)
 	variance := big.ZERO
 
-	for i := 0; i <= index; i++ {
+	for i := start; i <= index; i++ {
 		pow := vi.Indicator.Calculate(i).Sub(avg).Pow(2)
 		variance = variance.Add(pow)
 	}
 
-	return variance.Div(big.NewDecimal(float64(index + 1)))
+	return variance.Div(big.NewFromInt(index - start + 1))
 }

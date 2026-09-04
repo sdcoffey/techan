@@ -12,7 +12,9 @@ type relativeStrengthIndexIndicator struct {
 }
 
 // NewRelativeStrengthIndexIndicator returns a derivative Indicator which returns the relative strength index of the base indicator
-// in a given time frame. A more in-depth explanation of relative strength index can be found here:
+// in a given time frame. Wilder's initialization uses timeframe actual changes
+// (timeframe+1 prices), with zero returned during warm-up and for flat histories.
+// A more in-depth explanation of relative strength index can be found here:
 // https://www.investopedia.com/terms/r/rsi.asp
 func NewRelativeStrengthIndexIndicator(indicator Indicator, timeframe int) Indicator {
 	return relativeStrengthIndexIndicator{
@@ -30,7 +32,6 @@ func (rsi relativeStrengthIndexIndicator) Calculate(index int) big.Decimal {
 type relativeStrengthIndicator struct {
 	avgGain Indicator
 	avgLoss Indicator
-	window  int
 }
 
 // NewRelativeStrengthIndicator returns a derivative Indicator which returns the relative strength of the base indicator
@@ -40,12 +41,11 @@ func NewRelativeStrengthIndicator(indicator Indicator, timeframe int) Indicator 
 	return relativeStrengthIndicator{
 		avgGain: NewMMAIndicator(NewGainIndicator(indicator), timeframe),
 		avgLoss: NewMMAIndicator(NewLossIndicator(indicator), timeframe),
-		window:  timeframe,
 	}
 }
 
 func (rs relativeStrengthIndicator) Calculate(index int) big.Decimal {
-	if index < rs.window-1 {
+	if index < rs.FirstValidIndex() {
 		return big.ZERO
 	}
 
@@ -53,6 +53,9 @@ func (rs relativeStrengthIndicator) Calculate(index int) big.Decimal {
 	avgLoss := rs.avgLoss.Calculate(index)
 
 	if avgLoss.EQ(big.ZERO) {
+		if avgGain.EQ(big.ZERO) {
+			return big.ZERO
+		}
 		return big.NewDecimal(math.Inf(1))
 	}
 

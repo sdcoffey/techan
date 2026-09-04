@@ -10,11 +10,12 @@ type smaIndicator struct {
 // NewSimpleMovingAverage returns a derivative Indicator which returns the average of the current value and preceding
 // values in the given windowSize. It returns zero for indices before the first complete window.
 func NewSimpleMovingAverage(indicator Indicator, window int) Indicator {
+	requirePositiveWindow(window)
 	return smaIndicator{indicator, window}
 }
 
 func (sma smaIndicator) Calculate(index int) big.Decimal {
-	if index < sma.window-1 {
+	if index < sma.FirstValidIndex() {
 		return big.ZERO
 	}
 
@@ -27,3 +28,9 @@ func (sma smaIndicator) Calculate(index int) big.Decimal {
 
 	return result
 }
+
+func (sma smaIndicator) FirstValidIndex() int {
+	return FirstValidIndex(sma.indicator) + sma.window - 1
+}
+
+func (sma smaIndicator) dependencies() []Indicator { return []Indicator{sma.indicator} }
