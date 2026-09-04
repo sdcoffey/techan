@@ -29,8 +29,9 @@ var (
 )
 
 // ParseTimePeriod parses one or two UTC endpoints in YYYY-MM-DD or
-// YYYY-MM-DDTHH:MM:SS format, separated by whitespace or punctuation. An omitted
-// end uses the current time. Malformed or reversed ranges return errors.
+// YYYY-MM-DDTHH:MM:SS format, separated by whitespace or punctuation. A single
+// endpoint uses the current time as its end. Only whitespace may surround the
+// endpoints; dangling separators, malformed or reversed ranges return errors.
 //
 // Unlike the deprecated Parse function, dates use year-month-day ordering.
 func ParseTimePeriod(period string) (TimePeriod, error) {
@@ -62,7 +63,7 @@ func ParseTimePeriod(period string) (TimePeriod, error) {
 	return TimePeriod{Start: start, End: end}, nil
 }
 
-var timePeriodPattern = regexp.MustCompile(`^\s*(\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2})?)(?:[[:space:][:punct:]]+(\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2})?))?[[:space:][:punct:]]*$`)
+var timePeriodPattern = regexp.MustCompile(`^\s*(\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2})?)(?:[[:space:][:punct:]]+(\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2})?))?\s*$`)
 
 // Parse takes a string in one of the following formats and returns a new TimePeriod, and optionally, an error
 //

@@ -312,7 +312,7 @@ func TestRegressionParserValidation(t *testing.T) {
 }
 
 func FuzzParseTimePeriod(f *testing.F) {
-	for _, s := range []string{"", "garbage", "2020-01-01", "2020-01-01 -> 2020-01-02", "2020-01-01 2020-01-02 2020-01-03"} {
+	for _, s := range []string{"", "garbage", "2020-01-01", "2020-01-01 ->", "2020-01-01,", "2020-01-01 -> 2020-01-02", "2020-01-01 2020-01-02 2020-01-03"} {
 		f.Add(s)
 	}
 	f.Fuzz(func(t *testing.T, s string) {
